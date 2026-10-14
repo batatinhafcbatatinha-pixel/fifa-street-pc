@@ -1,0 +1,12 @@
+{
+ "0008D0A0": {
+  "lib": "game",
+  "name": "options_init",
+  "note": "Flash options screen init: context AUDIO/VIDEO/EATRAX -> index at 0x2BF3EC"
+ },
+ "000A2BB0": {
+  "lib": "game",
+  "name": "fe_load_screen_big",
+  "note": "cdecl (const char *screen): builds '<screen>.big' and loads that front-end screen"
+ }
+}

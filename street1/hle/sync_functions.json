@@ -1,0 +1,146 @@
+{
+ "00251BB0": {
+  "lib": "D3D8",
+  "conv": "thiscall",
+  "name": "CDevice_KickOff",
+  "args": [
+   {
+    "loc": "ecx",
+    "name": "this"
+   }
+  ],
+  "sites": 4
+ },
+ "00259D01": {
+  "lib": "D3D8",
+  "conv": "thiscall",
+  "name": "Miniport_RegisterBase",
+  "args": [
+   {
+    "loc": "ecx",
+    "name": "this"
+   }
+  ],
+  "native": "project/src/hle_device.c"
+ },
+ "00259D2C": {
+  "lib": "D3D8",
+  "conv": "thiscall",
+  "name": "Miniport_ReadConfig",
+  "args": [
+   {
+    "loc": "ecx",
+    "name": "this"
+   }
+  ],
+  "native": "project/src/hle_device.c"
+ },
+ "00259D6D": {
+  "lib": "D3D8",
+  "conv": "thiscall",
+  "name": "Miniport_InitClocksInstance",
+  "args": [
+   {
+    "loc": "ecx",
+    "name": "this"
+   }
+  ],
+  "native": "project/src/hle_device.c"
+ },
+ "00259DF0": {
+  "lib": "D3D8",
+  "conv": "thiscall",
+  "name": "Miniport_InitEngines",
+  "args": [
+   {
+    "loc": "ecx",
+    "name": "this"
+   }
+  ],
+  "native": "project/src/hle_device.c"
+ },
+ "00259EE2": {
+  "lib": "D3D8",
+  "conv": "thiscall",
+  "name": "Miniport_CreateDmaObject",
+  "args": [
+   {
+    "loc": "ecx",
+    "name": "this"
+   }
+  ],
+  "native": "project/src/hle_device.c"
+ },
+ "00259FB1": {
+  "lib": "D3D8",
+  "conv": "thiscall",
+  "name": "Miniport_CreateGrObject",
+  "args": [
+   {
+    "loc": "ecx",
+    "name": "this"
+   }
+  ],
+  "native": "project/src/hle_device.c"
+ },
+ "00259C6A": {
+  "lib": "D3D8",
+  "conv": "thiscall",
+  "name": "Miniport_CreateChannel",
+  "args": [
+   {
+    "loc": "ecx",
+    "name": "this"
+   }
+  ],
+  "native": "project/src/hle_device.c"
+ },
+ "00259CCD": {
+  "lib": "D3D8",
+  "conv": "thiscall",
+  "name": "Miniport_HashEntry",
+  "args": [
+   {
+    "loc": "ecx",
+    "name": "this"
+   }
+  ],
+  "native": "project/src/hle_device.c"
+ },
+ "00253AD0": {
+  "lib": "D3D8",
+  "conv": "thiscall",
+  "name": "CDevice_GpuBusy",
+  "args": [
+   {
+    "loc": "ecx",
+    "name": "this"
+   }
+  ],
+  "native": "project/src/hle_device.c"
+ },
+ "0025A356": {
+  "lib": "D3D8",
+  "conv": "thiscall",
+  "name": "Miniport_SetTileRegisters",
+  "args": [
+   {
+    "loc": "ecx",
+    "name": "this"
+   }
+  ],
+  "native": "project/src/hle_device.c"
+ },
+ "0025A544": {
+  "lib": "D3D8",
+  "conv": "thiscall",
+  "name": "Miniport_ClearTileRegisters",
+  "args": [
+   {
+    "loc": "ecx",
+    "name": "this"
+   }
+  ],
+  "native": "project/src/hle_device.c"
+ }
+}

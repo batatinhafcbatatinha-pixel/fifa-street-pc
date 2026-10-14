@@ -1,0 +1,425 @@
+{
+ "002660AB": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "IDirectSound_Release",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   }
+  ],
+  "sites": 1
+ },
+ "002660C1": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "IDirectSoundBuffer_Release",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   }
+  ],
+  "sites": 3
+ },
+ "00266CCF": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "IDirectSound_DownloadEffectsImage",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh",
+    "name": "pvImageBuffer"
+   },
+   {
+    "loc": "psh",
+    "name": "dwImageSize"
+   },
+   {
+    "loc": "psh",
+    "name": "pImageLoc"
+   },
+   {
+    "loc": "psh",
+    "name": "ppImageDesc"
+   }
+  ],
+  "sites": 2
+ },
+ "00266CF6": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "IDirectSound_SetEffectData",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh",
+    "name": "dwEffectIndex"
+   },
+   {
+    "loc": "psh",
+    "name": "dwOffset"
+   },
+   {
+    "loc": "psh",
+    "name": "pvData"
+   },
+   {
+    "loc": "psh",
+    "name": "dwDataSize"
+   },
+   {
+    "loc": "psh",
+    "name": "dwApply"
+   }
+  ],
+  "sites": 2
+ },
+ "00266D20": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "IDirectSound_SetMixBinHeadroom",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh",
+    "name": "dwMixBinMask"
+   },
+   {
+    "loc": "psh",
+    "name": "dwHeadroom"
+   }
+  ],
+  "sites": 8
+ },
+ "00266D40": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "IDirectSoundBuffer_SetEG",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh",
+    "name": "pEnvelopeDesc"
+   }
+  ],
+  "sites": 1
+ },
+ "00266D5C": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "IDirectSoundBuffer_SetFilter",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh",
+    "name": "pFilterDesc"
+   }
+  ],
+  "sites": 1
+ },
+ "00266D78": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "IDirectSoundBuffer_SetMixBinVolumes_8",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh",
+    "name": "pMixBins"
+   }
+  ],
+  "sites": 3
+ },
+ "00266D94": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "IDirectSoundBuffer_Play",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh",
+    "name": "dwReserved1"
+   },
+   {
+    "loc": "psh",
+    "name": "dwReserved2"
+   },
+   {
+    "loc": "psh",
+    "name": "dwFlags"
+   }
+  ],
+  "sites": 3
+ },
+ "00266DD0": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "IDirectSoundBuffer_StopEx",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh2",
+    "name": "rtTimeStamp"
+   },
+   {
+    "loc": "psh",
+    "name": "dwFlags"
+   }
+  ],
+  "sites": 2
+ },
+ "00266DF4": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "IDirectSoundBuffer_Pause",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh",
+    "name": "dwPause"
+   }
+  ],
+  "sites": 2
+ },
+ "00266E10": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "IDirectSoundBuffer_SetLoopRegion",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh",
+    "name": "dwLoopStart"
+   },
+   {
+    "loc": "psh",
+    "name": "dwLoopLength"
+   }
+  ],
+  "sites": 2
+ },
+ "00266E30": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "IDirectSoundBuffer_GetStatus",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh",
+    "name": "pdwStatus"
+   }
+  ],
+  "sites": 2
+ },
+ "00266E4C": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "IDirectSoundBuffer_GetCurrentPosition",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh",
+    "name": "pdwCurrentPlayCursor"
+   },
+   {
+    "loc": "psh",
+    "name": "pdwCurrentWriteCursor"
+   }
+  ],
+  "sites": 3
+ },
+ "00266E6C": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "IDirectSoundBuffer_SetCurrentPosition",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh",
+    "name": "dwNewPosition"
+   }
+  ],
+  "sites": 3
+ },
+ "00266E88": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "DirectSoundDoWork",
+  "args": [],
+  "sites": 1
+ },
+ "0026727A": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "IDirectSoundBuffer_SetFrequency",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh",
+    "name": "dwFrequency"
+   }
+  ],
+  "sites": 1
+ },
+ "00267296": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "IDirectSoundBuffer_SetMixBins",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh",
+    "name": "mixBins"
+   }
+  ],
+  "sites": 2
+ },
+ "002677C8": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "IDirectSoundBuffer_SetBufferData",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh",
+    "name": "pvBufferData"
+   },
+   {
+    "loc": "psh",
+    "name": "dwBufferBytes"
+   }
+  ],
+  "sites": 3
+ },
+ "00267D5E": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "IDirectSound_CreateSoundBuffer",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh",
+    "name": "pdsbd"
+   },
+   {
+    "loc": "psh",
+    "name": "ppBuffer"
+   },
+   {
+    "loc": "psh",
+    "name": "pUnused4"
+   }
+  ],
+  "sites": 1
+ },
+ "00267D82": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "IDirectSound_SetI3DL2Listener",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh",
+    "name": "pds3dl"
+   },
+   {
+    "loc": "psh",
+    "name": "dwApply"
+   }
+  ],
+  "sites": 1
+ },
+ "00267F48": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "DirectSoundCreate",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pguidDeviceId"
+   },
+   {
+    "loc": "psh",
+    "name": "ppDirectSound"
+   },
+   {
+    "loc": "psh",
+    "name": "pUnused3"
+   }
+  ],
+  "sites": 1
+ },
+ "00267F8F": {
+  "lib": "DSOUND",
+  "conv": "stdcall",
+  "name": "DirectSoundCreateBuffer",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pdsbd"
+   },
+   {
+    "loc": "psh",
+    "name": "ppBuffer"
+   }
+  ],
+  "sites": 1
+ }
+}

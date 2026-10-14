@@ -1,0 +1,49 @@
+name: Audit and package source kit
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Audit source publication and create ZIP
+        run: python tools/audit_publication.py --zip dist/fifa-street-pc-source-kit.zip
+      - name: Test extraction safeguards without a game
+        working-directory: street1/project/tools
+        run: python -m unittest -v test_fifa_setup
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: audit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python tools/audit_publication.py --zip dist/fifa-street-pc-source-kit.zip
+      - name: Publish source-only Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/fifa-street-pc-source-kit.zip \
+            --title "FIFA Street PC — $GITHUB_REF_NAME source kit" \
+            --notes-file RELEASE-NOTES.md

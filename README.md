@@ -1,0 +1,124 @@
+# FIFA Street (2005) — Native PC Port | No Emulated Xbox GPU in the Native Rendering Path
+
+An experimental original-Xbox FIFA Street port built through static recompilation, with native PC graphics and audio backends. **This public repository is a source and local-build kit, not a ready-to-play game download.** Game instructions are translated locally from your own verified USA disc. No game executable or generated game code is distributed here.
+
+## Features
+
+- Native PC execution of statically recompiled game code.
+- Native rendering through DirectX 11 or Vulkan (DXVK), selectable on Windows; Vulkan through DXVK native on Linux. The native rendering profile bypasses the emulated Xbox NV2A command processor.
+- Native audio: DirectSound reimplemented in C; the native audio profile bypasses the DSP interpreter.
+- Windows x64 and Linux x64 build paths.
+- Resolution presets from 720p to 8K, or your monitor's resolution. Performance depends on hardware, scene and build; 4K/60 is not a universal guarantee.
+- The game's own 16:9 widescreen mode; other display shapes use letterboxing. Additional aspect settings remain experimental.
+- In-game settings with **F1**: display mode, monitor, refresh rate, VSync, frame limit, resolution, aspect ratio, graphics API, GPU, game language (English / Spanish), FXAA, anisotropic filtering and volume.
+- Settings default to **English**, with Portuguese available through **Menu language**. The settings language is separate from game language.
+- Shader caching, specialized pixel shaders and native audio/frame-pacing improvements. Visual, audio, gameplay and save regressions may remain.
+
+The toolkit also retains compatibility models for Xbox kernel, memory, input and hardware, plus optional GPU/DSP implementations used for diagnostics. "Native graphics and audio" describes the selected execution path; it does not mean every Xbox compatibility component has been removed from the source tree.
+
+## Download or clone
+
+```sh
+git clone https://github.com/batatinhafcbatatinha-pixel/fifa-street-pc.git
+cd fifa-street-pc
+```
+
+Alternatively, download the **source-kit ZIP** from [Releases](https://github.com/batatinhafcbatatinha-pixel/fifa-street-pc/releases), or choose **Code → Download ZIP**. Extract the entire archive. These downloads contain source and tools only; they do not contain a precompiled game.
+
+The GitHub Actions workflow audits the publication allowlist, tests ISO extraction, and creates a source-kit ZIP on release tags. It never receives a ROM or builds translated game code. Standard hosted runners are [free for public repositories](https://docs.github.com/en/billing/concepts/product-billing/github-actions); the workflow uses a standard Ubuntu runner and publishes the ZIP as a release asset.
+
+## Your game files
+
+Only the **original Xbox USA revision** is currently accepted. Xbox 360 FIFA Street titles and the European executable are not supported. The tested European disc contains English/French/German resources, but has a different executable; changing discs does not unlock those languages in this build.
+
+Place your own extracted disc contents in this layout:
+
+```text
+fifa-street-pc/
+  game_files/
+    default.xbe
+    data/
+    ...other original disc files...
+```
+
+Required USA `default.xbe` SHA-256:
+
+```text
+f43dcca6fbd99e7a04dc94992443b368eefaa9d6bbc88432bf43b2d90e115ef1
+```
+
+If you have an original-Xbox XDVDFS ISO instead, inspect and extract it locally into a **new** directory:
+
+```sh
+python street1/project/tools/fifa_setup.py inspect --iso "/path/to/your-USA-disc.iso"
+python street1/project/tools/fifa_setup.py install --iso "/path/to/your-USA-disc.iso" --workspace ".local/disc" --extract-only
+```
+
+Use `.local/disc/game_files` instead of `game_files` in the build and launch commands below. Do not upload the ISO, extracted files, local analysis output, generated C, caches or compiled game executable to GitHub.
+
+## Build on Windows
+
+Install Python 3.10+ (with Tkinter), Visual Studio 2022 Build Tools with the C++ workload and Windows SDK, LLVM/Clang, CMake and Ninja. The scripts discover installed tools; they do not install system dependencies.
+
+From a terminal in the repository:
+
+```powershell
+python -m pip install -r requirements.txt
+python tools/build_local.py --game-files game_files
+python tools/play.py --game-files game_files
+```
+
+The first build disassembles your XBE, identifies functions, translates them into private C files, installs the native hooks and compiles the executable. It can take considerable time and memory. Build products and private game translations stay under `.local/`, which is excluded from version control.
+
+After a completed generation, `--reuse-generated` skips the translation phase when rebuilding native sources. If a build fails, keep the console output for diagnosis. This local reconstruction pipeline is experimental and should not be assumed identical to a previously tested private build.
+
+DirectX 11 is the default Windows backend. To enable Vulkan, obtain DXVK from its [official releases](https://github.com/doitsujin/dxvk/releases) and place the x64 `d3d11.dll` and `dxgi.dll` in `.local/build/vulkan/` before selecting Vulkan in settings. They are not bundled in this source kit. Windows N editions may need the Media Feature Pack for video playback.
+
+## Build on Linux
+
+Install Python 3.10+, Clang, CMake, Ninja, SDL2, SDL2_ttf, Vulkan drivers and development headers, DXVK native, and vkd3d-shader with HLSL compilation support. Get those dependencies from your distro or their upstream projects; prebuilt shared libraries are not bundled here.
+
+```sh
+python3 -m pip install -r requirements.txt
+python3 tools/build_local.py --game-files game_files \
+  --dxvk-native-dir /path/to/dxvk-native/usr \
+  --vkd3d-dir /path/to/vkd3d-install
+python3 tools/play.py --game-files game_files
+```
+
+The DXVK prefix must contain `include/dxvk` and `lib/libdxvk_d3d11.so`, `lib/libdxvk_dxgi.so` (including their `.so.0` files). The vkd3d prefix must contain the headers and `lib/libvkd3d-shader.so.1`. Mac support is not provided.
+
+## Controls
+
+Xbox-style controllers use the standard game controls. **F1** or **Back + Start** opens PC settings. **Alt + Enter** switches fullscreen.
+
+| Keyboard | Action |
+| --- | --- |
+| Arrows | D-pad |
+| Numpad 8 / 4 / 2 / 6 | Left stick |
+| I / J / K / L | Right stick |
+| Z / X / A / S | A / B / X / Y |
+| Q / E | White / Black |
+| 1 / 3 | Left / Right trigger |
+| Enter or Esc | Start |
+| Backspace | Back |
+
+Settings are saved in `fifastreet.ini` beside the locally built executable. Options marked with `*` require a restart. Logs go under `.local/logs/`.
+
+## Credits and licenses
+
+- Port integration and native backend work: [batatinhafcbatatinha-pixel](https://github.com/batatinhafcbatatinha-pixel).
+- [xboxrecomp](https://github.com/sp00nznet/xboxrecomp): **Ned Heller / sp00nz**, and the contributors listed in the preserved [CONTRIBUTORS.md](xboxrecomp/CONTRIBUTORS.md). This repository vendors a modified snapshot based on revision `193e2995ffaec871bb3be43a43bd66aa5fccfeb1`, with its original MIT license and notices.
+- [xemu](https://github.com/xemu-project/xemu): **espes, Jannik Vogel, Matt Borgerson** and contributors for the runtime components identified in [xboxrecomp/NOTICE](xboxrecomp/NOTICE). LGPL and GPL sources retain their original notices and license texts. DSP interpreter lineage also credits the **ARAnyM team** and **Thomas Huth / Hatari**; see [DSP provenance](xboxrecomp/src/apu/dsp/UPSTREAM.md).
+- [DXVK / DXVK native](https://github.com/doitsujin/dxvk): Philip Rebohle and contributors, zlib license. Optional external dependency; license reproduced in `licenses/`.
+- [vkd3d-shader](https://gitlab.winehq.org/wine/vkd3d): the Wine project and contributors, LGPL; optional Linux dependency.
+- [DejaVu fonts](https://dejavu-fonts.github.io/): DejaVu contributors and Bitstream; see the preserved font license. Optional system fonts on Linux.
+- [Capstone](https://www.capstone-engine.org/): Nguyen Anh Quynh and contributors; external local-build dependency with its own license.
+- Microsoft Visual C++ runtime and Windows SDK: Microsoft; obtained separately, not distributed in this repository.
+- FIFA Street, its game code, trademarks and assets belong to Electronic Arts and the respective rights holders. This project is not affiliated with or endorsed by EA or Microsoft.
+
+See [NOTICE.md](NOTICE.md) for the publication boundary and [LICENSE](LICENSE) for the license covering the port's own native source and tooling. Upstream components keep their original licenses; a root license does not relicense them or the game.
+
+---
+
+**⚠️ THIS PROJECT DOES NOT INCLUDE THE GAME, A ROM/ISO/XBE, EA GAME ASSETS, GENERATED GAME CODE OR A PRECOMPILED GAME EXECUTABLE. YOU MUST PROVIDE YOUR OWN LAWFULLY OBTAINED ORIGINAL-XBOX USA GAME FILES AND HAVE THE RIGHTS REQUIRED FOR YOUR USE. THIS PROJECT DOES NOT AUTHORIZE COPYRIGHT INFRINGEMENT. ALL GAME RIGHTS BELONG TO THEIR RESPECTIVE OWNERS. ⚠️**

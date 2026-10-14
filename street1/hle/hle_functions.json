@@ -1,0 +1,1540 @@
+{
+ "00250050": {
+  "lib": "D3D8",
+  "conv": "fastcall",
+  "name": "D3DDevice_SetRenderState_Simple",
+  "args": [
+   {
+    "loc": "ecx",
+    "name": "Method"
+   },
+   {
+    "loc": "edx",
+    "name": "Value"
+   }
+  ],
+  "sites": 71
+ },
+ "00257E40": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DResource_BlockUntilNotBusy",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   }
+  ],
+  "sites": 20
+ },
+ "00257CA0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DResource_Release",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   }
+  ],
+  "sites": 20
+ },
+ "00253800": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetTexture",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Stage"
+   },
+   {
+    "loc": "psh",
+    "name": "pTexture"
+   }
+  ],
+  "sites": 14
+ },
+ "00257E10": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DResource_Register",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh",
+    "name": "pBase"
+   }
+  ],
+  "sites": 9
+ },
+ "00254CE0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetStreamSource",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "StreamNumber"
+   },
+   {
+    "loc": "psh",
+    "name": "pStreamData"
+   },
+   {
+    "loc": "psh",
+    "name": "Stride"
+   }
+  ],
+  "sites": 9
+ },
+ "002539B0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetPalette",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Stage"
+   },
+   {
+    "loc": "psh",
+    "name": "pPalette"
+   }
+  ],
+  "sites": 9
+ },
+ "0025A8F0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DSurface_GetDesc",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh",
+    "name": "pDesc"
+   }
+  ],
+  "sites": 9
+ },
+ "0025CD70": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetVertexData2f",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Register"
+   },
+   {
+    "loc": "psh",
+    "name": "a"
+   },
+   {
+    "loc": "psh",
+    "name": "b"
+   }
+  ],
+  "sites": 8
+ },
+ "0025CDB0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetVertexData4f",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Register"
+   },
+   {
+    "loc": "psh",
+    "name": "a"
+   },
+   {
+    "loc": "psh",
+    "name": "b"
+   },
+   {
+    "loc": "psh",
+    "name": "c"
+   },
+   {
+    "loc": "psh",
+    "name": "d"
+   }
+  ],
+  "sites": 8
+ },
+ "002503D0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_FogColor",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 7
+ },
+ "00251330": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_StencilEnable",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 7
+ },
+ "00251440": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_YuvEnable",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 7
+ },
+ "002513D0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_StencilFail",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 6
+ },
+ "00250420": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_CullMode",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 6
+ },
+ "00250390": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_ShadowFunc",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 6
+ },
+ "00251470": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_OcclusionCullEnable",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 6
+ },
+ "00251550": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_RopZCmpAlwaysRead",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 6
+ },
+ "00251570": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_RopZRead",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 6
+ },
+ "00251BA0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_EndPush",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pPush"
+   }
+  ],
+  "sites": 5
+ },
+ "00250740": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_FillMode",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 5
+ },
+ "002512A0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_ZEnable",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 5
+ },
+ "00251610": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_MultiSampleAntiAlias",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 5
+ },
+ "002509D0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetTextureState_BumpEnv",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Stage"
+   },
+   {
+    "loc": "psh",
+    "name": "Type"
+   },
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 5
+ },
+ "00254E70": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetShaderConstantMode",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Mode"
+   }
+  ],
+  "sites": 5
+ },
+ "0025DEC0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetPixelShader",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Handle"
+   }
+  ],
+  "sites": 5
+ },
+ "002550E0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetVertexShader",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Handle"
+   }
+  ],
+  "sites": 5
+ },
+ "00253230": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_GetBackBuffer2",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "BackBuffer"
+   }
+  ],
+  "sites": 5
+ },
+ "00251B80": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_BeginPush_4",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Count"
+   }
+  ],
+  "sites": 4
+ },
+ "00250020": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_PSTextureModes",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 4
+ },
+ "00250870": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_VertexBlend",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 4
+ },
+ "00250790": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_BackFillMode",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 4
+ },
+ "002507F0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_TwoSidedLighting",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 4
+ },
+ "002504D0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_NormalizeNormals",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 4
+ },
+ "00250490": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_FrontFace",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 4
+ },
+ "00250510": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_TextureFactor",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 4
+ },
+ "00250660": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_ZBias",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 4
+ },
+ "002506E0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_LogicOp",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 4
+ },
+ "00250350": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_EdgeAntiAlias",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 4
+ },
+ "00251690": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_MultiSampleMask",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 4
+ },
+ "002515B0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_MultiSampleMode",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 4
+ },
+ "002515E0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_MultiSampleRenderTargetMode",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 4
+ },
+ "00250570": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_LineWidth",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 4
+ },
+ "002516E0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_SampleAlpha",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 4
+ },
+ "002505E0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_Dxt1NoiseEnable",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 4
+ },
+ "002514E0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_StencilCullEnable",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 4
+ },
+ "00251590": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderState_DoNotCullUncompressed",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 4
+ },
+ "00253D10": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetTile",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Index"
+   },
+   {
+    "loc": "psh",
+    "name": "pTile"
+   }
+  ],
+  "sites": 4
+ },
+ "00257FD0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_CreateVertexBuffer2",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Length"
+   }
+  ],
+  "sites": 4
+ },
+ "00252FB0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetRenderTarget",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pRenderTarget"
+   },
+   {
+    "loc": "psh",
+    "name": "pNewZStencil"
+   }
+  ],
+  "sites": 3
+ },
+ "002540A0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_PersistDisplay",
+  "args": [],
+  "sites": 3
+ },
+ "00252F00": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_Reset",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pPresentationParameters"
+   }
+  ],
+  "sites": 3
+ },
+ "00252E00": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_InsertFence",
+  "args": [],
+  "sites": 3
+ },
+ "00252C20": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_BlockOnFence",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Fence"
+   }
+  ],
+  "sites": 3
+ },
+ "00257D80": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DResource_IsBusy",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   }
+  ],
+  "sites": 3
+ },
+ "0025D000": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DTexture_GetLevelDesc",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh",
+    "name": "Level"
+   },
+   {
+    "loc": "psh",
+    "name": "pDesc"
+   }
+  ],
+  "sites": 2
+ },
+ "0025CF50": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_CreateTexture2",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Width"
+   },
+   {
+    "loc": "psh",
+    "name": "Height"
+   },
+   {
+    "loc": "psh",
+    "name": "Depth"
+   },
+   {
+    "loc": "psh",
+    "name": "Levels"
+   },
+   {
+    "loc": "psh",
+    "name": "Usage"
+   },
+   {
+    "loc": "psh",
+    "name": "Format"
+   },
+   {
+    "loc": "psh",
+    "name": "D3DResource"
+   }
+  ],
+  "sites": 2
+ },
+ "00258D70": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_Clear",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Count"
+   },
+   {
+    "loc": "psh",
+    "name": "pRects"
+   },
+   {
+    "loc": "psh",
+    "name": "Flags"
+   },
+   {
+    "loc": "psh",
+    "name": "Color"
+   },
+   {
+    "loc": "psh",
+    "name": "Z"
+   },
+   {
+    "loc": "psh",
+    "name": "Stencil"
+   }
+  ],
+  "sites": 2
+ },
+ "0025D010": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DTexture_GetSurfaceLevel2",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh",
+    "name": "Level"
+   }
+  ],
+  "sites": 2
+ },
+ "0025DB90": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_Swap",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Flags"
+   }
+  ],
+  "sites": 2
+ },
+ "002541D0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetScreenSpaceOffset",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "x"
+   },
+   {
+    "loc": "psh",
+    "name": "y"
+   }
+  ],
+  "sites": 2
+ },
+ "0025DC80": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetBackBufferScale",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "x"
+   },
+   {
+    "loc": "psh",
+    "name": "y"
+   }
+  ],
+  "sites": 2
+ },
+ "00252D10": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_GetTile",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Index"
+   },
+   {
+    "loc": "psh",
+    "name": "pTile"
+   }
+  ],
+  "sites": 2
+ },
+ "00252A30": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetGammaRamp",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "dwFlags"
+   },
+   {
+    "loc": "psh",
+    "name": "pRamp"
+   }
+  ],
+  "sites": 2
+ },
+ "0025A910": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DSurface_LockRect",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pThis"
+   },
+   {
+    "loc": "psh",
+    "name": "pLockedRect"
+   },
+   {
+    "loc": "psh",
+    "name": "pRect"
+   },
+   {
+    "loc": "psh",
+    "name": "Flags"
+   }
+  ],
+  "sites": 2
+ },
+ "0025CE60": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_Begin",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "PrimitiveType"
+   }
+  ],
+  "sites": 2
+ },
+ "0025CE10": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetVertexDataColor",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Register"
+   },
+   {
+    "loc": "psh",
+    "name": "Color"
+   }
+  ],
+  "sites": 2
+ },
+ "00258020": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DVertexBuffer_Lock2",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pVertexBuffer"
+   },
+   {
+    "loc": "psh",
+    "name": "Flags"
+   }
+  ],
+  "sites": 2
+ },
+ "0025B070": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_RunPushBuffer",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pPushBuffer"
+   },
+   {
+    "loc": "psh",
+    "name": "pFixup"
+   }
+  ],
+  "sites": 2
+ },
+ "00254CA0": {
+  "lib": "D3D8",
+  "conv": "fastcall",
+  "name": "D3DDevice_SetVertexShaderConstantNotInline",
+  "args": [
+   {
+    "loc": "ecx",
+    "name": "Register"
+   },
+   {
+    "loc": "edx",
+    "name": "pConstantData"
+   },
+   {
+    "loc": "psh",
+    "name": "ConstantCount"
+   }
+  ],
+  "sites": 2
+ },
+ "0025CB10": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_DrawIndexedVertices",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "PrimitiveType"
+   },
+   {
+    "loc": "psh",
+    "name": "VertexCount"
+   },
+   {
+    "loc": "psh",
+    "name": "pIndexData"
+   }
+  ],
+  "sites": 2
+ },
+ "0025CEF0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3D_AllocContiguousMemory",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "dwSize"
+   },
+   {
+    "loc": "psh",
+    "name": "dwAllocAttributes"
+   }
+  ],
+  "sites": 1
+ },
+ "0025CF30": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3D_FreeContiguousMemory",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pMemory"
+   }
+  ],
+  "sites": 1
+ },
+ "002508C0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetTextureState_TexCoordIndex",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Stage"
+   },
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 1
+ },
+ "00250A40": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetTextureState_BorderColor",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Stage"
+   },
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 1
+ },
+ "00250A80": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetTextureState_ColorKeyColor",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Stage"
+   },
+   {
+    "loc": "psh",
+    "name": "Value"
+   }
+  ],
+  "sites": 1
+ },
+ "0025A860": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_CreateImageSurface",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Width"
+   },
+   {
+    "loc": "psh",
+    "name": "Height"
+   },
+   {
+    "loc": "psh",
+    "name": "Usage"
+   },
+   {
+    "loc": "psh",
+    "name": "Format"
+   }
+  ],
+  "sites": 1
+ },
+ "002535D0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetViewport",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pViewport"
+   }
+  ],
+  "sites": 1
+ },
+ "0025D060": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3D_SetPushBufferSize",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "PushBufferSize"
+   },
+   {
+    "loc": "psh",
+    "name": "KickOffSize"
+   }
+  ],
+  "sites": 1
+ },
+ "0025D080": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "Direct3D_CreateDevice",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Adapter"
+   },
+   {
+    "loc": "psh",
+    "name": "DeviceType"
+   },
+   {
+    "loc": "psh",
+    "name": "hFocusWindow"
+   },
+   {
+    "loc": "psh",
+    "name": "BehaviorFlags"
+   },
+   {
+    "loc": "psh",
+    "name": "pPresentationParameters"
+   },
+   {
+    "loc": "psh",
+    "name": "ppReturnedDeviceInterface"
+   }
+  ],
+  "sites": 1
+ },
+ "00252AC0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_GetGammaRamp",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pRamp"
+   }
+  ],
+  "sites": 1
+ },
+ "002535B0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_GetDepthStencilSurface2",
+  "args": [],
+  "sites": 1
+ },
+ "00252CC0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetSwapCallback",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pCallback"
+   }
+  ],
+  "sites": 1
+ },
+ "00252DA0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetSoftDisplayFilter",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Enable"
+   }
+  ],
+  "sites": 1
+ },
+ "00252D50": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetFlickerFilter",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Filter"
+   }
+  ],
+  "sites": 1
+ },
+ "00253B00": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_BeginVisibilityTest",
+  "args": [],
+  "sites": 1
+ },
+ "00253BA0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_EndVisibilityTest",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Index"
+   }
+  ],
+  "sites": 1
+ },
+ "00252C30": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_GetVisibilityTestResult",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Index"
+   },
+   {
+    "loc": "psh",
+    "name": "pResult"
+   },
+   {
+    "loc": "psh",
+    "name": "pTimeStamp"
+   }
+  ],
+  "sites": 1
+ },
+ "00252CA0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetVerticalBlankCallback",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pCallback"
+   }
+  ],
+  "sites": 1
+ },
+ "00251B10": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_InsertCallback",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Type"
+   },
+   {
+    "loc": "psh",
+    "name": "pCallback"
+   },
+   {
+    "loc": "psh",
+    "name": "Context"
+   }
+  ],
+  "sites": 1
+ },
+ "00251AF0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_IsFencePending",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Fence"
+   }
+  ],
+  "sites": 1
+ },
+ "00253280": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_CopyRects",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pSourceSurface"
+   },
+   {
+    "loc": "psh",
+    "name": "pSourceRectsArray"
+   },
+   {
+    "loc": "psh",
+    "name": "cRects"
+   },
+   {
+    "loc": "psh",
+    "name": "pDestinationSurface"
+   },
+   {
+    "loc": "psh",
+    "name": "pDestPointsArray"
+   }
+  ],
+  "sites": 1
+ },
+ "00253C00": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_FlushVertexCache",
+  "args": [],
+  "sites": 1
+ },
+ "0025E390": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3D_ReturnTrue_25E390",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Unused"
+   }
+  ],
+  "sites": 1
+ },
+ "00257F90": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_CreateIndexBuffer2",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Length"
+   }
+  ],
+  "sites": 1
+ },
+ "00254970": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_CreateVertexShader",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pDeclaration"
+   },
+   {
+    "loc": "psh",
+    "name": "pFunction"
+   },
+   {
+    "loc": "psh",
+    "name": "pHandle"
+   },
+   {
+    "loc": "psh",
+    "name": "Usage"
+   }
+  ],
+  "sites": 1
+ },
+ "00254FD0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_DeleteVertexShader",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Handle"
+   }
+  ],
+  "sites": 1
+ },
+ "0025DE50": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_CreatePixelShader",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pPSDef"
+   },
+   {
+    "loc": "psh",
+    "name": "pHandle"
+   }
+  ],
+  "sites": 1
+ },
+ "0025DEA0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_DeletePixelShader",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Handle"
+   }
+  ],
+  "sites": 1
+ },
+ "00254AB0": {
+  "lib": "D3D8",
+  "conv": "fastcall",
+  "name": "D3DDevice_SetVertexShaderConstant1",
+  "args": [
+   {
+    "loc": "ecx",
+    "name": "Register"
+   },
+   {
+    "loc": "edx",
+    "name": "pConstantData"
+   }
+  ],
+  "sites": 1
+ },
+ "00254B10": {
+  "lib": "D3D8",
+  "conv": "fastcall",
+  "name": "D3DDevice_SetVertexShaderConstant4",
+  "args": [
+   {
+    "loc": "ecx",
+    "name": "Register"
+   },
+   {
+    "loc": "edx",
+    "name": "pConstantData"
+   }
+  ],
+  "sites": 1
+ },
+ "00253A40": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetIndices",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "pIndexData"
+   },
+   {
+    "loc": "psh",
+    "name": "BaseVertexIndex"
+   }
+  ],
+  "sites": 1
+ },
+ "0025E0C0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_SetPixelShaderConstant",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "Register"
+   },
+   {
+    "loc": "psh",
+    "name": "pConstantData"
+   },
+   {
+    "loc": "psh",
+    "name": "ConstantCount"
+   }
+  ],
+  "sites": 1
+ },
+ "0025CA70": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_DrawVertices",
+  "args": [
+   {
+    "loc": "psh",
+    "name": "PrimitiveType"
+   },
+   {
+    "loc": "psh",
+    "name": "StartVertex"
+   },
+   {
+    "loc": "psh",
+    "name": "VertexCount"
+   }
+  ],
+  "sites": 1
+ },
+ "0025CEA0": {
+  "lib": "D3D8",
+  "conv": "stdcall",
+  "name": "D3DDevice_End",
+  "args": [],
+  "sites": 2
+ }
+}
