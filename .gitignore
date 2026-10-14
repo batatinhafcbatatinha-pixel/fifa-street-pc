@@ -4,6 +4,7 @@ dist/
 game_files/
 **/game_files/
 **/src/recomp/gen/
+**/output/
 **/__pycache__/
 *.pyc
 *.iso
