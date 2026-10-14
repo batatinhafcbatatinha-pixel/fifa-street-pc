@@ -26,18 +26,24 @@ hooks_path = here / 'game_hooks.json'
 if hooks_path.exists():
     table.update(json.loads(hooks_path.read_text(encoding='utf-8')))
 addrs = sorted(int(a, 16) for a in table)
+address_set = set(addrs)
+definition = re.compile(r'^void sub_([0-9A-F]{8})(_gen)?\(void\)(?=[ \t]*(?:\r?$|\{))', re.M)
 
 renamed = 0
 found = set()
 for path in sorted(gen.glob('recomp_00*.c')):
     original = path.read_text(encoding='utf-8')
     text = original
-    for a in addrs:
-        name = f'sub_{a:08X}'
-        text, n = re.subn(rf'^void {name}\(void\)(\s*\{{|\s*$)', rf'void {name}_gen(void)\1', text, flags=re.M)
-        if n or re.search(rf'^void {name}_gen\(void\)', text, flags=re.M):
-            found.add(a)
-        renamed += n
+    def route(match):
+        global renamed
+        a = int(match[1], 16)
+        if a not in address_set:
+            return match[0]
+        found.add(a)
+        if not match[2]:
+            renamed += 1
+        return f'void sub_{a:08X}_gen(void)'
+    text = definition.sub(route, text)
     if text != original:
         path.write_text(text, encoding='utf-8', newline='\n')
 
