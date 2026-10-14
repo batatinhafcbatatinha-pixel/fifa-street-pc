@@ -52,6 +52,7 @@ def generate(xbe, local, env):
         raise ValueError(f'Expected 6 interrupt acknowledgement sites, found {count}; refusing an unverified build')
     run([sys.executable, private_street / 'translate-ebp-boundaries.py', '--apply'], ROOT, env)
     run([sys.executable, private_street / 'hle/apply-hle-wrappers.py'], ROOT, env)
+    (local / 'generation-complete.json').write_text(json.dumps({'xbeSha256': SETUP.XBE_SHA256}) + '\n', encoding='utf-8')
     return private_street / 'project'
 
 def main():
@@ -69,6 +70,8 @@ def main():
         raise ValueError('Unsupported game: only the verified original-Xbox USA executable is accepted')
     local = args.local_dir.resolve()
     local.mkdir(parents=True, exist_ok=True)
+    if args.reuse_generated and not (local / 'generation-complete.json').is_file():
+        raise ValueError('Generation has not finished in this directory; do not reuse incomplete output')
     env = SETUP.developer_environment() if os.name == 'nt' and not args.generate_only else os.environ.copy()
     project = local / 'source/street1/project' if args.reuse_generated else generate(xbe, local, env)
     if not (project / 'src/recomp/gen/recomp_funcs.h').is_file():
