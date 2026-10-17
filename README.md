@@ -1,12 +1,15 @@
-# FIFA Street (2005) — Native PC Port | No Emulated Xbox GPU in the Native Rendering Path
+# FIFA Street (2005) — Native PC Port | No Emulated Xbox Hardware
 
 An experimental original-Xbox FIFA Street port built through static recompilation, with native PC graphics and audio backends. **This public repository is a source and local-build kit, not a ready-to-play game download.** Game instructions are translated locally from your own verified USA disc. No game executable or generated game code is distributed here.
 
 ## Features
 
 - Native PC execution of statically recompiled game code.
-- Native rendering through DirectX 11 or Vulkan (DXVK), selectable on Windows; Vulkan through DXVK native on Linux. The native rendering profile bypasses the emulated Xbox NV2A command processor.
-- Native audio: DirectSound reimplemented in C; the native audio profile bypasses the DSP interpreter.
+- Hardware-free by default (`RECOMP_NO_HW=1` in every launcher): no model of the NV2A GPU, MCPX APU/DSP, AC97, USB/OHCI or flash is started. Their address ranges are only reserved, and any access is logged as `[NO-HW]` (expected count: 0).
+- Native rendering: Direct3D 8 reimplemented in C on DirectX 11 or Vulkan (DXVK), selectable on Windows; Vulkan through DXVK native on Linux.
+- Native audio: DirectSound reimplemented in C with its own mixer, output through XAudio2 (Windows) or SDL2 (Linux).
+- Native controllers: the XInput API reimplemented in C on host pads (XInput/SDL) and the keyboard; no USB stack.
+- Game threads run in parallel on the host CPU, with heap and stream code serialized (`RECOMP_GUEST_SMP=1`).
 - Windows x64 and Linux x64 build paths.
 - Resolution presets from 720p to 8K, or your monitor's resolution. Performance depends on hardware, scene and build; 4K/60 is not a universal guarantee.
 - The game's own 16:9 widescreen mode; other display shapes use letterboxing. Additional aspect settings remain experimental.
@@ -14,7 +17,7 @@ An experimental original-Xbox FIFA Street port built through static recompilatio
 - Settings default to **English**, with Portuguese available through **Menu language**. The settings language is separate from game language.
 - Shader caching, specialized pixel shaders and native audio/frame-pacing improvements. Visual, audio, gameplay and save regressions may remain.
 
-The toolkit also retains compatibility models for Xbox kernel, memory, input and hardware, plus optional GPU/DSP implementations used for diagnostics. "Native graphics and audio" describes the selected execution path; it does not mean every Xbox compatibility component has been removed from the source tree.
+The source tree still contains the older Xbox hardware models (NV2A, APU/DSP, OHCI) used for diagnostics and comparison; the default launch profile does not start any of them. The Xbox kernel and memory layout remain as compatibility layers. The Linux build has been tested under WSL2 (software Vulkan); real Linux GPUs, physical controllers and exclusive fullscreen there are untested.
 
 ## Download or clone
 

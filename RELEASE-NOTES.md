@@ -1,6 +1,6 @@
 Experimental native PC port source kit for FIFA Street (2005, original Xbox USA).
 
-Includes native graphics/audio integration, settings in English and Portuguese, the modified xboxrecomp toolkit, third-party notices, and tools to generate and build privately from your own supported USA game files.
+Includes the hardware-free native profile (Direct3D 8, DirectSound and XInput reimplemented in C; no emulated NV2A, APU/DSP, AC97, USB or flash), settings in English and Portuguese, the modified xboxrecomp toolkit, third-party notices, and tools to generate and build privately from your own supported USA game files.
 
 **This ZIP contains source and tooling only. It is not a ready-to-play game or precompiled port.** No ISO, XBE, EA game resources, translated game source or compiled game executable is included. Read README.md for requirements and build instructions. The European executable is not supported.
 

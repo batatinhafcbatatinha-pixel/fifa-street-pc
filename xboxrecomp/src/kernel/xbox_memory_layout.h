@@ -128,6 +128,16 @@ void xbox_SetTotalRam(size_t bytes);
  */
 BOOL xbox_MemoryLayoutInit(const void *xbe_data, size_t xbe_size);
 
+/* Hardware-free mode: the NV2A, MCPX and flash apertures are reserved with
+ * no access and no device model or register thread is started. Set before
+ * xbox_MemoryLayoutInit() (or RECOMP_NO_HW=1). xbox_HardwareGuardFault()
+ * is for the access-violation handler; xbox_HardwareAccessCount() is how
+ * many such accesses happened (0 = the run never touched hardware). */
+void xbox_SetNoHardware(int on);
+int xbox_no_hardware(void);
+int xbox_HardwareGuardFault(uint32_t va, uintptr_t rip, int write);
+long xbox_HardwareAccessCount(void);
+
 /**
  * Release the reserved Xbox memory layout.
  */

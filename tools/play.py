@@ -18,11 +18,10 @@ def main():
     if not executable.is_file():
         parser.error('Build locally with tools/build_local.py first')
     env = {k: v for k, v in os.environ.items() if not k.startswith('RECOMP_')}
-    for name in ('PB_EXEC', 'VBLANK', 'USB', 'DSP', 'AC97_READY', 'TITLE_KEVENTS',
-                 'GUEST_LOCK', 'HLE_PRIMARY', 'HLE_NOGPU', 'KEYBOARD', 'AUDIO_NATIVE', 'DS_NATIVE'):
+    # 100% native: no model of any console device (NV2A, APU/DSP, AC97, USB, flash).
+    for name in ('NO_HW', 'HLE_PRIMARY', 'HLE_NOGPU', 'DS_NATIVE', 'INPUT_NATIVE', 'VBLANK',
+                 'TITLE_KEVENTS', 'GUEST_LOCK', 'GUEST_SMP', 'KEYBOARD'):
         env['RECOMP_' + name] = '1'
-    if os.name == 'nt':
-        env['RECOMP_GPU'] = 'd3d11'
     env.setdefault('DXVK_LOG_LEVEL', 'none')
     logs = local / 'logs'
     logs.mkdir(parents=True, exist_ok=True)

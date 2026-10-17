@@ -9,10 +9,10 @@
 #include <wchar.h>
 
 static const char *const k_env[][2] = {
-    { "RECOMP_PB_EXEC", "1" },      { "RECOMP_VBLANK", "1" },       { "RECOMP_USB", "1" },
-    { "RECOMP_DSP", "1" },          { "RECOMP_AUDIO_NATIVE", "1" }, { "RECOMP_DS_NATIVE", "1" },
-    { "RECOMP_AC97_READY", "1" },   { "RECOMP_TITLE_KEVENTS", "1" },{ "RECOMP_GUEST_LOCK", "1" },
-    { "RECOMP_GPU", "d3d11" },      { "RECOMP_HLE_PRIMARY", "1" },  { "RECOMP_HLE_NOGPU", "1" },
+    /* 100% native: no model of any console device (NV2A, APU/DSP, AC97, USB, flash). */
+    { "RECOMP_NO_HW", "1" },        { "RECOMP_HLE_PRIMARY", "1" },  { "RECOMP_HLE_NOGPU", "1" },
+    { "RECOMP_DS_NATIVE", "1" },    { "RECOMP_INPUT_NATIVE", "1" }, { "RECOMP_VBLANK", "1" },
+    { "RECOMP_TITLE_KEVENTS", "1" },{ "RECOMP_GUEST_LOCK", "1" },   { "RECOMP_GUEST_SMP", "1" },
     { "RECOMP_KEYBOARD", "1" },
 };
 

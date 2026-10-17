@@ -45,6 +45,7 @@ static int                     g_xa2_frames_written = 0;
 static int                     g_xa2_size[XA2_NUM_BUFS];
 static float                   g_xa2_avg = XA2_TARGET, g_xa2_ratio = 1.0f;
 static unsigned                g_xa2_underruns, g_xa2_drops, g_xa2_submits;
+static float                   g_xa2_volume = -1.0f;   /* asked before the voice existed */
 
 int xa2_init(void)
 {
@@ -97,6 +98,8 @@ int xa2_init(void)
     g_xa2_next_buf = 0;
     g_xa2_initialized = 1;
     g_xa2_frames_written = 0;
+    if (g_xa2_volume >= 0.0f)
+        IXAudio2MasteringVoice_SetVolume(g_xa2_master, g_xa2_volume, XAUDIO2_COMMIT_NOW);
 
     fprintf(stderr, "[XA2] XAudio2 initialized (%d Hz stereo 16-bit, %d x %d-sample buffers)\n",
             XA2_SAMPLE_RATE, XA2_NUM_BUFS, XA2_BUF_SAMPLES);
@@ -212,6 +215,7 @@ int xa2_get_buffer_size(void)
  * and the silence while the options pause the game. */
 void xa2_set_volume(float volume)
 {
+    g_xa2_volume = volume;
     if (g_xa2_master)
         IXAudio2MasteringVoice_SetVolume(g_xa2_master, volume, XAUDIO2_COMMIT_NOW);
 }
@@ -226,6 +230,7 @@ void xa2_set_volume(float volume)
 
 #define SDL_RATE    48000
 #define SDL_TARGET  2048
+#define SDL_HOLD    3072                     /* deeper than this: wait for the device */
 #define SDL_MAX     8192
 #define SDL_RING    16384                    /* stereo frames, power of two */
 
@@ -309,7 +314,21 @@ int xa2_submit_samples(const int16_t *samples, int num_samples)
     float ratio;
     if (!s_dev || num_samples <= 0)
         return 0;
-    SDL_LockAudioDevice(s_dev);
+    /* A device clock slower than the nudge can follow (WSLg's PulseAudio runs
+     * ~1% under 48 kHz) would fill the ring until blocks drop: instead the
+     * producer waits for the device, so the mixer follows the device clock. */
+    for (i = 0; i < 100; i++) {
+        SDL_LockAudioDevice(s_dev);
+        w = s_w;
+        r = (uint64_t)s_r;
+        queued = (int)(w > r ? w - r : 0);
+        if (queued <= SDL_HOLD)
+            break;
+        SDL_UnlockAudioDevice(s_dev);
+        SDL_Delay(1);
+    }
+    if (i == 100)
+        SDL_LockAudioDevice(s_dev);
     w = s_w;
     r = (uint64_t)s_r;
     queued = (int)(w > r ? w - r : 0);

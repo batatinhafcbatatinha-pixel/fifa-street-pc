@@ -467,9 +467,17 @@ struct bridge_thread_start {
 
 static void bridge_write_handle(uint32_t handle_va, HANDLE h);
 
+int guest_cpu_body_begin(void);
+void guest_cpu_body_end(int saved);
+
+/* XAPI's frameless thread trampoline (FIFA Street 0x0015CED9). A title whose
+ * XAPI sits elsewhere sets its own address before the entry point runs. */
+uint32_t g_xapi_thread_trampoline = 0x0015CED9u;
+
 static void bridge_run_thread_inline(recomp_func_t fn, uint32_t ctx1,
                                      uint32_t ctx2)
 {
+    int body;
     int cpu_token = guest_cpu_callback_enter();
     g_esp -= 4; BRIDGE_MEM32(g_esp) = ctx2;
     g_esp -= 4; BRIDGE_MEM32(g_esp) = ctx1;
@@ -481,19 +489,23 @@ static void bridge_run_thread_inline(recomp_func_t fn, uint32_t ctx1,
      * and ctx2, matching a real call instruction. */
     g_ebp = g_esp - 4;
     g_seh_ebp = g_ebp;
+    body = guest_cpu_body_begin();      /* RECOMP_GUEST_SMP: runs unpinned */
     fn();
+    guest_cpu_body_end(body);
     g_esp += 12;
     guest_cpu_callback_leave(cpu_token);
 }
 
 static void bridge_run_thread_callback(recomp_func_t fn, uint32_t arg)
 {
-    int cpu_token = guest_cpu_callback_enter();
+    int cpu_token = guest_cpu_callback_enter(), body;
     g_esp -= 4; BRIDGE_MEM32(g_esp) = arg;
     g_esp -= 4; BRIDGE_MEM32(g_esp) = 0;
     g_ebp = g_esp;
     g_seh_ebp = g_ebp;
+    body = guest_cpu_body_begin();
     fn();
+    guest_cpu_body_end(body);
     g_esp += 8;
     guest_cpu_callback_leave(cpu_token);
 }
@@ -615,7 +627,7 @@ static void bridge_PsCreateSystemThreadEx(void)
              * leaves its frameless EBP-based argument access ambiguous across
              * host threads. Resolve the trampoline here and invoke the callback
              * with the native one-argument thread ABI. */
-            if (start_routine == 0x0015CED9u && start_context1) {
+            if (start_routine == g_xapi_thread_trampoline && start_context1) {
                 recomp_func_t callback = recomp_lookup(start_context1);
                 if (!callback) callback = recomp_lookup_manual(start_context1);
                 if (callback) {
@@ -630,11 +642,13 @@ static void bridge_PsCreateSystemThreadEx(void)
                 g_esp -= 4; BRIDGE_MEM32(g_esp) = start_context1;
                 g_esp -= 4; BRIDGE_MEM32(g_esp) = 0;
                 if (start_routine == start_context1 &&
-                    start_routine != 0x0015CED9u)
+                    start_routine != g_xapi_thread_trampoline)
                     bridge_run_thread_callback(fn, start_context2);
                 else {
                     int cpu_token = guest_cpu_callback_enter();
+                    int body = guest_cpu_body_begin();
                     fn();
+                    guest_cpu_body_end(body);
                     g_esp += 12;
                     guest_cpu_callback_leave(cpu_token);
                 }
@@ -669,7 +683,7 @@ static void bridge_PsCreateSystemThreadEx(void)
                             "worker 0x%08X on this thread\n", start_routine);
                     fflush(stderr);
                     if (start_routine == start_context1 &&
-                        start_routine != 0x0015CED9u)
+                        start_routine != g_xapi_thread_trampoline)
                         bridge_run_thread_callback(fn, start_context2);
                     else
                         bridge_run_thread_inline(fn, start_context1, start_context2);
@@ -684,7 +698,7 @@ static void bridge_PsCreateSystemThreadEx(void)
                             start_routine);
                     fflush(stderr);
                     if (start_routine == start_context1 &&
-                        start_routine != 0x0015CED9u)
+                        start_routine != g_xapi_thread_trampoline)
                         bridge_run_thread_callback(fn, start_context2);
                     else
                         bridge_run_thread_inline(fn, start_context1, start_context2);
@@ -2574,6 +2588,12 @@ void xbox_Nv2aAckInterrupt(uint32_t address, uint32_t value)
 static void ke_wait_stall_report(uint32_t object)
 {
     uint32_t kint = xbox_GetConnectedInterrupt(NV2A_VECTOR);
+    if (xbox_no_hardware()) {             /* no registers to show */
+        fprintf(stderr, "  [KERNEL] STALL: wait on event 0x%08X (hdr %08X state %08X) > 2 s\n",
+                object, BRIDGE_MEM32(object), BRIDGE_MEM32(object + 4));
+        fflush(stderr);
+        return;
+    }
     fprintf(stderr,
             "  [KERNEL] STALL: wait on event 0x%08X (hdr %08X state %08X) > 2 s; "
             "nv notify pending=%d asserted=%d param=%u; PGRAPH intr=%08X en=%08X "
@@ -2680,6 +2700,8 @@ static void kernel_vblank_tick(void)
             fprintf(stderr, "  [NV2A] vblank -> native handler %s\n", ran > 0 ? "ran" : "deferred");
         return;
     }
+    if (xbox_no_hardware())
+        return;                           /* no status registers to raise */
 
     BRIDGE_MEM32(XBOX_NV2A_REG_BASE + NV2A_PCRTC_INTR_0) |= NV2A_PCRTC_INTR_VBLANK;
     BRIDGE_MEM32(XBOX_NV2A_REG_BASE + NV2A_PMC_INTR_0)   |= NV2A_PMC_INTR_PCRTC;
@@ -8300,11 +8322,13 @@ static void bridge_PsCreateSystemThread(void)
             fn = recomp_lookup_manual(start_routine);
         if (fn) {
             if (is_first_call) {
-                int cpu_token = guest_cpu_callback_enter();
+                int cpu_token = guest_cpu_callback_enter(), body;
                 g_esp -= 4; BRIDGE_MEM32(g_esp) = start_context2;
                 g_esp -= 4; BRIDGE_MEM32(g_esp) = start_context1;
                 g_esp -= 4; BRIDGE_MEM32(g_esp) = 0;
+                body = guest_cpu_body_begin();
                 fn();
+                guest_cpu_body_end(body);
                 g_esp += 12;
                 guest_cpu_callback_leave(cpu_token);
             } else {
@@ -9860,6 +9884,18 @@ static RECOMP_TLS int t_guest_thread;     /* this host thread runs a guest threa
 static RECOMP_TLS int t_guest_held;       /* and holds the guest CPU */
 static RECOMP_TLS int t_guest_cli;
 static RECOMP_TLS int t_dispatch_depth;
+/* RECOMP_GUEST_SMP=1 (needs RECOMP_GUEST_LOCK=1): the lock becomes the
+ * kernel's lock instead of the CPU. Guest code at PASSIVE level with
+ * interrupts enabled runs on as many host cores as there are guest threads;
+ * the lock is held only inside kernel calls, at raised IRQL or after CLI
+ * (the console's "nobody else runs" guarantees), in device callbacks (DPCs,
+ * timers, interrupts) and in the HLE natives (D3D, DirectSound, XInput),
+ * whose C state was serialised by the CPU lock. t_smp_pin counts the
+ * callbacks/natives on this thread's stack; the lock is released when a
+ * thread is back in plain guest code (no pin, no kernel call, preemptible).
+ * Atomics in the title (lock cmpxchg/xadd) are lifted as host atomics. */
+static int g_guest_smp;
+static RECOMP_TLS int t_smp_pin;
 static RECOMP_TLS unsigned t_guest_backedges;
 static RECOMP_TLS uint32_t t_guest_last_ordinal, t_guest_last_callsite;
 static volatile LONG g_cpu_owner_tid, g_cpu_owner_fs, g_cpu_owner_cli;
@@ -9914,13 +9950,25 @@ void guest_cpu_report(void)
             (uint32_t)g_cpu_owner_esp,
             tid == InterlockedCompareExchange(&g_cpu_owner_tid, 0, 0) ? "" : " (owner changed)");
 }
+unsigned long guest_cpu_owner_thread(void)
+{
+    return (unsigned long)InterlockedCompareExchange(&g_cpu_owner_tid, 0, 0);
+}
+
 static BOOL CALLBACK guest_cpu_init(PINIT_ONCE once, PVOID parameter, PVOID *context)
 {
     const char *e = getenv("RECOMP_GUEST_LOCK");
     (void)once; (void)parameter; (void)context;
     InitializeCriticalSection(&g_guest_cpu);
     g_guest_cpu_on = e && *e == '1';
-    if (g_guest_cpu_on)
+    {
+        const char *smp = getenv("RECOMP_GUEST_SMP");
+        g_guest_smp = g_guest_cpu_on && smp && *smp == '1';
+    }
+    if (g_guest_smp)
+        fprintf(stderr, "  [KERNEL] guest SMP: guest threads run in parallel; the lock "
+                        "covers kernel calls, raised IRQL/CLI, callbacks and HLE natives\n");
+    else if (g_guest_cpu_on)
         fprintf(stderr, "  [KERNEL] guest CPU lock on: one guest thread runs at a time\n");
     return TRUE;
 }
@@ -9946,8 +9994,85 @@ static int guest_cpu_preemptible(void)
         *(volatile uint8_t *)XBOX_TO_NATIVE(g_fs_base + 0x24) < 2);
 }
 
-void guest_cpu_cli(void) { t_guest_cli = 1; if (t_guest_held) g_cpu_owner_cli = 1; }
-void guest_cpu_sti(void) { t_guest_cli = 0; if (t_guest_held) g_cpu_owner_cli = 0; }
+/* SMP: back in plain guest code -- let the other threads into the kernel. */
+static void guest_smp_release_if_idle(void)
+{
+    if (g_guest_smp && t_guest_held && !t_smp_pin && !t_dispatch_depth
+            && t_guest_thread && guest_cpu_preemptible()) {
+        t_guest_held = 0;
+        guest_cpu_owner_clear();
+        LeaveCriticalSection(&g_guest_cpu);
+    }
+}
+
+static void guest_smp_acquire(void)
+{
+    if (!t_guest_held) {
+        guest_cpu_lock();
+        t_guest_held = 1;
+        guest_cpu_owner_publish();
+    }
+}
+
+void guest_cpu_cli(void)
+{
+    if (g_guest_smp)
+        guest_smp_acquire();             /* CLI: nobody else runs */
+    t_guest_cli = 1;
+    if (t_guest_held) g_cpu_owner_cli = 1;
+}
+
+void guest_cpu_sti(void)
+{
+    t_guest_cli = 0;
+    if (t_guest_held) g_cpu_owner_cli = 0;
+    guest_smp_release_if_idle();
+}
+
+/* HLE natives (hle_d3d8.c, hle_dsound.c, hle_input.c, ...): their C state
+ * was serialised by the CPU lock; under SMP they take it. No-op otherwise
+ * (the calling guest thread already holds the CPU). */
+int guest_cpu_native_enter(void)
+{
+    if (!guest_cpu_enabled() || !g_guest_smp)
+        return 0;
+    t_smp_pin++;
+    guest_smp_acquire();
+    return 1;
+}
+
+void guest_cpu_native_leave(int token)
+{
+    if (!token)
+        return;
+    t_smp_pin--;
+    guest_smp_release_if_idle();
+}
+
+/* A guest thread's body starts inside the call that created it (the title's
+ * first thread runs inside its PsCreateSystemThreadEx, workers inside the
+ * thread-start callback). Under SMP the body is plain guest code: clear the
+ * pins and kernel depth it inherited, and put them back when it returns. */
+int guest_cpu_body_begin(void)
+{
+    int saved;
+    if (!guest_cpu_enabled() || !g_guest_smp)
+        return 0;
+    saved = 0x40000000 | (t_smp_pin << 12) | (t_dispatch_depth & 0xFFF);
+    t_smp_pin = 0;
+    t_dispatch_depth = 0;
+    guest_smp_release_if_idle();
+    return saved;
+}
+
+void guest_cpu_body_end(int saved)
+{
+    if (!saved)
+        return;
+    guest_smp_acquire();
+    t_smp_pin = (saved >> 12) & 0x3FFFF;
+    t_dispatch_depth = saved & 0xFFF;
+}
 
 /* Blocking on a contended host-backed guest lock must let its guest owner
  * resume even when the caller is a DPC/ISR. Preserve all guest state and
@@ -9977,9 +10102,14 @@ void guest_cpu_resume(int token)
 int guest_cpu_callback_enter(void)
 {
     int token;
+    if (guest_cpu_enabled() && g_guest_smp) {
+        t_smp_pin++;                     /* a DPC/ISR/timer runs pinned */
+        if (t_guest_held)
+            return 8;
+    }
     if (!guest_cpu_enabled() || t_guest_held)
         return 0;
-    token = 2 | (t_guest_thread ? 1 : 0) | (t_guest_cli ? 4 : 0);
+    token = 2 | (t_guest_thread ? 1 : 0) | (t_guest_cli ? 4 : 0) | (g_guest_smp ? 8 : 0);
     guest_cpu_lock();
     t_guest_held = 1;
     t_guest_thread = 1;
@@ -9992,6 +10122,12 @@ void guest_cpu_callback_leave(int token)
 {
     if (!token)
         return;
+    if (token & 8)
+        t_smp_pin--;
+    if (!(token & 2)) {                  /* SMP, lock was already held */
+        guest_smp_release_if_idle();
+        return;
+    }
     if (t_guest_held) {
         t_guest_held = 0;
         guest_cpu_owner_clear();
@@ -10006,7 +10142,7 @@ void guest_cpu_callback_leave(int token)
 void guest_cpu_join(void)
 {
     t_guest_thread = 1;
-    if (guest_cpu_enabled() && !t_guest_held) {
+    if (guest_cpu_enabled() && !g_guest_smp && !t_guest_held) {
         guest_cpu_lock();
         t_guest_held = 1;
         guest_cpu_owner_publish();
@@ -10040,6 +10176,8 @@ void guest_cpu_yield(void)
     xbox_nv2a_kick();                     /* a guest spinning may wait on the GPU */
     if (!guest_cpu_preemptible())
         return;
+    if (g_guest_smp && t_smp_pin)
+        return;                           /* SMP: a pinned section is atomic */
     if (!InterlockedCompareExchange(&g_guest_waiters, 0, 0))
         return;                           /* nobody to hand the CPU to */
     t_guest_held = 0;
@@ -10146,8 +10284,12 @@ static void kernel_thunk_dispatch(void)
             g_cpu_owner_esp = (LONG)g_esp;
         }
     }
-    int held = t_guest_held;
-    int released = held && guest_cpu_preemptible()
+    int held;
+    int released;
+    if (g_guest_smp && t_guest_thread)
+        guest_smp_acquire();             /* the kernel runs under the lock */
+    held = t_guest_held;
+    released = held && guest_cpu_preemptible()
                  && t_guest_last_ordinal != 159 /* managed inside the wait */
                  && guest_cpu_kernel_can_block(t_guest_last_ordinal);
     if (released) {                    /* let other guest threads run meanwhile */
@@ -10165,6 +10307,7 @@ static void kernel_thunk_dispatch(void)
         t_guest_held = 1;
         guest_cpu_owner_publish();
     }
+    guest_smp_release_if_idle();         /* SMP: back to guest code */
 }
 
 static void kernel_thunk_dispatch_body(void)

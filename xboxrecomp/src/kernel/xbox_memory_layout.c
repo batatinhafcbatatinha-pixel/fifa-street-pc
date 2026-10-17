@@ -114,6 +114,70 @@ static void *g_mcpx_memory = NULL;
 #define XBOX_FLASH_BASE 0xFF000000u
 #define XBOX_FLASH_SIZE (1u * 1024u * 1024u)
 static void *g_flash_memory = NULL;
+
+/* Hardware-free mode (RECOMP_NO_HW=1, or xbox_SetNoHardware(1) before
+ * MemoryLayoutInit): the title's hardware is serviced by native code above
+ * the hardware (D3D, DirectSound, XInput in C), so nothing models a device.
+ * The three apertures are only reserved, with no access, so no host
+ * allocation can land there; any touch faults into xbox_HardwareGuardFault,
+ * which names it. Nothing is started that polls or acknowledges registers. */
+static int s_no_hw = -1;
+static struct { uint32_t base, size; const char *name; void *mem; } s_hw_win[3];
+static volatile LONG s_hw_hits;
+
+void xbox_SetNoHardware(int on)
+{
+    s_no_hw = on ? 1 : 0;
+}
+
+int xbox_no_hardware(void)
+{
+    if (s_no_hw < 0) {
+        const char *e = getenv("RECOMP_NO_HW");
+        s_no_hw = e && *e && *e != '0';
+    }
+    return s_no_hw;
+}
+
+static void hw_reserve(int i, uint32_t base, uint32_t size, const char *name)
+{
+    s_hw_win[i].base = base;
+    s_hw_win[i].size = size;
+    s_hw_win[i].name = name;
+    s_hw_win[i].mem = VirtualAlloc((LPVOID)(base + g_memory_offset), size,
+                                   MEM_RESERVE, PAGE_NOACCESS);
+    fprintf(stderr, "  %s 0x%08X..0x%08X: reserved, no access (no hardware model)\n",
+            name, base, base + size);
+}
+
+/* An access fault at Xbox VA va: if it is inside a hardware aperture, report
+ * it, count it and back that one page with zeroed memory so the run goes on
+ * (the count, printed by xbox_HardwareReport, is what says the run was not
+ * hardware-free). Returns 1 when the faulting access can be retried. */
+int xbox_HardwareGuardFault(uint32_t va, uintptr_t rip, int write)
+{
+    int i;
+    if (s_no_hw != 1)
+        return 0;
+    for (i = 0; i < 3; i++) {
+        if (s_hw_win[i].mem && va >= s_hw_win[i].base && va - s_hw_win[i].base < s_hw_win[i].size) {
+            LONG n = InterlockedIncrement(&s_hw_hits);
+            if (n <= 32)
+                fprintf(stderr, "[NO-HW] %s %s at 0x%08X (offset 0x%06X) from host RIP %p\n",
+                        s_hw_win[i].name, write ? "write" : "read", va, va - s_hw_win[i].base,
+                        (void *)rip);
+            fflush(stderr);
+            return VirtualAlloc((LPVOID)((va & ~0xFFFu) + g_memory_offset), 0x1000,
+                                MEM_COMMIT, PAGE_READWRITE) != NULL;
+        }
+    }
+    return 0;
+}
+
+long xbox_HardwareAccessCount(void)
+{
+    return s_hw_hits;
+}
 /* The contiguous window's backing section. It is a file mapping rather than
  * plain committed memory for one reason: the tiled aperture has to be a
  * second view of the very same bytes, and only a mapping can be mapped
@@ -1116,6 +1180,23 @@ static DWORD WINAPI nv2a_ack_thread(LPVOID param)
             Sleep(GetTickCount() - s_ack_last_put_ms < 4 ? 0 : 1);
         else
             WaitForSingleObject(s_nv2a_wake, 1);   /* xbox_nv2a_kick or 1 ms */
+    }
+    return 0;
+}
+
+/* KeTickCount without the NV2A thread, which is where it is advanced
+ * otherwise. Frozen, it stops every title clock built on it: FIFA Street's
+ * EA timer (KeTickCount drift check, then a one-shot timer per tick) never
+ * ticks, so its scheduled tasks -- DirectSoundDoWork and the audio stream
+ * among them -- never run and the boot movie never ends. 1 ms, the unit
+ * (timeBeginPeriod(1) is set by the kernel timer thread). */
+static DWORD WINAPI kernel_clock_thread(LPVOID unused)
+{
+    (void)unused;
+    for (;;) {
+        *(volatile uint32_t *)((uintptr_t)(XBOX_KERNEL_DATA_BASE + KDATA_TICK_COUNT)
+                               + g_memory_offset) = GetTickCount();
+        Sleep(1);
     }
     return 0;
 }
@@ -2424,6 +2505,7 @@ BOOL xbox_MemoryLayoutInit(const void *xbe_data, size_t xbe_size)
      * is to bridge the D3D8 entry point that owns the loop, not to start
      * emulating NV2A. Nothing has needed that yet.
      */
+    if (!xbox_no_hardware())
     {
         uintptr_t nv2a_native = XBOX_NV2A_BASE + g_memory_offset;
         g_nv2a_memory = VirtualAlloc(
@@ -2470,6 +2552,7 @@ BOOL xbox_MemoryLayoutInit(const void *xbe_data, size_t xbe_size)
      * waiting for a bit to set, extend the NV2A ack thread's table rather than
      * emulating the device.
      */
+    if (!xbox_no_hardware())
     {
         uintptr_t mcpx_native = XBOX_MCPX_BASE + g_memory_offset;
         g_mcpx_memory = VirtualAlloc(
@@ -2562,7 +2645,14 @@ BOOL xbox_MemoryLayoutInit(const void *xbe_data, size_t xbe_size)
         }
     }
 
+    if (xbox_no_hardware()) {
+        hw_reserve(0, XBOX_NV2A_BASE, XBOX_NV2A_SIZE, "NV2A");
+        hw_reserve(1, XBOX_MCPX_BASE, XBOX_MCPX_SIZE, "MCPX (APU/AC97/USB/NIC)");
+        hw_reserve(2, XBOX_FLASH_BASE, XBOX_FLASH_SIZE, "Flash");
+    }
+
     /* Flash ROM aperture -- see XBOX_FLASH_BASE for why. */
+    if (!xbox_no_hardware())
     {
         uintptr_t flash_native = XBOX_FLASH_BASE + g_memory_offset;
 
@@ -2585,6 +2675,12 @@ BOOL xbox_MemoryLayoutInit(const void *xbe_data, size_t xbe_size)
 
     if (g_nv2a_memory) {
         xbox_Nv2aAckStart();
+    } else {
+        /* No NV2A thread (RECOMP_NO_HW): KeTickCount still has to run. */
+        HANDLE th = CreateThread(NULL, 0, kernel_clock_thread, NULL, 0, NULL);
+        if (th)
+            CloseHandle(th);
+        fprintf(stderr, "  KeTickCount: kernel clock thread (no NV2A thread)\n");
     }
 
     /*

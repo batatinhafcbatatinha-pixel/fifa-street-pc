@@ -7,10 +7,10 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 
 ROOT = Path(__file__).resolve().parent
-PROFILE = {key: '1' for key in ('RECOMP_PB_EXEC', 'RECOMP_VBLANK', 'RECOMP_USB',
-    'RECOMP_DSP', 'RECOMP_AC97_READY', 'RECOMP_TITLE_KEVENTS', 'RECOMP_GUEST_LOCK',
-    'RECOMP_FB_WINDOW', 'RECOMP_KEYBOARD')}
-PROFILE['RECOMP_GPU'] = 'd3d11'
+# 100% native: no model of any console device (NV2A, APU/DSP, AC97, USB, flash).
+PROFILE = {key: '1' for key in ('RECOMP_NO_HW', 'RECOMP_HLE_PRIMARY', 'RECOMP_HLE_NOGPU',
+    'RECOMP_DS_NATIVE', 'RECOMP_INPUT_NATIVE', 'RECOMP_VBLANK', 'RECOMP_TITLE_KEVENTS',
+    'RECOMP_GUEST_LOCK', 'RECOMP_GUEST_SMP', 'RECOMP_KEYBOARD')}
 
 
 def main():
