@@ -126,6 +126,7 @@ static int sync_mode(void)
 }
 
 static uint64_t s_notify_original;    /* software methods left to 0x259690 */
+static uint64_t s_foreign_kicks;      /* native mode: kicks with commands nobody native wrote */
 
 void hle_sync_report(void)
 {
@@ -135,9 +136,12 @@ void hle_sync_report(void)
             (unsigned long long)s_census_kicks, (unsigned long long)s_census_words,
             (unsigned long long)s_census_sema, (unsigned long long)s_census_jumps,
             (unsigned long long)s_census_calls);
-    if (s_mode == 2)
-        fprintf(stderr, "[HLE-SYNC]   software methods left to the library handler: %llu\n",
-                (unsigned long long)s_notify_original);
+    if (s_mode == 2) {
+        extern long xbox_HardwareAccessCount(void);
+        fprintf(stderr, "[HLE-SYNC]   kicks carrying non-native commands: %llu\n",
+                (unsigned long long)s_foreign_kicks);
+        fprintf(stderr, "[NO-HW] hardware aperture accesses so far: %ld\n", xbox_HardwareAccessCount());
+    }
     for (int i = 0; i < 32; i++)
         if (s_census_notify[i])
             fprintf(stderr, "[HLE-SYNC]   software method %2d x%llu\n", i,
@@ -237,7 +241,18 @@ static void call_notify_handler(uint32_t v)
 volatile uint32_t hle_sync_kick_count;
 int hle_api_software_method(uint32_t v);
 
+static void kickoff(void);
+int guest_cpu_native_enter(void);
+void guest_cpu_native_leave(int token);
+
 void sub_00251BB0(void)
+{
+    int smp = guest_cpu_native_enter();
+    kickoff();
+    guest_cpu_native_leave(smp);
+}
+
+static void kickoff(void)
 {
     uint32_t dev = g_ecx, flags, put;
     int mode = sync_mode();
@@ -250,34 +265,45 @@ void sub_00251BB0(void)
     }
     flags = MEM32(dev + DEV_FLAGS);
     if (flags & 0x2000) {                 /* the library's own GPU-less path */
-        sub_00251BB0_gen();
+        uint32_t fifo = 0x260D40u, p = MEM32(dev + DEV_PUT) & 0x0FFFFFFFu;
+        if (mode != 2) {
+            sub_00251BB0_gen();
+            return;
+        }
+        /* 0x251C26 in C: a FIFO block in the library's data, PUT = GET, and
+         * every fence up to the current time complete. */
+        MEM32(dev + DEV_FIFO) = fifo;
+        MEM32(fifo + 0x40) = p;
+        MEM32(fifo + 0x44) = p;
+        MEM32(MEM32(dev + DEV_SEMAPHORE)) = MEM32(dev + 0x2C) - 2;
+        MEM32(dev + 0x1DE4) = MEM32(dev + 0x2478);
+        s_scan = MEM32(dev + DEV_PUT);
+        g_esp += 4;                       /* ret */
         return;
     }
     put = (flags & 4) ? MEM32(dev + DEV_RECORD_PUT) : MEM32(dev + DEV_PUT);
     s_census_kicks++;
-    s_in_kickoff = 1;
-    s_notify_count = 0;
-    scan_to(dev, put);
-    s_in_kickoff = 0;
     if (mode == 1) {
+        s_in_kickoff = 1;
+        s_notify_count = 0;
+        scan_to(dev, put);
+        s_in_kickoff = 0;
         sub_00251BB0_gen();
         return;
     }
+    /* Native: the backend has already drawn every call and the native API
+     * completed its fences and queued its flips itself, so nothing is read
+     * back from the ring. Bytes between the last kick and PUT can only come
+     * from library code that is not native; they are counted, not run. */
+    if (s_scan && s_scan != put) {
+        s_foreign_kicks++;
+        if (s_foreign_kicks <= 8)
+            fprintf(stderr, "[HLE-SYNC] commands from non-native code in %08X..%08X (dropped)\n",
+                    s_scan, put);
+    }
+    s_scan = put;
     MEM32(MEM32(dev + DEV_FIFO) + 0x44) = put & 0x0FFFFFFFu;     /* GET = PUT */
     if (MEM32(GPULESS_FLAG))
         MEM32(dev + DEV_FLAGS) |= 0x2000;
-    {
-        int n = s_notify_count;
-        uint32_t list[MAX_NOTIFY];
-        memcpy(list, s_notify, sizeof(uint32_t) * (size_t)n);
-        /* Kinds 8 and 9 only write PGRAPH registers (RDI / indirect
-         * register writes for the NV2A); everything else is CPU work. */
-        for (int i = 0; i < n; i++)
-            if ((list[i] & 0x1F) != 9 && (list[i] & 0x1F) != 8 &&
-                !hle_api_software_method(list[i])) {
-                s_notify_original++;
-                call_notify_handler(list[i]);
-            }
-    }
     g_esp += 4;                           /* ret */
 }

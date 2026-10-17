@@ -58,6 +58,9 @@ set(GAME_SOURCES
     src/hle_vsh.c
     src/hle_dsound.c
     src/hle_dsound_native.c
+    src/hle_input.c
+    src/hle_smp_serial.c
+    src/hle_stall.c
     src/hle_sync.c
     src/hle_native_api.c
     src/hle_native_resources.c

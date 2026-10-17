@@ -1,0 +1,2214 @@
+{
+"0015C554": [
+"XAPILIB",
+"FUN",
+"XapiMapLetterToDirectory",
+"stdcall",
+"(psh pDriveString, psh pDeviceString, psh pszTitleId, psh bCreateDirectory, psh pwszTitleName, psh bUpdateTimestamp)"
+],
+"0015D7C1": [
+"XAPILIB",
+"FUN",
+"XGetSectionSize",
+"stdcall",
+"(psh hSection)"
+],
+"0026F41C": [
+"XAPILIB",
+"FUN",
+"MU_Init",
+"stdcall",
+"(psh pThis)"
+],
+"0026F829": [
+"XAPILIB",
+"FUN",
+"IUsbInit_GetMaxDeviceTypeCount",
+"thiscall",
+"(ecx this, psh DeviceType)"
+],
+"0026F320": [
+"XAPILIB",
+"VAR",
+"g_DeviceType_MU",
+"",
+""
+],
+"0027059F": [
+"XAPILIB",
+"FUN",
+"GetTypeInformation",
+"fastcall",
+"(ecx XppType)"
+],
+"0026F244": [
+"XAPILIB",
+"VAR",
+"g_DeviceTypeInfoTableBegin",
+"",
+""
+],
+"0026F24C": [
+"XAPILIB",
+"VAR",
+"g_DeviceTypeInfoTableEnd",
+"",
+""
+],
+"0026F274": [
+"XAPILIB",
+"VAR",
+"g_DeviceType_Gamepad",
+"",
+""
+],
+"0026F2D8": [
+"XAPILIB",
+"VAR",
+"g_DeviceType_IRDongle",
+"",
+""
+],
+"00250E70": [
+"D3D8",
+"FUN",
+"D3D_CommonSetDebugRegisters",
+"stdcall",
+"()"
+],
+"00261238": [
+"D3D8",
+"VAR",
+"D3D_g_pDevice",
+"",
+""
+],
+"00250050": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_Simple",
+"fastcall",
+"(ecx Method, edx Value)"
+],
+"00250080": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderStateNotInline",
+"stdcall",
+"(psh State, psh Value)"
+],
+"00250740": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_FillMode",
+"stdcall",
+"(psh Value)"
+],
+"00261110": [
+"D3D8",
+"VAR",
+"D3D_g_DeferredRenderState",
+"",
+""
+],
+"002611C0": [
+"D3D8",
+"VAR",
+"D3D_g_ComplexRenderState",
+"",
+""
+],
+"002611CC": [
+"D3D8",
+"VAR",
+"D3DRS_FillMode",
+"",
+""
+],
+"002611D0": [
+"D3D8",
+"VAR",
+"D3DRS_BackFillMode",
+"",
+""
+],
+"002611D4": [
+"D3D8",
+"VAR",
+"D3DRS_TwoSidedLighting",
+"",
+""
+],
+"002611E0": [
+"D3D8",
+"VAR",
+"D3DRS_StencilEnable",
+"",
+""
+],
+"002611E4": [
+"D3D8",
+"VAR",
+"D3DRS_StencilFail",
+"",
+""
+],
+"002611E8": [
+"D3D8",
+"VAR",
+"D3DRS_FrontFace",
+"",
+""
+],
+"002611EC": [
+"D3D8",
+"VAR",
+"D3DRS_CullMode",
+"",
+""
+],
+"002611F4": [
+"D3D8",
+"VAR",
+"D3DRS_ZBias",
+"",
+""
+],
+"002611F8": [
+"D3D8",
+"VAR",
+"D3DRS_LogicOp",
+"",
+""
+],
+"00261200": [
+"D3D8",
+"VAR",
+"D3DRS_MultiSampleAntiAlias",
+"",
+""
+],
+"00261204": [
+"D3D8",
+"VAR",
+"D3DRS_MultiSampleMask",
+"",
+""
+],
+"00261208": [
+"D3D8",
+"VAR",
+"D3DRS_MultiSampleMode",
+"",
+""
+],
+"0026120C": [
+"D3D8",
+"VAR",
+"D3DRS_MultiSampleRenderTargetMode",
+"",
+""
+],
+"00261218": [
+"D3D8",
+"VAR",
+"D3DRS_SampleAlpha",
+"",
+""
+],
+"0026121C": [
+"D3D8",
+"VAR",
+"D3DRS_Dxt1NoiseEnable",
+"",
+""
+],
+"00261220": [
+"D3D8",
+"VAR",
+"D3DRS_YuvEnable",
+"",
+""
+],
+"00261224": [
+"D3D8",
+"VAR",
+"D3DRS_OcclusionCullEnable",
+"",
+""
+],
+"00261228": [
+"D3D8",
+"VAR",
+"D3DRS_StencilCullEnable",
+"",
+""
+],
+"0026122C": [
+"D3D8",
+"VAR",
+"D3DRS_RopZCmpAlwaysRead",
+"",
+""
+],
+"00261230": [
+"D3D8",
+"VAR",
+"D3DRS_RopZRead",
+"",
+""
+],
+"00261234": [
+"D3D8",
+"VAR",
+"D3DRS_DoNotCullUncompressed",
+"",
+""
+],
+"00260FA0": [
+"D3D8",
+"VAR",
+"D3D_g_RenderState",
+"",
+""
+],
+"002508C0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetTextureState_TexCoordIndex",
+"stdcall",
+"(psh Stage, psh Value)"
+],
+"00260DA0": [
+"D3D8",
+"VAR",
+"D3D_g_DeferredTextureState",
+"",
+""
+],
+"00254CE0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetStreamSource",
+"stdcall",
+"(psh StreamNumber, psh pStreamData, psh Stride)"
+],
+"002636F8": [
+"D3D8",
+"VAR",
+"D3D_g_Stream",
+"",
+""
+],
+"00001DBC": [
+"D3D8",
+"VAR",
+"m_VerticalBlankEvent_OFFSET",
+"D3DDevice",
+""
+],
+"00001DB4": [
+"D3D8",
+"VAR",
+"m_SwapCallback_OFFSET",
+"D3DDevice",
+""
+],
+"00001DB8": [
+"D3D8",
+"VAR",
+"m_VBlankCallback_OFFSET",
+"D3DDevice",
+""
+],
+"0015CAC2": [
+"XAPILIB",
+"FUN",
+"_cinit",
+"stdcall",
+"()"
+],
+"0015CB1A": [
+"XAPILIB",
+"FUN",
+"_rtinit",
+"stdcall",
+"()"
+],
+"0015BAB2": [
+"XAPILIB",
+"FUN",
+"XapiFormatObjectAttributes",
+"stdcall",
+"(psh pObjectAttributes, psh pObjectName, psh pName)"
+],
+"0015CC8A": [
+"XAPILIB",
+"FUN",
+"XapiCallThreadNotifyRoutines",
+"stdcall",
+"(psh Create)"
+],
+"0015B3EB": [
+"XAPILIB",
+"FUN",
+"XLaunchNewImageA",
+"stdcall",
+"(psh lpTitlePath, psh pLaunchData)"
+],
+"0015DDF7": [
+"XAPILIB",
+"FUN",
+"XUnmountAlternateTitleA",
+"stdcall",
+"(psh chDrive)"
+],
+"0015B9AA": [
+"XAPILIB",
+"FUN",
+"mainXapiStartup",
+"stdcall",
+"(psh lpParameter)"
+],
+"0015B30F": [
+"XAPILIB",
+"FUN",
+"GetLastError",
+"stdcall",
+"()"
+],
+"0015B337": [
+"XAPILIB",
+"FUN",
+"SetLastError",
+"stdcall",
+"(psh ErrorCode)"
+],
+"0015CE9D": [
+"XAPILIB",
+"FUN",
+"UnhandledExceptionFilter",
+"stdcall",
+"(psh ExceptionPointers)"
+],
+"0015C8DD": [
+"XAPILIB",
+"FUN",
+"XapiBootToDash",
+"stdcall",
+"(psh dwReason, psh dwParameter1, psh dwParameter2)"
+],
+"0015D8E4": [
+"XAPILIB",
+"FUN",
+"XapiSelectCachePartition",
+"stdcall",
+"(psh bAlwaysFormat, psh pnCachePartition, psh pbForceFormat)"
+],
+"0015B365": [
+"XAPILIB",
+"FUN",
+"XapiSetLastNTError",
+"stdcall",
+"(psh Status)"
+],
+"0015CED9": [
+"XAPILIB",
+"FUN",
+"XapiThreadStartup",
+"stdcall",
+"(psh StartRoutine, psh StartContext)"
+],
+"0015B11D": [
+"XAPILIB",
+"FUN",
+"CreateEventA",
+"stdcall",
+"(psh lpEventAttributes, psh bManualReset, psh bInitialState, psh lpName)"
+],
+"0015B1BC": [
+"XAPILIB",
+"FUN",
+"CreateMutexA",
+"stdcall",
+"(psh lpMutexAttributes, psh bInitialOwner, psh lpName)"
+],
+"0015CF71": [
+"XAPILIB",
+"FUN",
+"CreateThread",
+"stdcall",
+"(psh lpThreadAttributes, psh dwStackSize, psh lpStartAddress, psh lpParameter, psh dwCreationFlags, psh lpThreadId)"
+],
+"0015CDE4": [
+"XAPILIB",
+"FUN",
+"ExitThread",
+"stdcall",
+"(psh dwExitCode)"
+],
+"0015C953": [
+"XAPILIB",
+"FUN",
+"XapiInitProcess",
+"stdcall",
+"()"
+],
+"00160900": [
+"XAPILIB",
+"FUN",
+"XCalculateSignatureBegin",
+"stdcall",
+"(psh dwFlags, psh dwAltTitleId)"
+],
+"0015CDF6": [
+"XAPILIB",
+"FUN",
+"GetExitCodeThread",
+"stdcall",
+"(psh hThread, psh lpExitCode)"
+],
+"0015CD14": [
+"XAPILIB",
+"FUN",
+"GetThreadPriority",
+"stdcall",
+"(psh hThread)"
+],
+"0015AEC1": [
+"XAPILIB",
+"FUN",
+"GetTimeZoneInformation",
+"stdcall",
+"(psh lpTimeZoneInformation)"
+],
+"002447AB": [
+"XAPILIB",
+"FUN",
+"OutputDebugStringA",
+"stdcall",
+"(psh lpOutputString)"
+],
+"0015BA1E": [
+"XAPILIB",
+"FUN",
+"mainCRTStartup",
+"cdecl",
+"()"
+],
+"0015B2EA": [
+"XAPILIB",
+"FUN",
+"QueryPerformanceCounter",
+"stdcall",
+"(psh lpPerformanceCount)"
+],
+"0015CD8E": [
+"XAPILIB",
+"FUN",
+"RaiseException",
+"stdcall",
+"(psh dwExceptionCode, psh dwExceptionFlags, psh nNumberOfArguments, psh lpArguments)"
+],
+"0015B19E": [
+"XAPILIB",
+"FUN",
+"ResetEvent",
+"stdcall",
+"(psh hEvent)"
+],
+"0015B17E": [
+"XAPILIB",
+"FUN",
+"SetEvent",
+"stdcall",
+"(psh hEvent)"
+],
+"0015CCC2": [
+"XAPILIB",
+"FUN",
+"SetThreadPriority",
+"stdcall",
+"(psh hThread, psh nPriority)"
+],
+"0015D67A": [
+"XAPILIB",
+"FUN",
+"XAutoPowerDownResetTimer",
+"stdcall",
+"()"
+],
+"0015DC34": [
+"XAPILIB",
+"FUN",
+"XMountAlternateTitleA",
+"stdcall",
+"(psh lpRootPath, psh dwAltTitleId, psh pchDrive)"
+],
+"0015DB2F": [
+"XAPILIB",
+"FUN",
+"XMountUtilityDrive",
+"stdcall",
+"(psh bFormatClean)"
+],
+"0015DEF3": [
+"XAPILIB",
+"FUN",
+"XMUNameFromDriveLetter",
+"stdcall",
+"(psh chDrive, psh pwszName, psh chName)"
+],
+"0015CE54": [
+"XAPILIB",
+"FUN",
+"XRegisterThreadNotifyRoutine",
+"stdcall",
+"(psh pThreadNotification, psh bRegister)"
+],
+"00244660": [
+"XAPILIB",
+"FUN",
+"timeKillEvent",
+"stdcall",
+"(psh uTimerID)"
+],
+"0024453C": [
+"XAPILIB",
+"FUN",
+"timeSetEvent",
+"stdcall",
+"(psh uDelay, psh uResolution, psh lpTimeProc, psh dwUser, psh uEvent)"
+],
+"00270568": [
+"XAPILIB",
+"FUN",
+"GetTypeInformation2",
+"fastcall",
+"(cl XidType, edx pTypeIndex)"
+],
+"002704FB": [
+"XAPILIB",
+"FUN",
+"XGetDeviceChanges",
+"stdcall",
+"(psh DeviceType, psh pdwInsertions, psh pdwRemovals)"
+],
+"002704D9": [
+"XAPILIB",
+"FUN",
+"XGetDevices",
+"stdcall",
+"(psh DeviceType)"
+],
+"002711F9": [
+"XAPILIB",
+"FUN",
+"XID_fCloseDevice",
+"thiscall",
+"(ecx this)"
+],
+"0026F733": [
+"XAPILIB",
+"FUN",
+"XInitDevices",
+"stdcall",
+"(psh dwPreallocTypeCount, psh PreallocTypes)"
+],
+"00270228": [
+"XAPILIB",
+"FUN",
+"XInputClose",
+"stdcall",
+"(psh hDevice)"
+],
+"00270234": [
+"XAPILIB",
+"FUN",
+"XInputGetCapabilities",
+"stdcall",
+"(psh hDevice, psh pCapabilities)"
+],
+"0027040C": [
+"XAPILIB",
+"FUN",
+"XInputGetState",
+"stdcall",
+"(psh hDevice, psh pState)"
+],
+"002701D2": [
+"XAPILIB",
+"FUN",
+"XInputOpen",
+"stdcall",
+"(psh DeviceType, psh dwPort, psh dwSlot, psh pPollingParameters)"
+],
+"0027047F": [
+"XAPILIB",
+"FUN",
+"XInputSetState",
+"stdcall",
+"(psh hDevice, psh pFeedback)"
+],
+"00276E43": [
+"XAPILIB",
+"FUN",
+"XMountMUA",
+"stdcall",
+"(psh dwPort, psh dwSlot, psh pchDrive)"
+],
+"00276F75": [
+"XAPILIB",
+"FUN",
+"XUnmountMU",
+"stdcall",
+"(psh dwPort, psh dwSlot)"
+],
+"00250210": [
+"D3D8",
+"FUN",
+"D3D_UpdateProjectionViewportTransform",
+"stdcall",
+"()"
+],
+"00255650": [
+"D3D8",
+"FUN",
+"CDevice_InitializeFrameBuffers",
+"thiscall",
+"(ecx this, psh pPresentationParams)"
+],
+"00255520": [
+"D3D8",
+"FUN",
+"CDevice_FreeFrameBuffers",
+"thiscall",
+"(ecx this)"
+],
+"00257950": [
+"D3D8",
+"FUN",
+"CDevice_SetStateVB",
+"thiscall",
+"(ecx this, psh unknown2)"
+],
+"00259EE2": [
+"D3D8",
+"FUN",
+"CMiniport_CreateCtxDmaObject",
+"thiscall",
+"(ecx this, psh unknown1, psh unknown2, psh unknown3, psh unknown4, psh unknown5)"
+],
+"0025A1F4": [
+"D3D8",
+"FUN",
+"CMiniport_InitHardware",
+"thiscall",
+"(ecx this)"
+],
+"00259160": [
+"D3D8",
+"FUN",
+"CMiniport_IsFlipPending",
+"thiscall",
+"(ecx this)"
+],
+"0025CE60": [
+"D3D8",
+"FUN",
+"D3DDevice_Begin",
+"stdcall",
+"(psh PrimitiveType)"
+],
+"00251B80": [
+"D3D8",
+"FUN",
+"D3DDevice_BeginPush_4",
+"stdcall",
+"(psh Count)"
+],
+"00252050": [
+"D3D8",
+"FUN",
+"D3DDevice_BeginStateBig",
+"stdcall",
+"(psh unknown1)"
+],
+"00253B00": [
+"D3D8",
+"FUN",
+"D3DDevice_BeginVisibilityTest",
+"stdcall",
+"()"
+],
+"00252CE0": [
+"D3D8",
+"FUN",
+"D3DDevice_BlockUntilVerticalBlank",
+"stdcall",
+"()"
+],
+"00258D70": [
+"D3D8",
+"FUN",
+"D3DDevice_Clear",
+"stdcall",
+"(psh Count, psh pRects, psh Flags, psh Color, psh Z, psh Stencil)"
+],
+"00253280": [
+"D3D8",
+"FUN",
+"D3DDevice_CopyRects",
+"stdcall",
+"(psh pSourceSurface, psh pSourceRectsArray, psh cRects, psh pDestinationSurface, psh pDestPointsArray)"
+],
+"00257F90": [
+"D3D8",
+"FUN",
+"D3DDevice_CreateIndexBuffer2",
+"stdcall",
+"(psh Length)"
+],
+"0025DE50": [
+"D3D8",
+"FUN",
+"D3DDevice_CreatePixelShader",
+"stdcall",
+"(psh pPSDef, psh pHandle)"
+],
+"0025CF50": [
+"D3D8",
+"FUN",
+"D3DDevice_CreateTexture2",
+"stdcall",
+"(psh Width, psh Height, psh Depth, psh Levels, psh Usage, psh Format, psh D3DResource)"
+],
+"00257FD0": [
+"D3D8",
+"FUN",
+"D3DDevice_CreateVertexBuffer2",
+"stdcall",
+"(psh Length)"
+],
+"00254970": [
+"D3D8",
+"FUN",
+"D3DDevice_CreateVertexShader",
+"stdcall",
+"(psh pDeclaration, psh pFunction, psh pHandle, psh Usage)"
+],
+"0025DEA0": [
+"D3D8",
+"FUN",
+"D3DDevice_DeletePixelShader",
+"stdcall",
+"(psh Handle)"
+],
+"00254FD0": [
+"D3D8",
+"FUN",
+"D3DDevice_DeleteVertexShader",
+"stdcall",
+"(psh Handle)"
+],
+"0025CB10": [
+"D3D8",
+"FUN",
+"D3DDevice_DrawIndexedVertices",
+"stdcall",
+"(psh PrimitiveType, psh VertexCount, psh pIndexData)"
+],
+"0025CA70": [
+"D3D8",
+"FUN",
+"D3DDevice_DrawVertices",
+"stdcall",
+"(psh PrimitiveType, psh StartVertex, psh VertexCount)"
+],
+"0025CEA0": [
+"D3D8",
+"FUN",
+"D3DDevice_End",
+"stdcall",
+"()"
+],
+"00251BA0": [
+"D3D8",
+"FUN",
+"D3DDevice_EndPush",
+"stdcall",
+"(psh pPush)"
+],
+"00253BA0": [
+"D3D8",
+"FUN",
+"D3DDevice_EndVisibilityTest",
+"stdcall",
+"(psh Index)"
+],
+"00253C00": [
+"D3D8",
+"FUN",
+"D3DDevice_FlushVertexCache",
+"stdcall",
+"()"
+],
+"00253230": [
+"D3D8",
+"FUN",
+"D3DDevice_GetBackBuffer2",
+"stdcall",
+"(psh BackBuffer)"
+],
+"002535B0": [
+"D3D8",
+"FUN",
+"D3DDevice_GetDepthStencilSurface2",
+"stdcall",
+"()"
+],
+"00252AC0": [
+"D3D8",
+"FUN",
+"D3DDevice_GetGammaRamp",
+"stdcall",
+"(psh pRamp)"
+],
+"00252D10": [
+"D3D8",
+"FUN",
+"D3DDevice_GetTile",
+"stdcall",
+"(psh Index, psh pTile)"
+],
+"002500E0": [
+"D3D8",
+"FUN",
+"D3DDevice_GetViewportOffsetAndScale",
+"stdcall",
+"(psh pOffset, psh pScale)"
+],
+"00252C30": [
+"D3D8",
+"FUN",
+"D3DDevice_GetVisibilityTestResult",
+"stdcall",
+"(psh Index, psh pResult, psh pTimeStamp)"
+],
+"00251B10": [
+"D3D8",
+"FUN",
+"D3DDevice_InsertCallback",
+"stdcall",
+"(psh Type, psh pCallback, psh Context)"
+],
+"00253AD0": [
+"D3D8",
+"FUN",
+"D3DDevice_IsBusy",
+"stdcall",
+"()"
+],
+"00251AF0": [
+"D3D8",
+"FUN",
+"D3DDevice_IsFencePending",
+"stdcall",
+"(psh Fence)"
+],
+"00251BB0": [
+"D3D8",
+"FUN",
+"CDevice_KickOff",
+"thiscall",
+"(ecx this)"
+],
+"00254D70": [
+"D3D8",
+"FUN",
+"D3DDevice_LoadVertexShader",
+"stdcall",
+"(psh Handle, psh Address)"
+],
+"002540A0": [
+"D3D8",
+"FUN",
+"D3DDevice_PersistDisplay",
+"stdcall",
+"()"
+],
+"00252F00": [
+"D3D8",
+"FUN",
+"D3DDevice_Reset",
+"stdcall",
+"(psh pPresentationParameters)"
+],
+"0025B070": [
+"D3D8",
+"FUN",
+"D3DDevice_RunPushBuffer",
+"stdcall",
+"(psh pPushBuffer, psh pFixup)"
+],
+"00254DD0": [
+"D3D8",
+"FUN",
+"D3DDevice_SelectVertexShader",
+"stdcall",
+"(psh Handle, psh Address)"
+],
+"0025DC80": [
+"D3D8",
+"FUN",
+"D3DDevice_SetBackBufferScale",
+"stdcall",
+"(psh x, psh y)"
+],
+"00252D50": [
+"D3D8",
+"FUN",
+"D3DDevice_SetFlickerFilter",
+"stdcall",
+"(psh Filter)"
+],
+"00252A30": [
+"D3D8",
+"FUN",
+"D3DDevice_SetGammaRamp",
+"stdcall",
+"(psh dwFlags, psh pRamp)"
+],
+"00253A40": [
+"D3D8",
+"FUN",
+"D3DDevice_SetIndices",
+"stdcall",
+"(psh pIndexData, psh BaseVertexIndex)"
+],
+"002539B0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetPalette",
+"stdcall",
+"(psh Stage, psh pPalette)"
+],
+"0025DEC0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetPixelShader",
+"stdcall",
+"(psh Handle)"
+],
+"0025E0C0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetPixelShaderConstant",
+"stdcall",
+"(psh Register, psh pConstantData, psh ConstantCount)"
+],
+"00250790": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_BackFillMode",
+"stdcall",
+"(psh Value)"
+],
+"00250420": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_CullMode",
+"stdcall",
+"(psh Value)"
+],
+"00251590": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_DoNotCullUncompressed",
+"stdcall",
+"(psh Value)"
+],
+"002505E0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_Dxt1NoiseEnable",
+"stdcall",
+"(psh Value)"
+],
+"00250350": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_EdgeAntiAlias",
+"stdcall",
+"(psh Value)"
+],
+"002503D0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_FogColor",
+"stdcall",
+"(psh Value)"
+],
+"00250490": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_FrontFace",
+"stdcall",
+"(psh Value)"
+],
+"00250570": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_LineWidth",
+"stdcall",
+"(psh Value)"
+],
+"002506E0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_LogicOp",
+"stdcall",
+"(psh Value)"
+],
+"00251610": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_MultiSampleAntiAlias",
+"stdcall",
+"(psh Value)"
+],
+"00251690": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_MultiSampleMask",
+"stdcall",
+"(psh Value)"
+],
+"002515B0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_MultiSampleMode",
+"stdcall",
+"(psh Value)"
+],
+"002515E0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_MultiSampleRenderTargetMode",
+"stdcall",
+"(psh Value)"
+],
+"002504D0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_NormalizeNormals",
+"stdcall",
+"(psh Value)"
+],
+"00251470": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_OcclusionCullEnable",
+"stdcall",
+"(psh Value)"
+],
+"00250020": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_PSTextureModes",
+"stdcall",
+"(psh Value)"
+],
+"00251550": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_RopZCmpAlwaysRead",
+"stdcall",
+"(psh Value)"
+],
+"00251570": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_RopZRead",
+"stdcall",
+"(psh Value)"
+],
+"002516E0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_SampleAlpha",
+"stdcall",
+"(psh Value)"
+],
+"00250390": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_ShadowFunc",
+"stdcall",
+"(psh Value)"
+],
+"002514E0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_StencilCullEnable",
+"stdcall",
+"(psh Value)"
+],
+"00251330": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_StencilEnable",
+"stdcall",
+"(psh Value)"
+],
+"002513D0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_StencilFail",
+"stdcall",
+"(psh Value)"
+],
+"00250510": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_TextureFactor",
+"stdcall",
+"(psh Value)"
+],
+"002507F0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_TwoSidedLighting",
+"stdcall",
+"(psh Value)"
+],
+"00250870": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_VertexBlend",
+"stdcall",
+"(psh Value)"
+],
+"00251440": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_YuvEnable",
+"stdcall",
+"(psh Value)"
+],
+"00250660": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_ZBias",
+"stdcall",
+"(psh Value)"
+],
+"002512A0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderState_ZEnable",
+"stdcall",
+"(psh Value)"
+],
+"00252FB0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetRenderTarget",
+"stdcall",
+"(psh pRenderTarget, psh pNewZStencil)"
+],
+"00253D20": [
+"D3D8",
+"FUN",
+"D3DDevice_SetScissors",
+"stdcall",
+"(psh Count, psh Exclusive, psh pRects)"
+],
+"002541D0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetScreenSpaceOffset",
+"stdcall",
+"(psh x, psh y)"
+],
+"00254E70": [
+"D3D8",
+"FUN",
+"D3DDevice_SetShaderConstantMode",
+"stdcall",
+"(psh Mode)"
+],
+"00252DA0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetSoftDisplayFilter",
+"stdcall",
+"(psh Enable)"
+],
+"00252CC0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetSwapCallback",
+"stdcall",
+"(psh pCallback)"
+],
+"00253800": [
+"D3D8",
+"FUN",
+"D3DDevice_SetTexture",
+"stdcall",
+"(psh Stage, psh pTexture)"
+],
+"00250AC0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetTextureStageStateNotInline",
+"stdcall",
+"(psh Stage, psh Type, psh Value)"
+],
+"00250A40": [
+"D3D8",
+"FUN",
+"D3DDevice_SetTextureState_BorderColor",
+"stdcall",
+"(psh Stage, psh Value)"
+],
+"002509D0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetTextureState_BumpEnv",
+"stdcall",
+"(psh Stage, psh Type, psh Value)"
+],
+"00250A80": [
+"D3D8",
+"FUN",
+"D3DDevice_SetTextureState_ColorKeyColor",
+"stdcall",
+"(psh Stage, psh Value)"
+],
+"00252AF0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetTransform",
+"stdcall",
+"(psh State, psh pMatrix)"
+],
+"0025CD70": [
+"D3D8",
+"FUN",
+"D3DDevice_SetVertexData2f",
+"stdcall",
+"(psh Register, psh a, psh b)"
+],
+"0025CDB0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetVertexData4f",
+"stdcall",
+"(psh Register, psh a, psh b, psh c, psh d)"
+],
+"002550E0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetVertexShader",
+"stdcall",
+"(psh Handle)"
+],
+"00254AB0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetVertexShaderConstant1",
+"fastcall",
+"(ecx Register, edx pConstantData)"
+],
+"00254B10": [
+"D3D8",
+"FUN",
+"D3DDevice_SetVertexShaderConstant4",
+"fastcall",
+"(ecx Register, edx pConstantData)"
+],
+"00254CA0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetVertexShaderConstantNotInline",
+"fastcall",
+"(ecx Register, edx pConstantData, psh ConstantCount)"
+],
+"00254BC0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetVertexShaderConstantNotInlineFast",
+"fastcall",
+"(ecx Register, edx pConstantData, psh ConstantCount)"
+],
+"00252CA0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetVerticalBlankCallback",
+"stdcall",
+"(psh pCallback)"
+],
+"002535D0": [
+"D3D8",
+"FUN",
+"D3DDevice_SetViewport",
+"stdcall",
+"(psh pViewport)"
+],
+"0025DB90": [
+"D3D8",
+"FUN",
+"D3DDevice_Swap",
+"stdcall",
+"(psh Flags)"
+],
+"00258070": [
+"D3D8",
+"FUN",
+"D3DPalette_Lock2",
+"stdcall",
+"(psh pThis, psh Flags)"
+],
+"00257C60": [
+"D3D8",
+"FUN",
+"D3DResource_AddRef",
+"stdcall",
+"(psh pThis)"
+],
+"00257CF0": [
+"D3D8",
+"FUN",
+"D3DResource_GetType",
+"stdcall",
+"(psh pThis)"
+],
+"00257D80": [
+"D3D8",
+"FUN",
+"D3DResource_IsBusy",
+"stdcall",
+"(psh pThis)"
+],
+"00257E10": [
+"D3D8",
+"FUN",
+"D3DResource_Register",
+"stdcall",
+"(psh pThis, psh pBase)"
+],
+"00257CA0": [
+"D3D8",
+"FUN",
+"D3DResource_Release",
+"stdcall",
+"(psh pThis)"
+],
+"0025A8F0": [
+"D3D8",
+"FUN",
+"D3DSurface_GetDesc",
+"stdcall",
+"(psh pThis, psh pDesc)"
+],
+"0025A910": [
+"D3D8",
+"FUN",
+"D3DSurface_LockRect",
+"stdcall",
+"(psh pThis, psh pLockedRect, psh pRect, psh Flags)"
+],
+"0025D010": [
+"D3D8",
+"FUN",
+"D3DTexture_GetSurfaceLevel2",
+"stdcall",
+"(psh pThis, psh Level)"
+],
+"00258020": [
+"D3D8",
+"FUN",
+"D3DVertexBuffer_Lock2",
+"stdcall",
+"(psh pVertexBuffer, psh Flags)"
+],
+"0025CEF0": [
+"D3D8",
+"FUN",
+"D3D_AllocContiguousMemory",
+"stdcall",
+"(psh dwSize, psh dwAllocAttributes)"
+],
+"002520C0": [
+"D3D8",
+"FUN",
+"D3D_BlockOnResource",
+"stdcall",
+"(psh pResource)"
+],
+"00251D90": [
+"D3D8",
+"FUN",
+"D3D_BlockOnTime",
+"stdcall",
+"(psh unknown1, psh unknown2)"
+],
+"00258A65": [
+"D3D8",
+"FUN",
+"CMiniport_GetDisplayCapabilities",
+"stdcall",
+"()"
+],
+"00250F40": [
+"D3D8",
+"FUN",
+"D3D_CommonSetMultiSampleModeAndScale",
+"fastcall",
+"(ecx this, edx pViewport)"
+],
+"00257B40": [
+"D3D8",
+"FUN",
+"D3D_DestroyResource",
+"stdcall",
+"(psh pResource)"
+],
+"002520A0": [
+"D3D8",
+"FUN",
+"D3D_KickOffAndWaitForIdle",
+"stdcall",
+"()"
+],
+"00256310": [
+"D3D8",
+"FUN",
+"D3D_LazySetPointParams",
+"stdcall",
+"(psh Device)"
+],
+"00251CD0": [
+"D3D8",
+"FUN",
+"D3D_SetFence",
+"stdcall",
+"(psh Flags)"
+],
+"0025D060": [
+"D3D8",
+"FUN",
+"D3D_SetPushBufferSize",
+"stdcall",
+"(psh PushBufferSize, psh KickOffSize)"
+],
+"00253C30": [
+"D3D8",
+"FUN",
+"D3D_SetTileNoWait",
+"stdcall",
+"(psh Index, psh pTile)"
+],
+"0025D080": [
+"D3D8",
+"FUN",
+"Direct3D_CreateDevice",
+"stdcall",
+"(psh Adapter, psh DeviceType, psh hFocusWindow, psh BehaviorFlags, psh pPresentationParameters, psh ppReturnedDeviceInterface)"
+],
+"002584E0": [
+"D3D8",
+"FUN",
+"Get2DSurfaceDesc",
+"stdcall",
+"(psh pPixelContainer, psh dwLevel, psh pDesc)"
+],
+"002587D0": [
+"D3D8",
+"FUN",
+"Lock2DSurface",
+"stdcall",
+"(psh pPixelContainer, psh FaceType, psh Level, psh pLockedRect, psh pRect, psh Flags)"
+],
+"00251F00": [
+"D3D8",
+"FUN",
+"D3D_MakeRequestedSpace_8",
+"stdcall",
+"(psh MinimumSpace, psh RequestedSpace)"
+],
+"001A0670": [
+"D3D8",
+"FUN",
+"D3DDevice_SetVertexShaderConstant",
+"stdcall",
+"(psh Register, psh pConstantData, psh ConstantCount)"
+],
+"00252C20": [
+"D3D8",
+"FUN",
+"D3DDevice_BlockOnFence",
+"stdcall",
+"(psh Fence)"
+],
+"00252E00": [
+"D3D8",
+"FUN",
+"D3DDevice_InsertFence",
+"stdcall",
+"()"
+],
+"00252040": [
+"D3D8",
+"FUN",
+"D3DDevice_MakeSpace",
+"stdcall",
+"()"
+],
+"00253D10": [
+"D3D8",
+"FUN",
+"D3DDevice_SetTile",
+"stdcall",
+"(psh Index, psh pTile)"
+],
+"0025CE10": [
+"D3D8",
+"FUN",
+"D3DDevice_SetVertexDataColor",
+"stdcall",
+"(psh Register, psh Color)"
+],
+"00257E40": [
+"D3D8",
+"FUN",
+"D3DResource_BlockUntilNotBusy",
+"stdcall",
+"(psh pThis)"
+],
+"00265A66": [
+"XGRAPHC",
+"FUN",
+"XGSetTextureHeader",
+"stdcall",
+"(psh Width, psh Height, psh Levels, psh Usage, psh Format, psh Pool, psh pTexture, psh Data, psh Pitch)"
+],
+"00265A90": [
+"XGRAPHC",
+"FUN",
+"XGSetVertexBufferHeader",
+"stdcall",
+"(psh Length, psh Usage, psh FVF, psh Pool, psh pBuffer, psh Data)"
+],
+"002649E4": [
+"XGRAPHC",
+"FUN",
+"XGSwizzleRect",
+"stdcall",
+"(psh pSource, psh Pitch, psh pRect, psh pDest, psh Width, psh Height, psh pPoint, psh BytesPerPixel)"
+],
+"00265135": [
+"XGRAPHC",
+"FUN",
+"XGUnswizzleRect",
+"stdcall",
+"(psh pSource, psh Width, psh Height, psh pRect, psh pDest, psh Pitch, psh pPoint, psh BytesPerPixel)"
+],
+"002660D7": [
+"DSOUND",
+"FUN",
+"XAudioCalculatePitch",
+"stdcall",
+"(psh dwFrequency)"
+],
+"0026605E": [
+"DSOUND",
+"FUN",
+"DirectSoundEnterCriticalSection",
+"stdcall",
+"()"
+],
+"00265ECC": [
+"DSOUND",
+"FUN",
+"DSound_CRefCount_AddRef",
+"stdcall",
+"(psh pThis)"
+],
+"00265EEA": [
+"DSOUND",
+"FUN",
+"DSound_CRefCount_Release",
+"stdcall",
+"(psh pThis)"
+],
+"00267FE6": [
+"DSOUND",
+"FUN",
+"DSound_CMemoryManager_PoolAlloc",
+"stdcall",
+"(psh PoolTag, psh Size, psh ZeroInitialize)"
+],
+"00268CCD": [
+"DSOUND",
+"FUN",
+"CMcpxAPU_ServiceDeferredCommandsLow",
+"thiscall",
+"(ecx this)"
+],
+"00268DAC": [
+"DSOUND",
+"FUN",
+"CMcpxAPU_SetMixBinHeadroom_4",
+"thiscall",
+"(ecx this, psh dwMixBinMask)"
+],
+"00267588": [
+"DSOUND",
+"FUN",
+"CDirectSound3DCalculator_Calculate3D",
+"stdcall",
+"(psh pUnknown1, psh pUnknown2)"
+],
+"0026689C": [
+"DSOUND",
+"FUN",
+"CDirectSound3DCalculator_GetVoiceData",
+"stdcall",
+"(psh pUnknown1, psh pUnknown2, psh pUnknown3, psh pUnknown4, psh pUnknown5)"
+],
+"0026A5F2": [
+"DSOUND",
+"FUN",
+"CMcpxVoiceClient_SetEG",
+"thiscall",
+"(ecx this, psh pEnvelopeDesc)"
+],
+"0026A784": [
+"DSOUND",
+"FUN",
+"CMcpxVoiceClient_SetFilter",
+"thiscall",
+"(ecx this, psh pFilterDesc)"
+],
+"0026AB08": [
+"DSOUND",
+"FUN",
+"CMcpxVoiceClient_SetMixBins",
+"thiscall",
+"(ecx this)"
+],
+"0026AC61": [
+"DSOUND",
+"FUN",
+"CMcpxVoiceClient_SetPitch",
+"thiscall",
+"(ecx this)"
+],
+"0026ABC9": [
+"DSOUND",
+"FUN",
+"CMcpxVoiceClient_SetVolume",
+"thiscall",
+"(ecx this)"
+],
+"0026AF17": [
+"DSOUND",
+"FUN",
+"CMcpxVoiceClient_Commit3dSettings_0",
+"thiscall",
+"(ecx this)"
+],
+"00266337": [
+"DSOUND",
+"FUN",
+"CDirectSoundVoiceSettings_SetMixBinVolumes",
+"thiscall",
+"(ecx this, psh pMixBins)"
+],
+"00266473": [
+"DSOUND",
+"FUN",
+"CDirectSoundVoice_CommitDeferredSettings",
+"stdcall",
+"(psh pThis)"
+],
+"00266430": [
+"DSOUND",
+"FUN",
+"CDirectSoundVoice_SetEG",
+"stdcall",
+"(psh pThis, psh pEnvelopeDesc)"
+],
+"00266443": [
+"DSOUND",
+"FUN",
+"CDirectSoundVoice_SetFilter",
+"stdcall",
+"(psh pThis, psh pFilterDesc)"
+],
+"0026716A": [
+"DSOUND",
+"FUN",
+"CDirectSoundVoice_SetMixBins",
+"stdcall",
+"(psh pThis, psh pMixBins)"
+],
+"00266456": [
+"DSOUND",
+"FUN",
+"CDirectSoundVoice_SetMixBinVolumes_8",
+"stdcall",
+"(psh pThis, psh pMixBins)"
+],
+"00266417": [
+"DSOUND",
+"FUN",
+"CDirectSoundVoice_SetPitch",
+"stdcall",
+"(psh pThis, psh lPitch)"
+],
+"00267146": [
+"DSOUND",
+"FUN",
+"CDirectSoundVoice_SetFrequency",
+"stdcall",
+"(psh pThis, psh dwFrequency)"
+],
+"0026744E": [
+"DSOUND",
+"FUN",
+"CDirectSoundBufferSettings_SetBufferData",
+"thiscall",
+"(ecx this, psh pvBufferData, psh dwBufferBytes)"
+],
+"0026B6F4": [
+"DSOUND",
+"FUN",
+"CMcpxBuffer_GetCurrentPosition",
+"thiscall",
+"(ecx this, psh pdwCurrentPlayCursor, psh pdwCurrentWriteCursor)"
+],
+"0026B6B2": [
+"DSOUND",
+"FUN",
+"CMcpxBuffer_GetStatus",
+"thiscall",
+"(ecx this, psh pdwStatus)"
+],
+"0026B63F": [
+"DSOUND",
+"FUN",
+"CMcpxBuffer_Pause",
+"thiscall",
+"(ecx this, psh dwPause)"
+],
+"0026BAFE": [
+"DSOUND",
+"FUN",
+"CMcpxBuffer_Play",
+"thiscall",
+"(ecx this, psh dwFlags)"
+],
+"0026BD76": [
+"DSOUND",
+"FUN",
+"CMcpxBuffer_SetBufferData",
+"thiscall",
+"(ecx this)"
+],
+"0026BC5C": [
+"DSOUND",
+"FUN",
+"CMcpxBuffer_SetCurrentPosition",
+"thiscall",
+"(ecx this, psh dwNewPosition)"
+],
+"0026BBCC": [
+"DSOUND",
+"FUN",
+"CMcpxBuffer_Stop",
+"thiscall",
+"(ecx this, psh dwFlags)"
+],
+"0026BE35": [
+"DSOUND",
+"FUN",
+"CMcpxBuffer_Stop_Ex",
+"thiscall",
+"(ecx this, psh2 rtTimeStamp, psh dwFlags)"
+],
+"002667F6": [
+"DSOUND",
+"FUN",
+"CDirectSoundBuffer_GetCurrentPosition",
+"stdcall",
+"(psh this, psh pdwCurrentPlayCursor, psh pdwCurrentWriteCursor)"
+],
+"00266720": [
+"DSOUND",
+"FUN",
+"CDirectSoundBuffer_GetStatus",
+"stdcall",
+"(psh this, psh pdwStatus)"
+],
+"002666CF": [
+"DSOUND",
+"FUN",
+"CDirectSoundBuffer_Pause",
+"stdcall",
+"(psh this, psh dwPause)"
+],
+"002665D6": [
+"DSOUND",
+"FUN",
+"CDirectSoundBuffer_Play",
+"stdcall",
+"(psh this, psh dwReserved1, psh dwReserved2, psh dwFlags)"
+],
+"002674DA": [
+"DSOUND",
+"FUN",
+"CDirectSoundBuffer_SetBufferData",
+"stdcall",
+"(psh this, psh pvBufferData, psh dwBufferBytes)"
+],
+"0026684B": [
+"DSOUND",
+"FUN",
+"CDirectSoundBuffer_SetCurrentPosition",
+"stdcall",
+"(psh this, psh dwNewPosition)"
+],
+"00266BE5": [
+"DSOUND",
+"FUN",
+"CDirectSoundBuffer_SetEG",
+"stdcall",
+"(psh this, psh pEnvelopeDesc)"
+],
+"00266C33": [
+"DSOUND",
+"FUN",
+"CDirectSoundBuffer_SetFilter",
+"stdcall",
+"(psh this, psh pFilterDesc)"
+],
+"002671DE": [
+"DSOUND",
+"FUN",
+"CDirectSoundBuffer_SetFrequency",
+"stdcall",
+"(psh this, psh dwFrequency)"
+],
+"00266771": [
+"DSOUND",
+"FUN",
+"CDirectSoundBuffer_SetLoopRegion",
+"stdcall",
+"(psh this, psh dwLoopStart, psh dwLoopLength)"
+],
+"0026722C": [
+"DSOUND",
+"FUN",
+"CDirectSoundBuffer_SetMixBins",
+"stdcall",
+"(psh this, psh mixBins)"
+],
+"00266C81": [
+"DSOUND",
+"FUN",
+"CDirectSoundBuffer_SetMixBinVolumes_8",
+"stdcall",
+"(psh this, psh pMixBins)"
+],
+"00266676": [
+"DSOUND",
+"FUN",
+"CDirectSoundBuffer_StopEx",
+"stdcall",
+"(psh this, psh2 rtTimeStamp, psh dwFlags)"
+],
+"00266627": [
+"DSOUND",
+"FUN",
+"CDirectSoundBuffer_Stop",
+"stdcall",
+"(psh this)"
+],
+"00267877": [
+"DSOUND",
+"FUN",
+"CDirectSound_CommitDeferredSettings",
+"stdcall",
+"(psh this)"
+],
+"00267B9F": [
+"DSOUND",
+"FUN",
+"CDirectSound_CreateSoundBuffer",
+"stdcall",
+"(psh this, psh pdsbd, psh ppBuffer, psh pUnused4)"
+],
+"002661E1": [
+"DSOUND",
+"FUN",
+"CDirectSound_DownloadEffectsImage",
+"stdcall",
+"(psh this, psh pvImageBuffer, psh dwImageSize, psh pImageLoc, psh ppImageDesc)"
+],
+"00266306": [
+"DSOUND",
+"FUN",
+"CDirectSound_DoWork",
+"stdcall",
+"()"
+],
+"00266245": [
+"DSOUND",
+"FUN",
+"CDirectSound_SetEffectData",
+"stdcall",
+"(psh this, psh dwEffectIndex, psh dwOffset, psh pvData, psh dwDataSize, psh dwApply)"
+],
+"00267C3B": [
+"DSOUND",
+"FUN",
+"CDirectSound_SetI3DL2Listener",
+"stdcall",
+"(psh this, psh pds3dl, psh dwApply)"
+],
+"002662A7": [
+"DSOUND",
+"FUN",
+"CDirectSound_SetMixBinHeadroom",
+"stdcall",
+"(psh this, psh dwMixBinMask, psh dwHeadroom)"
+],
+"00266E4C": [
+"DSOUND",
+"FUN",
+"IDirectSoundBuffer_GetCurrentPosition",
+"stdcall",
+"(psh pThis, psh pdwCurrentPlayCursor, psh pdwCurrentWriteCursor)"
+],
+"00266E30": [
+"DSOUND",
+"FUN",
+"IDirectSoundBuffer_GetStatus",
+"stdcall",
+"(psh pThis, psh pdwStatus)"
+],
+"00266DF4": [
+"DSOUND",
+"FUN",
+"IDirectSoundBuffer_Pause",
+"stdcall",
+"(psh pThis, psh dwPause)"
+],
+"00266D94": [
+"DSOUND",
+"FUN",
+"IDirectSoundBuffer_Play",
+"stdcall",
+"(psh pThis, psh dwReserved1, psh dwReserved2, psh dwFlags)"
+],
+"002660C1": [
+"DSOUND",
+"FUN",
+"IDirectSoundBuffer_Release",
+"stdcall",
+"(psh pThis)"
+],
+"002677C8": [
+"DSOUND",
+"FUN",
+"IDirectSoundBuffer_SetBufferData",
+"stdcall",
+"(psh pThis, psh pvBufferData, psh dwBufferBytes)"
+],
+"00266E6C": [
+"DSOUND",
+"FUN",
+"IDirectSoundBuffer_SetCurrentPosition",
+"stdcall",
+"(psh pThis, psh dwNewPosition)"
+],
+"00266D40": [
+"DSOUND",
+"FUN",
+"IDirectSoundBuffer_SetEG",
+"stdcall",
+"(psh pThis, psh pEnvelopeDesc)"
+],
+"00266D5C": [
+"DSOUND",
+"FUN",
+"IDirectSoundBuffer_SetFilter",
+"stdcall",
+"(psh pThis, psh pFilterDesc)"
+],
+"0026727A": [
+"DSOUND",
+"FUN",
+"IDirectSoundBuffer_SetFrequency",
+"stdcall",
+"(psh pThis, psh dwFrequency)"
+],
+"00266E10": [
+"DSOUND",
+"FUN",
+"IDirectSoundBuffer_SetLoopRegion",
+"stdcall",
+"(psh pThis, psh dwLoopStart, psh dwLoopLength)"
+],
+"00267296": [
+"DSOUND",
+"FUN",
+"IDirectSoundBuffer_SetMixBins",
+"stdcall",
+"(psh pThis, psh mixBins)"
+],
+"00266D78": [
+"DSOUND",
+"FUN",
+"IDirectSoundBuffer_SetMixBinVolumes_8",
+"stdcall",
+"(psh pThis, psh pMixBins)"
+],
+"00266DB8": [
+"DSOUND",
+"FUN",
+"IDirectSoundBuffer_Stop",
+"stdcall",
+"(psh pThis)"
+],
+"00266DD0": [
+"DSOUND",
+"FUN",
+"IDirectSoundBuffer_StopEx",
+"stdcall",
+"(psh pThis, psh2 rtTimeStamp, psh dwFlags)"
+],
+"00267D5E": [
+"DSOUND",
+"FUN",
+"IDirectSound_CreateSoundBuffer",
+"stdcall",
+"(psh pThis, psh pdsbd, psh ppBuffer, psh pUnused4)"
+],
+"00266CCF": [
+"DSOUND",
+"FUN",
+"IDirectSound_DownloadEffectsImage",
+"stdcall",
+"(psh pThis, psh pvImageBuffer, psh dwImageSize, psh pImageLoc, psh ppImageDesc)"
+],
+"002660AB": [
+"DSOUND",
+"FUN",
+"IDirectSound_Release",
+"stdcall",
+"(psh pThis)"
+],
+"00266CF6": [
+"DSOUND",
+"FUN",
+"IDirectSound_SetEffectData",
+"stdcall",
+"(psh pThis, psh dwEffectIndex, psh dwOffset, psh pvData, psh dwDataSize, psh dwApply)"
+],
+"00267D82": [
+"DSOUND",
+"FUN",
+"IDirectSound_SetI3DL2Listener",
+"stdcall",
+"(psh pThis, psh pds3dl, psh dwApply)"
+],
+"00266D20": [
+"DSOUND",
+"FUN",
+"IDirectSound_SetMixBinHeadroom",
+"stdcall",
+"(psh pThis, psh dwMixBinMask, psh dwHeadroom)"
+],
+"00267F48": [
+"DSOUND",
+"FUN",
+"DirectSoundCreate",
+"stdcall",
+"(psh pguidDeviceId, psh ppDirectSound, psh pUnused3)"
+],
+"00267F8F": [
+"DSOUND",
+"FUN",
+"DirectSoundCreateBuffer",
+"stdcall",
+"(psh pdsbd, psh ppBuffer)"
+],
+"00266E88": [
+"DSOUND",
+"FUN",
+"DirectSoundDoWork",
+"stdcall",
+"()"
+],
+"00000794": [
+"D3D8",
+"VAR",
+"m_VertexShader_OFFSET",
+"D3DDevice",
+""
+],
+"002F1A5C": [
+"XAPILIB",
+"VAR",
+"g_XapiAltLett_MU",
+"",
+""
+],
+"002F1A60": [
+"XAPILIB",
+"VAR",
+"g_XapiMountedMUs",
+"",
+""
+],
+"00308DF0": [
+"XAPILIB",
+"VAR",
+"g_XapiCurrentTopLevelFilter",
+"",
+""
+],
+"00000004": [
+"XAPILIB",
+"VAR",
+"_tls_array",
+"",
+""
+],
+"002F1800": [
+"XAPILIB",
+"VAR",
+"_tls_index",
+"",
+""
+],
+"00000008": [
+"XAPILIB",
+"VAR",
+"XapiLastErrorCode_OFFSET",
+"",
+""
+],
+"002CE5C8": [
+"XAPILIB",
+"VAR",
+"XapiThreadNotifyRoutineList",
+"",
+""
+]
+}

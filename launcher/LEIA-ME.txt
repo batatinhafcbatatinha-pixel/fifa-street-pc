@@ -1,0 +1,121 @@
+FIFA Street (2005) - Versão para PC
+===================================
+
+Uma versão nativa para PC do FIFA Street (Xbox, 2005), feita por
+recompilação estática. Não é um emulador: o código do jogo foi traduzido
+para rodar direto no seu PC.
+
+- Gráficos nativos: as chamadas Direct3D do jogo rodam em DirectX 11 ou
+  Vulkan. O chip de vídeo do Xbox não é emulado.
+- Som nativo: o sistema de som do jogo foi refeito para PC. Sem chip de
+  áudio emulado, sem estalos.
+- Qualquer resolução, de 720p até 8K, ou a do seu monitor (4K roda a 60 fps
+  estáveis numa placa intermediária).
+- Widescreen 16:9 de verdade: usa o modo widescreen do próprio jogo, então
+  a câmera, o placar e o que aparece nas laterais ficam certos.
+  (Telas 16:10, 21:9 e 32:9 mostram a imagem 16:9 com barras pretas.)
+- Configurações dentro do jogo (aperte F1).
+- Windows e Linux.
+
+
+VOCÊ PRECISA DO JOGO
+--------------------
+Este pacote não vem com o jogo. Você precisa ter o seu FIFA Street do Xbox
+original (versão americana).
+
+Copie tudo o que está no disco do jogo para a pasta "game_files", de forma
+que o arquivo "default.xbe" fique aqui:
+
+    game_files\default.xbe
+
+(O disco também tem uma pasta "data"; ela vai dentro de game_files também.)
+
+
+WINDOWS
+-------
+Precisa: Windows 10 ou 11 de 64 bits e uma placa de vídeo com DirectX 11.
+         Edições "N" do Windows também precisam do Media Feature Pack.
+
+1. Extraia o zip inteiro para uma pasta (fora de Arquivos de Programas).
+2. Copie os arquivos do jogo para "game_files" (veja acima).
+3. Dê dois cliques em "Play FIFA Street.exe".
+
+Se o Windows SmartScreen avisar sobre o arquivo, clique em "Mais
+informações" e depois em "Executar assim mesmo".
+
+
+LINUX
+-----
+Precisa: PC de 64 bits, uma distro recente (Ubuntu 24.04 ou mais nova,
+Fedora 39 ou mais nova...) e driver de vídeo com Vulkan funcionando.
+
+1. Instale as bibliotecas que o jogo usa. No Ubuntu / Debian:
+       sudo apt install libsdl2-2.0-0 libsdl2-ttf-2.0-0 libepoxy0 libssl3 mesa-vulkan-drivers
+   (Placas NVIDIA: o driver da NVIDIA já traz o Vulkan.)
+2. Extraia o zip inteiro para uma pasta.
+3. Copie os arquivos do jogo para "game_files" (veja acima).
+4. Abra um terminal nessa pasta e rode:
+       sh play-fifa-street.sh
+
+
+MAC
+---
+Ainda não funciona no Mac.
+
+
+CONTROLES
+---------
+Funciona qualquer controle no estilo Xbox (Xbox 360 / One / Series e a
+maioria dos outros).
+
+Teclado:
+  Setas               Direcional
+  Teclado num. 8/4/2/6  Analógico esquerdo
+  I / J / K / L       Analógico direito
+  Z X A S             Botões A B X Y
+  Q / E               Botões Branco / Preto
+  1 / 3               Gatilho esquerdo / direito
+  Enter ou Esc        Start (pausa)
+  Backspace           Back
+  F1                  Configurações
+  Alt+Enter           Janela / tela cheia
+
+
+CONFIGURAÇÕES (F1)
+------------------
+F1 no teclado, ou Back+Start no controle, abre as configurações a qualquer
+momento. Também dá para abrir pelo botão "CONFIGURAÇÕES DO PC" no menu
+principal e no menu de pausa. O menu começa em inglês ("PC SETTINGS");
+"Menu language" permite trocar para português imediatamente. O idioma do
+jogo é uma opção separada.
+
+Dá para mudar: janela ou tela cheia, monitor, taxa de atualização, VSync,
+limite de quadros, resolução, proporção da imagem, antisserrilhamento
+(FXAA), filtro de texturas, API gráfica (DirectX 11 ou Vulkan, só no
+Windows), placa de vídeo, idioma do jogo (inglês ou espanhol) e volume.
+
+Itens marcados com * só mudam depois de reiniciar; o próprio menu reinicia
+o jogo para você. As configurações ficam salvas no fifastreet.ini, ao lado
+do exe do jogo.
+
+
+PROBLEMAS
+---------
+- O jogo não abre: confira se existe game_files\default.xbe.
+- Imagem "rasgando" (tearing): ligue o VSync nas configurações.
+- Algo estranho na imagem com DirectX 11: teste o Vulkan nas configurações
+  (ou o contrário).
+- Se o jogo fechar, a pasta "logs" tem os detalhes. Mande junto se for
+  avisar de um problema.
+
+
+PROGRAMAS DE TERCEIROS
+----------------------
+- DXVK (Vulkan para DirectX 11) - licença zlib - licenses\DXVK-LICENSE.txt
+- vkd3d-shader (compilador de shaders no Linux) - LGPL 2.1 -
+  licenses\vkd3d-COPYING.txt; código-fonte: https://gitlab.winehq.org/wine/vkd3d
+- Fontes DejaVu (menu de configurações no Linux) - licenses\DejaVu-fonts-LICENSE.txt
+- Runtime do Microsoft Visual C++ (vcruntime140.dll)
+
+FIFA Street é marca da Electronic Arts. Este projeto não é feito nem
+aprovado pela EA ou pela Microsoft.

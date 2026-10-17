@@ -1,0 +1,1034 @@
+{
+ "0016198D": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0016198D",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "001619FF": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_001619FF",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00161AA1": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00161AA1",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00161AAA": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00161AAA",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00161AB0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00161AB0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00161AB6": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00161AB6",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00161ABC": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00161ABC",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00161AC2": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00161AC2",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00161AC8": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00161AC8",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00161ACE": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00161ACE",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00161B16": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00161B16",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00161B4C": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00161B4C",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00161BA1": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00161BA1",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00161BEB": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00161BEB",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00161C22": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00161C22",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00161C8D": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00161C8D",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00161E07": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00161E07",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00161E3E": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00161E3E",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00161E4F": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00161E4F",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00161E9E": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00161E9E",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00161F2E": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00161F2E",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00161F40": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00161F40",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "001622B1": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_001622B1",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "001622BA": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_001622BA",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "001622C3": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_001622C3",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "001622DC": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_001622DC",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0016231B": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0016231B",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00162385": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00162385",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00162504": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00162504",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00162540": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00162540",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00162573": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00162573",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "001625A7": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_001625A7",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "001625B8": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_001625B8",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "001625C1": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_001625C1",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "001625EF": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_001625EF",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0016261E": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0016261E",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00162635": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00162635",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00162642": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00162642",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00162667": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00162667",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00162693": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00162693",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "001627F4": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_001627F4",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00227CB4": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00227CB4",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00227DAC": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00227DAC",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00227DE0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00227DE0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00227DF0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00227DF0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00227E10": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00227E10",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00227E50": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00227E50",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00227E70": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00227E70",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00227EC0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00227EC0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00227EE0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00227EE0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00227EF0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00227EF0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00227F20": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00227F20",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00227F50": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00227F50",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00228010": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00228010",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002280D0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002280D0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00228100": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00228100",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00228160": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00228160",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002281F0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002281F0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00228270": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00228270",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00228320": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00228320",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002283C0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002283C0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002283E0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002283E0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00228400": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00228400",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00228490": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00228490",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002284F0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002284F0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00228520": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00228520",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002285A0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002285A0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002285F0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002285F0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002372F0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002372F0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00237320": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00237320",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002373B0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002373B0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00237620": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00237620",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002376E0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002376E0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00237850": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00237850",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002378D0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002378D0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002378F0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002378F0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00237920": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00237920",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00237FC0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00237FC0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00237FD0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00237FD0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00237FE2": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00237FE2",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00237FFF": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00237FFF",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023801C": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023801C",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023806A": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023806A",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002380B0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002380B0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002380ED": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002380ED",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00238115": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00238115",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00238163": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00238163",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023818F": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023818F",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002382E6": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002382E6",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023830E": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023830E",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00238349": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00238349",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00238476": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00238476",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00238497": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00238497",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023868C": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023868C",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002386FA": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002386FA",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00238724": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00238724",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00238762": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00238762",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023879B": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023879B",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002387C0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002387C0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00238863": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00238863",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00238911": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00238911",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002389B1": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002389B1",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002389D6": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002389D6",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002389FB": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002389FB",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00238A2D": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00238A2D",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00238A55": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00238A55",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00238A7A": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00238A7A",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00238AF7": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00238AF7",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00238B28": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00238B28",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00238BCA": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00238BCA",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00238D98": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00238D98",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00238DE3": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00238DE3",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00238E66": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00238E66",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00238FFD": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00238FFD",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002390F5": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002390F5",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00239185": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00239185",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023918B": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023918B",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002392AB": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002392AB",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002393D4": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002393D4",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00239875": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00239875",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002398A0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002398A0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002398D8": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002398D8",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002398EC": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002398EC",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00239900": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00239900",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023991D": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023991D",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002399CC": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002399CC",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "002399E9": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_002399E9",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00239A97": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00239A97",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00239B6A": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00239B6A",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00239BB6": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00239BB6",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00239BFC": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00239BFC",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00239BFF": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00239BFF",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00239C07": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00239C07",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00239C63": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00239C63",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00239C9D": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00239C9D",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00239D18": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00239D18",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00239D1B": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00239D1B",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00239D23": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00239D23",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00239D75": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00239D75",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00239D7F": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00239D7F",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00239D92": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00239D92",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00239DE6": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00239DE6",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00239DF0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00239DF0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00239E3A": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00239E3A",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00239E70": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00239E70",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "00239EE0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_00239EE0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023A170": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023A170",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023A1B1": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023A1B1",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023A62F": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023A62F",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023A690": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023A690",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023A716": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023A716",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023A773": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023A773",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023A7A1": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023A7A1",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023A83C": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023A83C",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023A841": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023A841",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023A852": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023A852",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023A86D": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023A86D",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023A876": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023A876",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023A87F": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023A87F",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023A8FF": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023A8FF",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023A927": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023A927",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023A959": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023A959",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023A95F": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023A95F",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023A971": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023A971",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023A97E": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023A97E",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023A9A0": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023A9A0",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023A9F8": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023A9F8",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023AA00": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023AA00",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023AB24": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023AB24",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023ACCD": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023ACCD",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023ACE4": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023ACE4",
+  "native": "project/src/hle_smp_serial.c"
+ },
+ "0023AD00": {
+  "lib": "GAME",
+  "conv": "any",
+  "name": "smp_serial_0023AD00",
+  "native": "project/src/hle_smp_serial.c"
+ }
+}

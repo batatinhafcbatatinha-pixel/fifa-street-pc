@@ -21,29 +21,32 @@ if ds_path.exists():
 sync_path = here / 'sync_functions.json'
 if sync_path.exists():
     table.update(json.loads(sync_path.read_text(encoding='utf-8')))
+# XAPI XInput/XPP functions in C: project/src/hle_input.c.
+input_path = here / 'input_functions.json'
+if input_path.exists():
+    table.update(json.loads(input_path.read_text(encoding='utf-8')))
+# Title heap code serialised under RECOMP_GUEST_SMP: project/src/hle_smp_serial.c
+# (generated with the table by hle/make-smp-serial.py).
+serial_path = here / 'smp_serial_functions.json'
+if serial_path.exists():
+    table.update(json.loads(serial_path.read_text(encoding='utf-8')))
 # Game functions observed by project/src/game_hooks.c (front-end screens).
 hooks_path = here / 'game_hooks.json'
 if hooks_path.exists():
     table.update(json.loads(hooks_path.read_text(encoding='utf-8')))
 addrs = sorted(int(a, 16) for a in table)
-address_set = set(addrs)
-definition = re.compile(r'^void sub_([0-9A-F]{8})(_gen)?\(void\)(?=[ \t]*(?:\r?$|\{))', re.M)
 
 renamed = 0
 found = set()
 for path in sorted(gen.glob('recomp_00*.c')):
     original = path.read_text(encoding='utf-8')
     text = original
-    def route(match):
-        global renamed
-        a = int(match[1], 16)
-        if a not in address_set:
-            return match[0]
-        found.add(a)
-        if not match[2]:
-            renamed += 1
-        return f'void sub_{a:08X}_gen(void)'
-    text = definition.sub(route, text)
+    for a in addrs:
+        name = f'sub_{a:08X}'
+        text, n = re.subn(rf'^void {name}\(void\)(\s*\{{|\s*$)', rf'void {name}_gen(void)\1', text, flags=re.M)
+        if n or re.search(rf'^void {name}_gen\(void\)', text, flags=re.M):
+            found.add(a)
+        renamed += n
     if text != original:
         path.write_text(text, encoding='utf-8', newline='\n')
 

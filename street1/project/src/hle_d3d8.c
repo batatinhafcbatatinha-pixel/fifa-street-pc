@@ -419,7 +419,11 @@ static void hle_native_call(int id, void (*gen)(void))
     hle_native_observe(id, 0, 1, a, ecx, edx, g_eax);
 }
 
+int guest_cpu_native_enter(void);
+void guest_cpu_native_leave(int token);
+/* RECOMP_GUEST_SMP: the API runs under the guest kernel lock (no-op otherwise). */
 #define HLE_API(va, name, conv, args) \
-    void sub_##va(void) { hle_enter(HLE_##name); hle_native_call(HLE_##name, sub_##va##_gen); }
+    void sub_##va(void) { int smp_ = guest_cpu_native_enter(); hle_enter(HLE_##name); \
+                          hle_native_call(HLE_##name, sub_##va##_gen); guest_cpu_native_leave(smp_); }
 #include "hle_d3d8_table.h"
 #undef HLE_API

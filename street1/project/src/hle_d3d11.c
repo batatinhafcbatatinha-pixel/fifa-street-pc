@@ -1084,6 +1084,8 @@ void hle_native_represent(void)
     LeaveCriticalSection(&g_hle.lock);
 }
 
+void hle_stall_tick(void);
+
 void hle_native_swap(uint32_t flags)
 {
     HleSurface *rt;
@@ -1095,6 +1097,7 @@ void hle_native_swap(uint32_t flags)
     EnterCriticalSection(&g_hle.lock);
     hle_draw_flush();
     g_hle.swaps++;
+    hle_stall_tick();
     rt = hle_surface_for(MEM32(hle_device_va() + DEV_RENDER_TARGET));
     if (rt)
         g_hle.last_present = rt->data;

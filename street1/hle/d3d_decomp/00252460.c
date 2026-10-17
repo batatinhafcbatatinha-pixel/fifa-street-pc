@@ -1,0 +1,131 @@
+// callers: 0x2576d0
+
+undefined4 FUN_00252460(float *param_1,float *param_2,int param_3)
+
+{
+  float fVar1;
+  float fVar2;
+  float fVar3;
+  float fVar4;
+  float fVar5;
+  float fVar6;
+  float fVar7;
+  float fVar8;
+  float fVar9;
+  float fVar10;
+  float fVar11;
+  float fVar12;
+  float fVar13;
+  float fVar14;
+  float fVar15;
+  float fVar16;
+  float fVar17;
+  float fVar18;
+  float fVar19;
+  float fVar20;
+  float fVar21;
+  float fVar22;
+  float fVar23;
+  float fVar24;
+  float fVar25;
+  uint uVar26;
+  float fVar27;
+  float10 fVar28;
+  
+  fVar3 = param_2[5];
+  fVar1 = *param_2;
+  fVar2 = param_2[1];
+  fVar27 = param_2[4];
+  fVar4 = param_2[9];
+  fVar5 = param_2[8];
+  fVar6 = param_2[0xd];
+  fVar19 = fVar3 * fVar1 - fVar27 * fVar2;
+  fVar7 = param_2[0xc];
+  fVar8 = param_2[2];
+  fVar9 = param_2[3];
+  fVar10 = param_2[6];
+  fVar11 = param_2[10];
+  fVar22 = fVar4 * fVar1 - fVar5 * fVar2;
+  fVar12 = param_2[0xe];
+  fVar13 = param_2[7];
+  fVar14 = fVar6 * fVar1 - fVar7 * fVar2;
+  fVar15 = fVar4 * fVar27 - fVar5 * fVar3;
+  fVar1 = param_2[0xb];
+  fVar27 = fVar6 * fVar27 - fVar7 * fVar3;
+  fVar2 = param_2[0xf];
+  fVar3 = fVar6 * fVar5 - fVar7 * fVar4;
+  fVar21 = fVar11 * fVar19 + (fVar8 * fVar15 - fVar10 * fVar22);
+  fVar20 = (fVar10 * fVar14 - fVar12 * fVar19) - fVar8 * fVar27;
+  fVar18 = fVar12 * fVar22 + (fVar8 * fVar3 - fVar11 * fVar14);
+  fVar17 = (fVar11 * fVar27 - fVar12 * fVar15) - fVar10 * fVar3;
+  fVar16 = (fVar22 * fVar13 - fVar19 * fVar1) - fVar15 * fVar9;
+  fVar19 = fVar19 * fVar2 + (fVar27 * fVar9 - fVar14 * fVar13);
+  fVar14 = (fVar14 * fVar1 - fVar22 * fVar2) - fVar3 * fVar9;
+  fVar15 = fVar15 * fVar2 + (fVar3 * fVar13 - fVar27 * fVar1);
+  fVar22 = fVar8 * fVar13 - fVar10 * fVar9;
+  fVar24 = fVar8 * fVar1 - fVar11 * fVar9;
+  fVar23 = fVar8 * fVar2 - fVar12 * fVar9;
+  fVar25 = fVar10 * fVar1 - fVar11 * fVar13;
+  fVar13 = fVar10 * fVar2 - fVar12 * fVar13;
+  fVar27 = *param_2;
+  fVar4 = param_2[4];
+  fVar5 = param_2[8];
+  fVar6 = param_2[0xc];
+  fVar11 = fVar11 * fVar2 - fVar12 * fVar1;
+  fVar1 = param_2[1];
+  fVar2 = param_2[5];
+  fVar3 = param_2[9];
+  fVar7 = param_2[0xd];
+  fVar10 = (fVar24 * fVar2 - fVar22 * fVar3) - fVar25 * fVar1;
+  fVar9 = fVar22 * fVar7 + (fVar13 * fVar1 - fVar23 * fVar2);
+  fVar8 = (fVar23 * fVar3 - fVar24 * fVar7) - fVar11 * fVar1;
+  fVar7 = fVar25 * fVar7 + (fVar11 * fVar2 - fVar13 * fVar3);
+  fVar3 = fVar22 * fVar5 + (fVar25 * fVar27 - fVar24 * fVar4);
+  fVar1 = (fVar4 * fVar23 - fVar22 * fVar6) - fVar13 * fVar27;
+  fVar2 = fVar24 * fVar6 + (fVar11 * fVar27 - fVar23 * fVar5);
+  fVar11 = (fVar13 * fVar5 - fVar25 * fVar6) - fVar11 * fVar4;
+  fVar27 = fVar7 * fVar27 + fVar8 * fVar4 + fVar9 * fVar5 + fVar10 * fVar6;
+  if (fVar27 == 0.0) {
+    return 0xffffffff;
+  }
+  if (param_3 != 0) {
+    fVar28 = (float10)FUN_002523b0(fVar27 * fVar27);
+    fVar27 = (float)((uint)fVar27 & 0x80000000 | (uint)(float)fVar28);
+    *param_1 = fVar27 * fVar7;
+    param_1[4] = fVar27 * fVar11;
+    param_1[1] = fVar27 * fVar8;
+    param_1[8] = fVar27 * fVar15;
+    param_1[2] = fVar27 * fVar9;
+    param_1[0xc] = fVar27 * fVar17;
+    param_1[3] = fVar27 * fVar10;
+    param_1[5] = fVar27 * fVar2;
+    param_1[9] = fVar27 * fVar14;
+    param_1[6] = fVar27 * fVar1;
+    param_1[0xd] = fVar27 * fVar18;
+    param_1[7] = fVar27 * fVar3;
+    param_1[10] = fVar27 * fVar19;
+    param_1[0xe] = fVar27 * fVar20;
+    param_1[0xb] = fVar27 * fVar16;
+    param_1[0xf] = fVar27 * fVar21;
+    return 0;
+  }
+  uVar26 = (uint)fVar27 & 0x80000000;
+  *param_1 = (float)((uint)fVar7 ^ uVar26);
+  param_1[4] = (float)((uint)fVar11 ^ uVar26);
+  param_1[1] = (float)((uint)fVar8 ^ uVar26);
+  param_1[8] = (float)((uint)fVar15 ^ uVar26);
+  param_1[2] = (float)((uint)fVar9 ^ uVar26);
+  param_1[0xc] = (float)((uint)fVar17 ^ uVar26);
+  param_1[3] = (float)((uint)fVar10 ^ uVar26);
+  param_1[5] = (float)((uint)fVar2 ^ uVar26);
+  param_1[9] = (float)((uint)fVar14 ^ uVar26);
+  param_1[6] = (float)((uint)fVar1 ^ uVar26);
+  param_1[0xd] = (float)((uint)fVar18 ^ uVar26);
+  param_1[7] = (float)((uint)fVar3 ^ uVar26);
+  param_1[10] = (float)((uint)fVar19 ^ uVar26);
+  param_1[0xe] = (float)((uint)fVar20 ^ uVar26);
+  param_1[0xb] = (float)((uint)fVar16 ^ uVar26);
+  param_1[0xf] = (float)((uint)fVar21 ^ uVar26);
+  return 0;
+}
+

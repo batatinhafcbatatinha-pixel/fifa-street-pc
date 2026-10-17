@@ -1,0 +1,961 @@
+{
+ "00250050": {
+  "name": "D3DDevice_SetRenderState_Simple",
+  "sites": 71,
+  "callers": [
+   "00192F00",
+   "001934B0",
+   "00194440",
+   "00197E50",
+   "00198100",
+   "00198750",
+   "00198F52",
+   "00198FC0",
+   "00199120",
+   "00199190",
+   "00199260",
+   "001992D0",
+   "00199340",
+   "001993B0",
+   "00199600",
+   "0019CAB0",
+   "0019CE70"
+  ]
+ },
+ "00257E40": {
+  "name": "D3DResource_BlockUntilNotBusy",
+  "sites": 20,
+  "callers": [
+   "0018E500",
+   "0018E590",
+   "00194D60",
+   "00194E10",
+   "00195320",
+   "001954E0",
+   "00195C90",
+   "00195DB0",
+   "00196480",
+   "0019A5D6",
+   "0019F010",
+   "0019F110"
+  ]
+ },
+ "00257CA0": {
+  "name": "D3DResource_Release",
+  "sites": 20,
+  "callers": [
+   "001952A0",
+   "001958D0",
+   "001970C0",
+   "001995D0",
+   "00199C10",
+   "0019A210",
+   "0019A840",
+   "0019A900",
+   "0019AD80",
+   "0019F010",
+   "0019F110",
+   "0019F290",
+   "0019F3F0"
+  ]
+ },
+ "00253800": {
+  "name": "D3DDevice_SetTexture",
+  "sites": 14,
+  "callers": [
+   "001934B0",
+   "00194900",
+   "00194E10",
+   "00195C90",
+   "00195DB0",
+   "00196480",
+   "00198100",
+   "0019A5D6"
+  ]
+ },
+ "00257E10": {
+  "name": "D3DResource_Register",
+  "sites": 9,
+  "callers": [
+   "0018E4E0",
+   "0018E540",
+   "00194880",
+   "00194E10",
+   "00195320",
+   "001954E0",
+   "00195770",
+   "0019F390"
+  ]
+ },
+ "00254CE0": {
+  "name": "D3DDevice_SetStreamSource",
+  "sites": 9,
+  "callers": [
+   "0018E500",
+   "0019A5D6",
+   "0019F010",
+   "0019F110",
+   "001A0740",
+   "001A0790"
+  ]
+ },
+ "002539B0": {
+  "name": "D3DDevice_SetPalette",
+  "sites": 9,
+  "callers": [
+   "00194900",
+   "00194D60",
+   "00195320",
+   "001954E0",
+   "00195DB0",
+   "00196480",
+   "0019A5D6"
+  ]
+ },
+ "0025A8F0": {
+  "name": "D3DSurface_GetDesc",
+  "sites": 9,
+  "callers": [
+   "00198750",
+   "00199C10",
+   "0019A210",
+   "0019A2E0",
+   "0019A3D0",
+   "0019A4C0",
+   "00265AC9"
+  ]
+ },
+ "0025CD70": {
+  "name": "D3DDevice_SetVertexData2f",
+  "sites": 8,
+  "callers": [
+   "0019E4A0",
+   "0019E810"
+  ]
+ },
+ "0025CDB0": {
+  "name": "D3DDevice_SetVertexData4f",
+  "sites": 8,
+  "callers": [
+   "0019E4A0",
+   "0019E810"
+  ]
+ },
+ "002503D0": {
+  "name": "D3DDevice_SetRenderState_FogColor",
+  "sites": 7,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "00198100",
+   "00198750",
+   "00199840",
+   "0019CAB0"
+  ]
+ },
+ "00251330": {
+  "name": "D3DDevice_SetRenderState_StencilEnable",
+  "sites": 7,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "00198100",
+   "00198750",
+   "00199570",
+   "0019CAB0"
+  ]
+ },
+ "00251440": {
+  "name": "D3DDevice_SetRenderState_YuvEnable",
+  "sites": 7,
+  "callers": [
+   "00192F00",
+   "001934B0",
+   "00194440",
+   "00194900",
+   "00197E50",
+   "00198100",
+   "0019CAB0"
+  ]
+ },
+ "002513D0": {
+  "name": "D3DDevice_SetRenderState_StencilFail",
+  "sites": 6,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "00198750",
+   "00199200",
+   "0019CAB0"
+  ]
+ },
+ "00250420": {
+  "name": "D3DDevice_SetRenderState_CullMode",
+  "sites": 6,
+  "callers": [
+   "00192F00",
+   "001934B0",
+   "00194440",
+   "00197E50",
+   "00198750",
+   "0019CAB0"
+  ]
+ },
+ "00250390": {
+  "name": "D3DDevice_SetRenderState_ShadowFunc",
+  "sites": 6,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "00198750",
+   "00199B20",
+   "0019CAB0"
+  ]
+ },
+ "00251470": {
+  "name": "D3DDevice_SetRenderState_OcclusionCullEnable",
+  "sites": 6,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "00198750",
+   "0019A760",
+   "0019CAB0"
+  ]
+ },
+ "00251550": {
+  "name": "D3DDevice_SetRenderState_RopZCmpAlwaysRead",
+  "sites": 6,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "00198750",
+   "0019A710",
+   "0019CAB0"
+  ]
+ },
+ "00251570": {
+  "name": "D3DDevice_SetRenderState_RopZRead",
+  "sites": 6,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "00198750",
+   "0019A6C0",
+   "0019CAB0"
+  ]
+ },
+ "00251BA0": {
+  "name": "D3DDevice_EndPush",
+  "sites": 5,
+  "callers": [
+   "0018EE60",
+   "0018EEE0",
+   "0018F110",
+   "0018F190",
+   "0019E400"
+  ]
+ },
+ "00250740": {
+  "name": "D3DDevice_SetRenderState_FillMode",
+  "sites": 5,
+  "callers": [
+   "00192F00",
+   "001934B0",
+   "00194440",
+   "00197E50",
+   "0019CAB0"
+  ]
+ },
+ "002512A0": {
+  "name": "D3DDevice_SetRenderState_ZEnable",
+  "sites": 5,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "00198750",
+   "0019CAB0"
+  ]
+ },
+ "00251610": {
+  "name": "D3DDevice_SetRenderState_MultiSampleAntiAlias",
+  "sites": 5,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "00199CF0",
+   "0019CAB0"
+  ]
+ },
+ "002509D0": {
+  "name": "D3DDevice_SetTextureState_BumpEnv",
+  "sites": 5,
+  "callers": [
+   "00194640",
+   "00194900"
+  ]
+ },
+ "00254E70": {
+  "name": "D3DDevice_SetShaderConstantMode",
+  "sites": 5,
+  "callers": [
+   "00198100",
+   "00198750"
+  ]
+ },
+ "0025DEC0": {
+  "name": "D3DDevice_SetPixelShader",
+  "sites": 5,
+  "callers": [
+   "00198100",
+   "0019A5D6",
+   "0019F360",
+   "001A06E0"
+  ]
+ },
+ "002550E0": {
+  "name": "D3DDevice_SetVertexShader",
+  "sites": 5,
+  "callers": [
+   "00198100",
+   "0019A5D6",
+   "0019F310",
+   "001A06B0"
+  ]
+ },
+ "00253230": {
+  "name": "D3DDevice_GetBackBuffer2",
+  "sites": 5,
+  "callers": [
+   "00198750",
+   "001995D0",
+   "00199C10",
+   "0019A210"
+  ]
+ },
+ "00251B80": {
+  "name": "D3DDevice_BeginPush_4",
+  "sites": 4,
+  "callers": [
+   "0018F430",
+   "0018F600",
+   "0018F710",
+   "0019E400"
+  ]
+ },
+ "00250020": {
+  "name": "D3DDevice_SetRenderState_PSTextureModes",
+  "sites": 4,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "0019CAB0"
+  ]
+ },
+ "00250870": {
+  "name": "D3DDevice_SetRenderState_VertexBlend",
+  "sites": 4,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "0019CAB0"
+  ]
+ },
+ "00250790": {
+  "name": "D3DDevice_SetRenderState_BackFillMode",
+  "sites": 4,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "0019CAB0"
+  ]
+ },
+ "002507F0": {
+  "name": "D3DDevice_SetRenderState_TwoSidedLighting",
+  "sites": 4,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "0019CAB0"
+  ]
+ },
+ "002504D0": {
+  "name": "D3DDevice_SetRenderState_NormalizeNormals",
+  "sites": 4,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "0019CAB0"
+  ]
+ },
+ "00250490": {
+  "name": "D3DDevice_SetRenderState_FrontFace",
+  "sites": 4,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "0019CAB0"
+  ]
+ },
+ "00250510": {
+  "name": "D3DDevice_SetRenderState_TextureFactor",
+  "sites": 4,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "0019CAB0"
+  ]
+ },
+ "00250660": {
+  "name": "D3DDevice_SetRenderState_ZBias",
+  "sites": 4,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "0019CAB0"
+  ]
+ },
+ "002506E0": {
+  "name": "D3DDevice_SetRenderState_LogicOp",
+  "sites": 4,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "0019CAB0"
+  ]
+ },
+ "00250350": {
+  "name": "D3DDevice_SetRenderState_EdgeAntiAlias",
+  "sites": 4,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "0019CAB0"
+  ]
+ },
+ "00251690": {
+  "name": "D3DDevice_SetRenderState_MultiSampleMask",
+  "sites": 4,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "0019CAB0"
+  ]
+ },
+ "002515B0": {
+  "name": "D3DDevice_SetRenderState_MultiSampleMode",
+  "sites": 4,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "0019CAB0"
+  ]
+ },
+ "002515E0": {
+  "name": "D3DDevice_SetRenderState_MultiSampleRenderTargetMode",
+  "sites": 4,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "0019CAB0"
+  ]
+ },
+ "00250570": {
+  "name": "D3DDevice_SetRenderState_LineWidth",
+  "sites": 4,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "0019CAB0"
+  ]
+ },
+ "002516E0": {
+  "name": "D3DDevice_SetRenderState_SampleAlpha",
+  "sites": 4,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "0019CAB0"
+  ]
+ },
+ "002505E0": {
+  "name": "D3DDevice_SetRenderState_Dxt1NoiseEnable",
+  "sites": 4,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "0019CAB0"
+  ]
+ },
+ "002514E0": {
+  "name": "D3DDevice_SetRenderState_StencilCullEnable",
+  "sites": 4,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "0019CAB0"
+  ]
+ },
+ "00251590": {
+  "name": "D3DDevice_SetRenderState_DoNotCullUncompressed",
+  "sites": 4,
+  "callers": [
+   "00192F00",
+   "00194440",
+   "00197E50",
+   "0019CAB0"
+  ]
+ },
+ "00253D10": {
+  "name": "D3DDevice_SetTile",
+  "sites": 4,
+  "callers": [
+   "00198750"
+  ]
+ },
+ "00257FD0": {
+  "name": "D3DDevice_CreateVertexBuffer2",
+  "sites": 4,
+  "callers": [
+   "0019EFE0",
+   "0019F0C0"
+  ]
+ },
+ "00252FB0": {
+  "name": "D3DDevice_SetRenderTarget",
+  "sites": 3,
+  "callers": [
+   "001970C0",
+   "001980D0"
+  ]
+ },
+ "002540A0": {
+  "name": "D3DDevice_PersistDisplay",
+  "sites": 3,
+  "callers": [
+   "00198750",
+   "00199890",
+   "00199930"
+  ]
+ },
+ "00252F00": {
+  "name": "D3DDevice_Reset",
+  "sites": 3,
+  "callers": [
+   "00198750",
+   "00199890",
+   "00199930"
+  ]
+ },
+ "00252E00": {
+  "name": "D3DDevice_InsertFence",
+  "sites": 3,
+  "callers": [
+   "0019A140",
+   "0019A5D6",
+   "0019AE20"
+  ]
+ },
+ "00252C20": {
+  "name": "D3DDevice_BlockOnFence",
+  "sites": 3,
+  "callers": [
+   "0019A190",
+   "0019A5D6",
+   "0019AE20"
+  ]
+ },
+ "00257D80": {
+  "name": "D3DResource_IsBusy",
+  "sites": 3,
+  "callers": [
+   "0019F0B0",
+   "0019F250",
+   "0019F2E0"
+  ]
+ },
+ "0025D000": {
+  "name": "??",
+  "sites": 2,
+  "callers": [
+   "001948A0",
+   "00195820"
+  ]
+ },
+ "0025CF50": {
+  "name": "D3DDevice_CreateTexture2",
+  "sites": 2,
+  "callers": [
+   "00195950",
+   "0019A210"
+  ]
+ },
+ "00258D70": {
+  "name": "D3DDevice_Clear",
+  "sites": 2,
+  "callers": [
+   "00196CC0",
+   "00198750"
+  ]
+ },
+ "0025D010": {
+  "name": "D3DTexture_GetSurfaceLevel2",
+  "sites": 2,
+  "callers": [
+   "001970C0",
+   "0019A210"
+  ]
+ },
+ "0025DB90": {
+  "name": "D3DDevice_Swap",
+  "sites": 2,
+  "callers": [
+   "00198100",
+   "00198750"
+  ]
+ },
+ "002541D0": {
+  "name": "D3DDevice_SetScreenSpaceOffset",
+  "sites": 2,
+  "callers": [
+   "00198750",
+   "00199DA0"
+  ]
+ },
+ "0025DC80": {
+  "name": "D3DDevice_SetBackBufferScale",
+  "sites": 2,
+  "callers": [
+   "00198750",
+   "00199A70"
+  ]
+ },
+ "00252D10": {
+  "name": "D3DDevice_GetTile",
+  "sites": 2,
+  "callers": [
+   "00198750"
+  ]
+ },
+ "00252A30": {
+  "name": "D3DDevice_SetGammaRamp",
+  "sites": 2,
+  "callers": [
+   "00199420",
+   "00199500"
+  ]
+ },
+ "0025A910": {
+  "name": "D3DSurface_LockRect",
+  "sites": 2,
+  "callers": [
+   "00199C10",
+   "00265AC9"
+  ]
+ },
+ "0025CE60": {
+  "name": "D3DDevice_Begin",
+  "sites": 2,
+  "callers": [
+   "0019E4A0",
+   "0019E810"
+  ]
+ },
+ "0025CE10": {
+  "name": "D3DDevice_SetVertexDataColor",
+  "sites": 2,
+  "callers": [
+   "0019E4A0",
+   "0019E810"
+  ]
+ },
+ "00258020": {
+  "name": "D3DVertexBuffer_Lock2",
+  "sites": 2,
+  "callers": [
+   "0019F080",
+   "0019F200"
+  ]
+ },
+ "0025B070": {
+  "name": "D3DDevice_RunPushBuffer",
+  "sites": 2,
+  "callers": [
+   "0019F390",
+   "001A06A0"
+  ]
+ },
+ "00254CA0": {
+  "name": "D3DDevice_SetVertexShaderConstantNotInline",
+  "sites": 2,
+  "callers": [
+   "001A0670",
+   "001A0700"
+  ]
+ },
+ "0025CB10": {
+  "name": "D3DDevice_DrawIndexedVertices",
+  "sites": 2,
+  "callers": [
+   "001A0880",
+   "001A08A0"
+  ]
+ },
+ "0025CEF0": {
+  "name": "D3D_AllocContiguousMemory",
+  "sites": 1,
+  "callers": [
+   "0018E540"
+  ]
+ },
+ "0025CF30": {
+  "name": "??",
+  "sites": 1,
+  "callers": [
+   "0018E590"
+  ]
+ },
+ "002508C0": {
+  "name": "D3DDevice_SetTextureState_TexCoordIndex",
+  "sites": 1,
+  "callers": [
+   "00194640"
+  ]
+ },
+ "00250A40": {
+  "name": "D3DDevice_SetTextureState_BorderColor",
+  "sites": 1,
+  "callers": [
+   "00194640"
+  ]
+ },
+ "00250A80": {
+  "name": "D3DDevice_SetTextureState_ColorKeyColor",
+  "sites": 1,
+  "callers": [
+   "00194640"
+  ]
+ },
+ "0025A860": {
+  "name": "??",
+  "sites": 1,
+  "callers": [
+   "00195AD0"
+  ]
+ },
+ "002535D0": {
+  "name": "D3DDevice_SetViewport",
+  "sites": 1,
+  "callers": [
+   "001970C0"
+  ]
+ },
+ "0025D060": {
+  "name": "D3D_SetPushBufferSize",
+  "sites": 1,
+  "callers": [
+   "00198750"
+  ]
+ },
+ "0025D080": {
+  "name": "Direct3D_CreateDevice",
+  "sites": 1,
+  "callers": [
+   "00198750"
+  ]
+ },
+ "00252AC0": {
+  "name": "D3DDevice_GetGammaRamp",
+  "sites": 1,
+  "callers": [
+   "00198750"
+  ]
+ },
+ "002535B0": {
+  "name": "D3DDevice_GetDepthStencilSurface2",
+  "sites": 1,
+  "callers": [
+   "00198750"
+  ]
+ },
+ "00252CC0": {
+  "name": "D3DDevice_SetSwapCallback",
+  "sites": 1,
+  "callers": [
+   "00198750"
+  ]
+ },
+ "00252DA0": {
+  "name": "D3DDevice_SetSoftDisplayFilter",
+  "sites": 1,
+  "callers": [
+   "001999B0"
+  ]
+ },
+ "00252D50": {
+  "name": "D3DDevice_SetFlickerFilter",
+  "sites": 1,
+  "callers": [
+   "00199A00"
+  ]
+ },
+ "00253B00": {
+  "name": "D3DDevice_BeginVisibilityTest",
+  "sites": 1,
+  "callers": [
+   "00199B70"
+  ]
+ },
+ "00253BA0": {
+  "name": "D3DDevice_EndVisibilityTest",
+  "sites": 1,
+  "callers": [
+   "00199B90"
+  ]
+ },
+ "00252C30": {
+  "name": "D3DDevice_GetVisibilityTestResult",
+  "sites": 1,
+  "callers": [
+   "00199BB0"
+  ]
+ },
+ "00252CA0": {
+  "name": "D3DDevice_SetVerticalBlankCallback",
+  "sites": 1,
+  "callers": [
+   "0019A0F0"
+  ]
+ },
+ "00251B10": {
+  "name": "D3DDevice_InsertCallback",
+  "sites": 1,
+  "callers": [
+   "0019A110"
+  ]
+ },
+ "00251AF0": {
+  "name": "D3DDevice_IsFencePending",
+  "sites": 1,
+  "callers": [
+   "0019A160"
+  ]
+ },
+ "00253280": {
+  "name": "D3DDevice_CopyRects",
+  "sites": 1,
+  "callers": [
+   "0019A210"
+  ]
+ },
+ "00253C00": {
+  "name": "D3DDevice_FlushVertexCache",
+  "sites": 1,
+  "callers": [
+   "0019AE20"
+  ]
+ },
+ "0025E390": {
+  "name": "??",
+  "sites": 1,
+  "callers": [
+   "0019CF60"
+  ]
+ },
+ "00257F90": {
+  "name": "D3DDevice_CreateIndexBuffer2",
+  "sites": 1,
+  "callers": [
+   "0019F270"
+  ]
+ },
+ "00254970": {
+  "name": "D3DDevice_CreateVertexShader",
+  "sites": 1,
+  "callers": [
+   "0019F2F0"
+  ]
+ },
+ "00254FD0": {
+  "name": "D3DDevice_DeleteVertexShader",
+  "sites": 1,
+  "callers": [
+   "0019F310"
+  ]
+ },
+ "0025DE50": {
+  "name": "D3DDevice_CreatePixelShader",
+  "sites": 1,
+  "callers": [
+   "0019F340"
+  ]
+ },
+ "0025DEA0": {
+  "name": "D3DDevice_DeletePixelShader",
+  "sites": 1,
+  "callers": [
+   "0019F360"
+  ]
+ },
+ "00254AB0": {
+  "name": "D3DDevice_SetVertexShaderConstant1",
+  "sites": 1,
+  "callers": [
+   "001A0700"
+  ]
+ },
+ "00254B10": {
+  "name": "D3DDevice_SetVertexShaderConstant4",
+  "sites": 1,
+  "callers": [
+   "001A0700"
+  ]
+ },
+ "00253A40": {
+  "name": "D3DDevice_SetIndices",
+  "sites": 1,
+  "callers": [
+   "001A07E0"
+  ]
+ },
+ "0025E0C0": {
+  "name": "D3DDevice_SetPixelShaderConstant",
+  "sites": 1,
+  "callers": [
+   "001A0840"
+  ]
+ },
+ "0025CA70": {
+  "name": "D3DDevice_DrawVertices",
+  "sites": 1,
+  "callers": [
+   "001A0860"
+  ]
+ }
+}

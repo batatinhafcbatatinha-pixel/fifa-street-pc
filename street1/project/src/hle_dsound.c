@@ -160,7 +160,10 @@ static void ds_call(int id, void (*gen)(void))
     }
 }
 
+int guest_cpu_native_enter(void);
+void guest_cpu_native_leave(int token);
 #define HLE_DS(va, name, conv, args) \
-    void sub_##va(void) { ds_call(DS_##name, sub_##va##_gen); }
+    void sub_##va(void) { int smp_ = guest_cpu_native_enter(); ds_call(DS_##name, sub_##va##_gen); \
+                          guest_cpu_native_leave(smp_); }
 #include "hle_dsound_table.h"
 #undef HLE_DS

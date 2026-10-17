@@ -261,6 +261,11 @@ static LONG CALLBACK veh_handler(PEXCEPTION_POINTERS ep)
     if (ep->ExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION) {
         uintptr_t fault_addr = ep->ExceptionRecord->ExceptionInformation[1];
         uint32_t device_va = (uint32_t)(fault_addr - (uintptr_t)g_xbox_mem_offset);
+        /* Hardware-free run: a touch of a device aperture is reported and
+         * counted, never serviced by a model. */
+        if (g_xbox_mem_offset && xbox_HardwareGuardFault(device_va, (uintptr_t)ep->ContextRecord->Rip,
+                                                         ep->ExceptionRecord->ExceptionInformation[0] ? 1 : 0))
+            return EXCEPTION_CONTINUE_EXECUTION;
         if (g_xbox_mem_offset && xbox_OhciOwnsAddress(device_va)
                 && xbox_OhciHandleMmio(ep->ContextRecord, device_va))
             return EXCEPTION_CONTINUE_EXECUTION;
@@ -381,6 +386,38 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     setlocale(LC_CTYPE, "");
 #endif
 
+    /* RECOMP_NO_HW=1 (the launchers' profile): no device of the console is
+     * modelled. Every library that drove hardware runs as native C (D3D8 ->
+     * D3D11, DirectSound -> host audio, XInput -> host pads), so the switches
+     * that would bring a model or a library body back are forced here. */
+    if (xbox_no_hardware()) {
+        static const char *const off[] = {
+            "RECOMP_PB_EXEC", "RECOMP_PB_SCAN", "RECOMP_NV2A_TRACE", "RECOMP_USB", "RECOMP_DSP",
+            "RECOMP_AC97_READY", "RECOMP_AUDIO_NATIVE", "RECOMP_AUDIO_GP", "RECOMP_GPU",
+            "RECOMP_FB_WINDOW", "RECOMP_HLE_SHADOW", "RECOMP_HLE_LIBAPI", "RECOMP_HLE_LIBDRAW",
+            "RECOMP_HLE_LIBDEVICE", "RECOMP_HLE_NATIVEDEVICE", "RECOMP_HLE_SYNC_CENSUS",
+            "RECOMP_HLE_NATIVE_VBLANK", "RECOMP_HLE_APICHECK", "RECOMP_DS_SHADOW",
+        };
+        static const char *const on[] = {
+            "RECOMP_HLE_PRIMARY", "RECOMP_HLE_NOGPU", "RECOMP_DS_NATIVE", "RECOMP_INPUT_NATIVE",
+        };
+        for (size_t i = 0; i < sizeof off / sizeof off[0]; i++) {
+#ifdef _WIN32
+            _putenv_s(off[i], "");
+#else
+            unsetenv(off[i]);
+#endif
+        }
+        for (size_t i = 0; i < sizeof on / sizeof on[0]; i++) {
+#ifdef _WIN32
+            _putenv_s(on[i], "1");
+#else
+            setenv(on[i], "1", 1);
+#endif
+        }
+        fprintf(stderr, "[NO-HW] hardware-free run: no NV2A, APU, AC97, USB or flash model\n");
+    }
+
     /* fifastreet.ini (the in-game options) before anything reads the
      * environment variables it supplies. */
     hle_options_init();
@@ -437,7 +474,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
      * and a model nothing traps into never sees a register. The APU walks
      * Xbox physical RAM to find voice buffers, so it gets the guest RAM
      * base. */
-    if (getenv("RECOMP_AC97_READY")) {
+    if (getenv("RECOMP_AC97_READY") && !xbox_no_hardware()) {
         g_apu_state = mcpx_apu_init_standalone((uint8_t *)xbox_GetMemoryBase());
         fprintf(stderr, "[BOOT] emulated APU %s\n",
                 g_apu_state ? "up" : "FAILED to initialise");
@@ -504,8 +541,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     xbox_WatchdogStart();
 
     /* The game's XPP driver accesses the USB controller directly. Initialize
-     * its register model after guest memory, kernel and dispatch are ready. */
-    xbox_OhciInit();
+     * its register model after guest memory, kernel and dispatch are ready.
+     * With RECOMP_INPUT_NATIVE=1 the XInput API is in C (hle_input.c) and the
+     * USB stack never starts, so there is no controller to model. */
+    {
+        extern int hle_input_native_enabled(void);
+        if (hle_input_native_enabled() || xbox_no_hardware())
+            fprintf(stderr, "[INPUT-NATIVE] OHCI model not started\n");
+        else
+            xbox_OhciInit();
+    }
 
     /* Step 7: Call the recompiled entry point */
     printf("\nStarting game...\n");

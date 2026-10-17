@@ -4,9 +4,9 @@
  * The XDK DirectSound library programs the MCPX voice processor through its
  * registers; the runtime then reimplements that hardware in C. Here the 23
  * library entry points FIFA Street calls are implemented directly, with a
- * voice mixer of their own that feeds the same mixbins, final stereo fold,
- * XAudio2 output and 48 kHz pacing (xboxrecomp apu_core.c, g_apu_hle_voices).
- * The library and the APU registers are not touched at all.
+ * voice mixer of their own, a speaker fold and a 48 kHz output thread that
+ * feeds the host's audio (XAudio2, SDL off Windows) directly. Neither the
+ * library nor any model of the APU (registers, voice processor, DSPs) runs.
  *
  * What the title uses (measured, RECOMP_DS_LOG; conversions read from the
  * library with REA/Ghidra):
@@ -47,7 +47,6 @@ enum {
 #define DS_MAGIC  0x4453534Eu
 
 extern uint32_t xbox_HeapAlloc(uint32_t size, uint32_t alignment);
-extern void mcpx_apu_hle_start(void (*voices)(float mixbins[NUM_MIXBINS][FRAME]));
 
 typedef struct { float f, q, qnrm, h, b, l, p, n; } Svf;
 
@@ -399,11 +398,108 @@ static uint32_t create_buffer(uint32_t desc, uint32_t out)
     return 0;
 }
 
+/* ------------------------------------------------------- host output */
+
+/* The speaker mix: the six speaker mixbins (FL, FR, C, LFE, BL, BR) folded to
+ * stereo with the ITU coefficients, LFE dropped -- what the GP/EP programs
+ * did for this title -- under a peak limiter (instant attack, ~60 ms
+ * release), since crowd + commentary + music can sum past full scale. */
+static float s_limit_gain = 1.0f;
+
+static void fold_to_stereo(float mixbins[NUM_MIXBINS][FRAME], int16_t (*out)[2])
+{
+    int i;
+    for (i = 0; i < FRAME; i++) {
+        float c = 0.70710678f * mixbins[2][i];
+        float l = mixbins[0][i] + c + 0.70710678f * mixbins[4][i];
+        float r = mixbins[1][i] + c + 0.70710678f * mixbins[5][i];
+        float peak = fabsf(l) > fabsf(r) ? fabsf(l) : fabsf(r);
+        if (peak * s_limit_gain > 0.98f)
+            s_limit_gain = 0.98f / peak;
+        else
+            s_limit_gain += (1.0f - s_limit_gain) * 0.00035f;
+        l *= s_limit_gain;
+        r *= s_limit_gain;
+        l = l > 1.0f ? 1.0f : l < -1.0f ? -1.0f : l;
+        r = r > 1.0f ? 1.0f : r < -1.0f ? -1.0f : r;
+        out[i][0] = (int16_t)(l * 32767.0f);
+        out[i][1] = (int16_t)(r * 32767.0f);
+    }
+}
+
+extern int xa2_init(void);
+extern int xa2_submit_samples(const int16_t *samples, int num_samples);
+extern volatile int g_audio_muted;
+
+#define OUT_FRAMES 8                          /* 256 samples, 5.33 ms per block */
+
+/* 48 kHz on the host clock: a block of 8 mixer frames every 256 samples,
+ * resynchronised if the thread falls far behind. The output queue (XAudio2,
+ * or SDL off Windows) absorbs the jitter and trims the drift with its rate
+ * nudge. RECOMP_NATIVE_PCM=<file> captures 60 s of the output
+ * (RECOMP_PCM_FROM=<s> to start later). */
+static DWORD WINAPI audio_out_thread(LPVOID unused)
+{
+    LARGE_INTEGER f, now;
+    long long period, next;
+    unsigned long long blocks = 0, from = 0;
+    FILE *pcm = NULL;
+    const char *path = getenv("RECOMP_NATIVE_PCM"), *e = getenv("RECOMP_PCM_FROM");
+    (void)unused;
+    if (!xa2_init())
+        fprintf(stderr, "[DS-NATIVE] host audio output unavailable; mixing silently\n");
+    if (path && *path)
+        pcm = fopen(path, "wb");
+    if (e)
+        from = (unsigned long long)atol(e) * 48000ull / 256ull;
+    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+    QueryPerformanceFrequency(&f);
+    period = f.QuadPart * 256 / 48000;
+    QueryPerformanceCounter(&now);
+    next = now.QuadPart;
+    for (;;) {
+        int16_t block[OUT_FRAMES * FRAME][2];
+        int k;
+        for (k = 0; k < OUT_FRAMES; k++) {
+            float mixbins[NUM_MIXBINS][FRAME];
+            memset(mixbins, 0, sizeof mixbins);
+            mix_voices(mixbins);
+            fold_to_stereo(mixbins, block + k * FRAME);
+        }
+        if (g_audio_muted)
+            memset(block, 0, sizeof block);
+        if (pcm && blocks >= from && blocks < from + 60ull * 48000ull / 256ull) {
+            fwrite(block, 1, sizeof block, pcm);
+            fflush(pcm);
+        }
+        blocks++;
+        xa2_submit_samples(&block[0][0], OUT_FRAMES * FRAME);
+        next += period;
+        QueryPerformanceCounter(&now);
+        if (now.QuadPart - next > 8 * period)
+            next = now.QuadPart;
+        for (;;) {
+            long long left;
+            QueryPerformanceCounter(&now);
+            left = next - now.QuadPart;
+            if (left <= 0)
+                break;
+            left = left * 1000 / f.QuadPart;
+            Sleep(left > 1 ? (DWORD)(left - 1) : 1);
+        }
+    }
+    return 0;
+}
+
 static void start_mixer(void)
 {
     if (!s_started) {
+        HANDLE th;
         s_started = 1;
-        mcpx_apu_hle_start(mix_voices);
+        th = CreateThread(NULL, 0, audio_out_thread, NULL, 0, NULL);
+        if (th)
+            CloseHandle(th);
+        fprintf(stderr, "[DS-NATIVE] mixer and host output started (no APU)\n");
     }
 }
 

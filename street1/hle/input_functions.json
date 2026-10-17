@@ -1,0 +1,10 @@
+{
+ "0026F733": {"lib": "XAPILIB", "conv": "stdcall", "name": "XInitDevices", "native": "project/src/hle_input.c"},
+ "002704D9": {"lib": "XAPILIB", "conv": "stdcall", "name": "XGetDevices", "native": "project/src/hle_input.c"},
+ "002704FB": {"lib": "XAPILIB", "conv": "stdcall", "name": "XGetDeviceChanges", "native": "project/src/hle_input.c"},
+ "002701D2": {"lib": "XAPILIB", "conv": "stdcall", "name": "XInputOpen", "native": "project/src/hle_input.c"},
+ "00270228": {"lib": "XAPILIB", "conv": "stdcall", "name": "XInputClose", "native": "project/src/hle_input.c"},
+ "00270234": {"lib": "XAPILIB", "conv": "stdcall", "name": "XInputGetCapabilities", "native": "project/src/hle_input.c"},
+ "0027040C": {"lib": "XAPILIB", "conv": "stdcall", "name": "XInputGetState", "native": "project/src/hle_input.c"},
+ "0027047F": {"lib": "XAPILIB", "conv": "stdcall", "name": "XInputSetState", "native": "project/src/hle_input.c"}
+}

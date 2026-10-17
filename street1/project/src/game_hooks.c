@@ -19,7 +19,18 @@
 void sub_0008D0A0_gen(void);
 void hle_options_request(const char *why);
 
+int guest_cpu_native_enter(void);
+void guest_cpu_native_leave(int token);
+static void options_init_hook(void);
+
 void sub_0008D0A0(void)
+{
+    int smp = guest_cpu_native_enter();
+    options_init_hook();
+    guest_cpu_native_leave(smp);
+}
+
+static void options_init_hook(void)
 {
     /* The body writes the index only when the context matches; a marker
      * tells a match from a context it does not know. */
@@ -41,7 +52,16 @@ void sub_0008D0A0(void)
 void sub_000A2BB0_gen(void);
 void game_screen_loaded(const char *name);
 
+static void screen_load_hook(void);
+
 void sub_000A2BB0(void)
+{
+    int smp = guest_cpu_native_enter();
+    screen_load_hook();
+    guest_cpu_native_leave(smp);
+}
+
+static void screen_load_hook(void)
 {
     char name[48];
     uint32_t p = MEM32(g_esp + 4);

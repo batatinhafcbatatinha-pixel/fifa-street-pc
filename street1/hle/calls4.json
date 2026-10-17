@@ -1,0 +1,6 @@
+[{"name":"resolve_containing_procedure","arguments":{"address":"0x19f3dc"}},
+ {"name":"procedure_callers","arguments":{"procedure":"0x19e400"}},
+ {"name":"procedure_callers","arguments":{"procedure":"0x1a06a0"}},
+ {"name":"procedure_callers","arguments":{"procedure":"0x18f430"}},
+ {"name":"procedure_callers","arguments":{"procedure":"0x18f600"}},
+ {"name":"procedure_callers","arguments":{"procedure":"0x18f710"}}]
