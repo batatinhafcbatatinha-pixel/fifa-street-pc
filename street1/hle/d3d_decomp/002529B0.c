@@ -1,8 +1,0 @@
-// callers: 0x250570 0x250f40 0x2522e0 0x2535d0 0x253d20 0x256310 0x256800 0x258d70
-
-int FUN_002529b0(float param_1)
-
-{
-  return (int)param_1;
-}
-

@@ -23,3 +23,8 @@ game_files/
 *.loc
 *.log
 shadercache.bin
+# Decompiler output (Ghidra) used only during analysis; never published.
+street1/hle/d3d_decomp/
+street1/hle/caller_decomp/
+street1/hle/calls[0-9]*.json
+street1/hle/out[0-9]*.json
