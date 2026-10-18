@@ -17,6 +17,18 @@ An experimental original-Xbox FIFA Street port built through static recompilatio
 - Settings default to **English**, with Portuguese available through **Menu language**. The settings language is separate from game language.
 - Shader caching, specialized pixel shaders and native audio/frame-pacing improvements. Visual, audio, gameplay and save regressions may remain.
 
+## Why a native port instead of an emulator
+
+An emulator such as [xemu](https://github.com/xemu-project/xemu) recreates the Xbox itself: it interprets or JIT-translates the console's CPU code, and models the NV2A GPU, the MCPX audio DSP and the USB controllers register by register. That is the right approach for running the whole Xbox library accurately. This project takes a different route for one game:
+
+- **No emulated hardware in the hot path.** The game's x86 code is translated ahead of time into C and compiled by a modern optimizing compiler. Direct3D 8, DirectSound and XInput calls go straight to C implementations on DirectX 11/Vulkan, XAudio2/SDL2 and host pads, instead of being lowered to push-buffer commands, DSP microcode and USB packets that are then emulated again.
+- **Low CPU requirements.** In our tests on a Ryzen 5 3600 / RTX 3050 Laptop, a match stays at 60 fps even with the process pinned to a single physical core (2 logical threads), with no frame over 50 ms. Match loading takes about 3.5–4 s.
+- **Resolution and widescreen beyond the console.** Rendering is done by the PC GPU at any internal resolution (720p up to 8K, or the monitor's), with the game's widescreen mode and ultrawide letterboxing. With specialized pixel shaders, 4K ran at 60 fps with the GPU at about a third of its capacity in our tests.
+- **PC-side improvements in one place.** Shader caching, frame pacing, exclusive fullscreen, FXAA, anisotropic filtering, keyboard controls and an in-game settings menu are part of the port, not emulator-wide options.
+- **Readable and moddable.** Each part of the game's behaviour exists as C source in your local build. Individual functions can be inspected, replaced with hand-written native versions, or fixed directly.
+
+The trade-off: this approach only covers this one game (USA revision), and it is still experimental. An emulator is the more general and better-tested option for the Xbox library as a whole. The figures above come from a single test machine and are not guarantees.
+
 The source tree still contains the older Xbox hardware models (NV2A, APU/DSP, OHCI) used for diagnostics and comparison; the default launch profile does not start any of them. The Xbox kernel and memory layout remain as compatibility layers. The Linux build has been tested under WSL2 (software Vulkan); real Linux GPUs, physical controllers and exclusive fullscreen there are untested.
 
 ## Download or clone
