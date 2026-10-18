@@ -1,5 +1,9 @@
 # FIFA Street (2005) — Native PC Port | No Emulated Xbox Hardware
 
+> [!WARNING]
+> This repository does **not** include the game, ROM/ISO/XBE, EA assets or a precompiled executable.
+> You need your own original-Xbox USA disc. See [the full notice](#notice) at the end.
+
 An experimental original-Xbox FIFA Street port built through static recompilation, with native PC graphics and audio backends. **This public repository is a source and local-build kit, not a ready-to-play game download.** Game instructions are translated locally from your own verified USA disc. No game executable or generated game code is distributed here.
 
 ## Features
@@ -135,5 +139,7 @@ Settings are saved in `fifastreet.ini` beside the locally built executable. Opti
 See [NOTICE.md](NOTICE.md) for the publication boundary and [LICENSE](LICENSE) for the license covering the port's own native source and tooling. Upstream components keep their original licenses; a root license does not relicense them or the game.
 
 ---
+
+<a id="notice"></a>
 
 **⚠️ THIS PROJECT DOES NOT INCLUDE THE GAME, A ROM/ISO/XBE, EA GAME ASSETS, GENERATED GAME CODE OR A PRECOMPILED GAME EXECUTABLE. YOU MUST PROVIDE YOUR OWN LAWFULLY OBTAINED ORIGINAL-XBOX USA GAME FILES AND HAVE THE RIGHTS REQUIRED FOR YOUR USE. THIS PROJECT DOES NOT AUTHORIZE COPYRIGHT INFRINGEMENT. ALL GAME RIGHTS BELONG TO THEIR RESPECTIVE OWNERS. ⚠️**
