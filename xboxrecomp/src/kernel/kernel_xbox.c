@@ -137,11 +137,14 @@ NTSTATUS __stdcall xbox_ExQueryNonVolatileSetting(
 
     switch (ValueIndex) {
     case XC_LANGUAGE:
-        /* Xbox EEPROM language IDs: English=1, Spanish=5. The launcher
-         * validates that the selected title's resources are present. */
+        /* Xbox EEPROM language IDs: English=1, Japanese=2, German=3,
+         * French=4, Spanish=5, Italian=6, Korean=7, Chinese=8, Portuguese=9.
+         * The launcher validates that the selected title's resources are
+         * present; anything else reads as English. */
         if (ValueLength >= sizeof(ULONG)) {
             const char *language = getenv("RECOMP_LANGUAGE");
-            *(PULONG)Value = language && strcmp(language, "5") == 0 ? 5 : 1;
+            int id = language ? atoi(language) : 1;
+            *(PULONG)Value = id >= 1 && id <= 9 ? (ULONG)id : 1;
             if (Type) *Type = 4; /* REG_DWORD */
             if (ResultLength) *ResultLength = sizeof(ULONG);
         }

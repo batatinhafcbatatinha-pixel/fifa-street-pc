@@ -189,6 +189,55 @@ static int clampi(int v, int lo, int hi)
 
 /* Boot-time settings travel to the rest of the runtime as environment
  * variables, read where they always were. */
+/* Game languages, by Xbox EEPROM language ID. A release ships the resource
+ * pair data/FE<code>.loc + data/MC<code>.loc for each language it has (USA:
+ * English/Spanish, Europe: English/French/German); only those are offered. */
+static const struct { int id; const char *code; const wchar_t *name; } k_languages[] = {
+    { 1, "ENG", L"English" }, { 3, "GER", L"Deutsch" }, { 4, "FR", L"Français" }, { 5, "SP", L"Español" },
+};
+#define N_LANGUAGES ((int)(sizeof k_languages / sizeof k_languages[0]))
+
+static int language_installed(int id)
+{
+    int i;
+    for (i = 0; i < N_LANGUAGES; i++) {
+        char path[64];
+        FILE *f;
+        if (k_languages[i].id != id)
+            continue;
+        snprintf(path, sizeof path, "game_files/data/FE%s.loc", k_languages[i].code);
+        if (!(f = fopen(path, "rb")))
+            return 0;
+        fclose(f);
+        snprintf(path, sizeof path, "game_files/data/MC%s.loc", k_languages[i].code);
+        if (!(f = fopen(path, "rb")))
+            return 0;
+        fclose(f);
+        return 1;
+    }
+    return 0;
+}
+
+static int installed_languages(int *list)
+{
+    int i, n = 0;
+    for (i = 0; i < N_LANGUAGES; i++)
+        if (language_installed(k_languages[i].id))
+            list[n++] = k_languages[i].id;
+    if (!n)
+        list[n++] = 1;
+    return n;
+}
+
+static const wchar_t *language_name(int id)
+{
+    int i;
+    for (i = 0; i < N_LANGUAGES; i++)
+        if (k_languages[i].id == id)
+            return k_languages[i].name;
+    return L"English";
+}
+
 static void env_sync(const char *name, int *v, int lo, int hi, int unset_value)
 {
     const char *e = getenv(name);
@@ -255,7 +304,13 @@ void hle_options_init(void)
     g_opt.aniso = clampi(ini_get(L"anisotropico", 0), 0, 16);
     g_opt.api = clampi(ini_get(L"api_grafica", 0), 0, 1);
     g_opt.adapter = clampi(ini_get(L"gpu", -1), -1, 15);
-    g_opt.language = ini_get(L"idioma", 1) == 5 ? 5 : 1;
+    {
+        int langs[N_LANGUAGES], nl = installed_languages(langs), want = ini_get(L"idioma", 1), i;
+        g_opt.language = langs[0];
+        for (i = 0; i < nl; i++)
+            if (langs[i] == want)
+                g_opt.language = want;
+    }
     g_opt.volume = clampi(ini_get(L"volume", 100), 0, 100);
     g_opt.ui_language = clampi(ini_get(L"idioma_menu", 1), 0, 1);
 
@@ -267,7 +322,7 @@ void hle_options_init(void)
     e = getenv("RECOMP_HLE_SCALE");
     if (!(e && *e))
         scale_publish();
-    env_sync("RECOMP_LANGUAGE", &g_opt.language, 1, 5, -99);
+    env_sync("RECOMP_LANGUAGE", &g_opt.language, 1, 9, -99);
     env_sync("RECOMP_HLE_ADAPTER", &g_opt.adapter, -1, 15, -1);
     env_sync("RECOMP_HLE_FPS", &g_opt.fps, 0, 1000, -99);
     e = getenv("RECOMP_HLE_VSYNC");                  /* test runs; not published */
@@ -851,7 +906,10 @@ static void change(int it, int d)
         g_opt.adapter = cycle(list, n, g_opt.adapter, d);
         break;
     case IT_UI_LANG: g_opt.ui_language = !g_opt.ui_language; break;
-    case IT_LANG: g_opt.language = g_opt.language == 1 ? 5 : 1; break;
+    case IT_LANG:
+        n = installed_languages(list);
+        g_opt.language = cycle(list, n, g_opt.language, d);
+        break;
     case IT_VOLUME: g_opt.volume = clampi(g_opt.volume + 10 * d, 0, 100); break;
     }
     s_dirty = 1;
@@ -1412,7 +1470,7 @@ static void item_text(int it, wchar_t *label, wchar_t *value, int *greyed)
         break;
     case IT_LANG:
         wcscpy(label, ui_text(L"Idioma do jogo", L"Game language"));
-        wcscpy(value, g_opt.language == 5 ? L"Español" : L"English");
+        wcscpy(value, language_name(g_opt.language));
         break;
     case IT_VOLUME:
         wcscpy(label, L"Volume");

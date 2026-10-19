@@ -78,7 +78,7 @@ def main():
         save()
         env = {k: v for k, v in os.environ.items() if not k.startswith('RECOMP_')}
         env.update(PROFILE)
-        env['RECOMP_LANGUAGE'] = {'English': '1', 'Spanish': '5'}[language.get()]
+        env['RECOMP_LANGUAGE'] = {'English': '1', 'German': '3', 'French': '4', 'Spanish': '5'}[language.get()]
         logs = ROOT / 'logs'
         logs.mkdir(exist_ok=True)
         import datetime

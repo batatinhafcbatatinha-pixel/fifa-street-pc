@@ -2,9 +2,9 @@
 
 > [!WARNING]
 > This repository does **not** include the game, ROM/ISO/XBE, EA assets or a precompiled executable.
-> You need your own original-Xbox USA disc. See [the full notice](#notice) at the end.
+> You need your own original-Xbox USA or European disc. See [the full notice](#notice) at the end.
 
-An experimental original-Xbox FIFA Street port built through static recompilation, with native PC graphics and audio backends. **This public repository is a source and local-build kit, not a ready-to-play game download.** Game instructions are translated locally from your own verified USA disc. No game executable or generated game code is distributed here.
+An experimental original-Xbox FIFA Street port built through static recompilation, with native PC graphics and audio backends. **This public repository is a source and local-build kit, not a ready-to-play game download.** Game instructions are translated locally from your own verified USA or European disc. No game executable or generated game code is distributed here.
 
 ## Features
 
@@ -17,7 +17,7 @@ An experimental original-Xbox FIFA Street port built through static recompilatio
 - Windows x64 and Linux x64 build paths.
 - Resolution presets from 720p to 8K, or your monitor's resolution. Performance depends on hardware, scene and build; 4K/60 is not a universal guarantee.
 - The game's own 16:9 widescreen mode; other display shapes use letterboxing. Additional aspect settings remain experimental.
-- In-game settings with **F1**: display mode, monitor, refresh rate, VSync, frame limit, resolution, aspect ratio, graphics API, GPU, game language (English / Spanish), FXAA, anisotropic filtering and volume.
+- In-game settings with **F1**: display mode, monitor, refresh rate, VSync, frame limit, resolution, aspect ratio, graphics API, GPU, game language (English / Spanish on the USA disc; English / French / German on the European disc), FXAA, anisotropic filtering and volume.
 - Settings default to **English**, with Portuguese available through **Menu language**. The settings language is separate from game language.
 - Shader caching, specialized pixel shaders and native audio/frame-pacing improvements. Visual, audio, gameplay and save regressions may remain.
 
@@ -31,7 +31,7 @@ An emulator such as [xemu](https://github.com/xemu-project/xemu) recreates the X
 - **PC-side improvements in one place.** Shader caching, frame pacing, exclusive fullscreen, FXAA, anisotropic filtering, keyboard controls and an in-game settings menu are part of the port, not emulator-wide options.
 - **Readable and moddable.** Each part of the game's behaviour exists as C source in your local build. Individual functions can be inspected, replaced with hand-written native versions, or fixed directly.
 
-The trade-off: this approach only covers this one game (USA revision), and it is still experimental. An emulator is the more general and better-tested option for the Xbox library as a whole. The figures above come from a single test machine and are not guarantees.
+The trade-off: this approach only covers this one game (USA and European releases), and it is still experimental. An emulator is the more general and better-tested option for the Xbox library as a whole. The figures above come from a single test machine and are not guarantees.
 
 The source tree still contains the older Xbox hardware models (NV2A, APU/DSP, OHCI) used for diagnostics and comparison; the default launch profile does not start any of them. The Xbox kernel and memory layout remain as compatibility layers. The Linux build has been tested under WSL2 (software Vulkan); real Linux GPUs, physical controllers and exclusive fullscreen there are untested.
 
@@ -48,7 +48,9 @@ The GitHub Actions workflow audits the publication allowlist, tests ISO extracti
 
 ## Your game files
 
-Only the **original Xbox USA revision** is currently accepted. Xbox 360 FIFA Street titles and the European executable are not supported. The tested European disc contains English/French/German resources, but has a different executable; changing discs does not unlock those languages in this build.
+Two original-Xbox releases are accepted: the **USA** disc (English / Spanish) and the **European** disc (English / French / German). Xbox 360 FIFA Street titles are not supported.
+
+The European executable is the same build of the game as the USA one, relinked: code and data sit at different addresses and about 90 functions changed. The build detects which executable you have by its hash. For the European one it moves every USA address used by the native sources (D3D, DirectSound, XInput, hooks, routing tables) to its European counterpart using [`street1/regions/europe.json`](street1/regions/europe.json), and translates the European executable with its own function list. Those tables contain only addresses, never game code; they were made with [`street1/regions/make-region-table.py`](street1/regions/make-region-table.py) from both executables, which checks that every moved function is byte-identical apart from pointers. The European release runs at 60 Hz like the USA one, and the game language follows the setting (only languages whose files are on your disc are offered).
 
 Place your own extracted disc contents in this layout:
 
@@ -60,17 +62,18 @@ fifa-street-pc/
     ...other original disc files...
 ```
 
-Required USA `default.xbe` SHA-256:
+Accepted `default.xbe` SHA-256:
 
 ```text
-f43dcca6fbd99e7a04dc94992443b368eefaa9d6bbc88432bf43b2d90e115ef1
+USA     f43dcca6fbd99e7a04dc94992443b368eefaa9d6bbc88432bf43b2d90e115ef1
+Europe  8a67bfb82f8a7b99c957c17803a5626b5f27f93dfff4bc32ea3815941aa220a0
 ```
 
 If you have an original-Xbox XDVDFS ISO instead, inspect and extract it locally into a **new** directory:
 
 ```sh
-python street1/project/tools/fifa_setup.py inspect --iso "/path/to/your-USA-disc.iso"
-python street1/project/tools/fifa_setup.py install --iso "/path/to/your-USA-disc.iso" --workspace ".local/disc" --extract-only
+python street1/project/tools/fifa_setup.py inspect --iso "/path/to/your-disc.iso"
+python street1/project/tools/fifa_setup.py install --iso "/path/to/your-disc.iso" --workspace ".local/disc" --extract-only
 ```
 
 Use `.local/disc/game_files` instead of `game_files` in the build and launch commands below. Do not upload the ISO, extracted files, local analysis output, generated C, caches or compiled game executable to GitHub.
@@ -87,7 +90,7 @@ python tools/build_local.py --game-files game_files
 python tools/play.py --game-files game_files
 ```
 
-The first build disassembles your XBE, identifies functions, translates them into private C files, installs the native hooks and compiles the executable. It can take considerable time and memory. Build products and private game translations stay under `.local/`, which is excluded from version control.
+The first build disassembles your XBE, identifies functions, translates them into private C files, installs the native hooks and compiles the executable. Function boundaries follow the set used by the tested private build ([`street1/function-set.json`](street1/function-set.json), addresses only): builds made with earlier versions of this kit split some functions differently and crashed during boot, so regenerate from scratch (without `--reuse-generated`) if you built before. It can take considerable time and memory. Build products and private game translations stay under `.local/`, which is excluded from version control.
 
 After a completed generation, `--reuse-generated` skips the translation phase when rebuilding native sources. If a build fails, keep the console output for diagnosis. This local reconstruction pipeline is experimental and should not be assumed identical to a previously tested private build.
 
@@ -142,4 +145,4 @@ See [NOTICE.md](NOTICE.md) for the publication boundary and [LICENSE](LICENSE) f
 
 <a id="notice"></a>
 
-**⚠️ THIS PROJECT DOES NOT INCLUDE THE GAME, A ROM/ISO/XBE, EA GAME ASSETS, GENERATED GAME CODE OR A PRECOMPILED GAME EXECUTABLE. YOU MUST PROVIDE YOUR OWN LAWFULLY OBTAINED ORIGINAL-XBOX USA GAME FILES AND HAVE THE RIGHTS REQUIRED FOR YOUR USE. THIS PROJECT DOES NOT AUTHORIZE COPYRIGHT INFRINGEMENT. ALL GAME RIGHTS BELONG TO THEIR RESPECTIVE OWNERS. ⚠️**
+**⚠️ THIS PROJECT DOES NOT INCLUDE THE GAME, A ROM/ISO/XBE, EA GAME ASSETS, GENERATED GAME CODE OR A PRECOMPILED GAME EXECUTABLE. YOU MUST PROVIDE YOUR OWN LAWFULLY OBTAINED ORIGINAL-XBOX USA OR EUROPEAN GAME FILES AND HAVE THE RIGHTS REQUIRED FOR YOUR USE. THIS PROJECT DOES NOT AUTHORIZE COPYRIGHT INFRINGEMENT. ALL GAME RIGHTS BELONG TO THEIR RESPECTIVE OWNERS. ⚠️**

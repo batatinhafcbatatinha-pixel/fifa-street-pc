@@ -21,7 +21,7 @@ run directly on your PC.
 YOU NEED THE GAME
 -----------------
 This package does not include the game. You need your own copy of
-FIFA Street for the original Xbox (USA version).
+FIFA Street for the original Xbox (USA or European version).
 
 Copy everything from the game disc into the "game_files" folder, so that
 the file "default.xbe" ends up here:
@@ -90,7 +90,8 @@ switches between English and Portuguese immediately. Game language is separate.
 You can change: window or fullscreen, monitor, refresh rate, VSync, frame
 limit, resolution, aspect ratio, anti-aliasing (FXAA), texture filtering,
 graphics API (DirectX 11 or Vulkan, Windows only), graphics card, game
-language (English or Spanish) and volume.
+language (the languages on your disc: English/Spanish on the USA disc,
+English/French/German on the European disc) and volume.
 
 Items marked with * only change after a restart; the menu can restart the
 game for you. Settings are saved in fifastreet.ini, next to the game's exe.

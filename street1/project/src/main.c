@@ -553,6 +553,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     }
 
     /* Step 7: Call the recompiled entry point */
+    {
+        /* XAPI's frameless thread trampoline in this executable (the address
+         * moves between releases; street1/regions rewrites it). */
+        extern uint32_t g_xapi_thread_trampoline;
+        g_xapi_thread_trampoline = 0x0015CED9u;
+    }
     printf("\nStarting game...\n");
     fflush(stdout);
 

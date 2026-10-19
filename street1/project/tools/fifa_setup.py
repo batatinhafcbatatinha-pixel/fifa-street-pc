@@ -14,6 +14,16 @@ XBE_SHA256 = 'f43dcca6fbd99e7a04dc94992443b368eefaa9d6bbc88432bf43b2d90e115ef1'
 PROJECT = Path(__file__).resolve().parents[1]
 
 
+def supported_releases():
+    """SHA-256 -> release name: the USA executable plus street1/regions tables."""
+    releases = {XBE_SHA256: 'usa'}
+    for table in sorted((PROJECT.parent / 'regions').glob('*.json')):
+        if not table.name.startswith('function-'):
+            info = json.loads(table.read_text(encoding='utf-8'))
+            releases[info['xbeSha256']] = info['region']
+    return releases
+
+
 class Disc:
     def __init__(self, filename):
         self.file = open(filename, 'rb')
@@ -50,8 +60,9 @@ class Disc:
         if self.title_id != TITLE_ID:
             raise ValueError(f'Wrong game: TitleID {self.title_id:08X}, expected {TITLE_ID:08X}')
         self.xbe_hash = hashlib.sha256(xbe).hexdigest()
-        if self.xbe_hash != XBE_SHA256:
-            raise ValueError('Unsupported executable revision: this source targets the verified USA XBE only')
+        self.release = supported_releases().get(self.xbe_hash)
+        if not self.release:
+            raise ValueError('Unsupported executable revision: only the verified USA and European XBEs are supported')
 
     def read(self, offset, size):
         if offset < 0 or size < 0 or offset + size > self.length:
@@ -102,9 +113,9 @@ class Disc:
 
     def summary(self):
         names = {e['path'].lower() for e in self.entries}
-        languages = [label for label, code in [('English', 'eng'), ('Spanish', 'sp')]
+        languages = [label for label, code in [('English', 'eng'), ('French', 'fr'), ('German', 'ger'), ('Spanish', 'sp')]
                      if f'data/fe{code}.loc' in names and f'data/mc{code}.loc' in names]
-        return dict(titleId=f'{self.title_id:08X}', xbeSha256=self.xbe_hash,
+        return dict(titleId=f'{self.title_id:08X}', xbeSha256=self.xbe_hash, release=self.release,
                     volumeOffset=self.base, fileCount=len(self.entries),
                     extractedBytes=sum(e['size'] for e in self.entries),
                     languageResources=languages,
@@ -215,7 +226,7 @@ def main():
         manifest_path = workspace / 'installation.json'
         manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
         actual = hashlib.sha256((workspace / 'game_files/default.xbe').read_bytes()).hexdigest()
-        if actual != XBE_SHA256:
+        if actual not in supported_releases():
             raise ValueError('Installed XBE is not the supported revision')
         build(workspace, args.runtime.resolve())
         manifest['buildStatus'] = 'compiled'

@@ -1,4 +1,4 @@
-"""Generate private game code from a verified user-supplied USA XBE, then build."""
+"""Generate private game code from a verified user-supplied XBE (USA or Europe), then build."""
 import argparse
 import hashlib
 import importlib.util
@@ -14,23 +14,54 @@ ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location('fifa_setup', ROOT / 'street1/project/tools/fifa_setup.py')
 SETUP = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(SETUP)
+RSPEC = importlib.util.spec_from_file_location('relocate', ROOT / 'street1/regions/relocate.py')
+RELOCATE = importlib.util.module_from_spec(RSPEC)
+RSPEC.loader.exec_module(RELOCATE)
+
+def identify(xbe):
+    """Which supported release this executable is, or a clear refusal."""
+    digest = hashlib.sha256(xbe.read_bytes()).hexdigest()
+    if digest == SETUP.XBE_SHA256:
+        return dict(name='usa', sha256=digest, table=None, seeds=None)
+    for table in sorted((ROOT / 'street1/regions').glob('*.json')):
+        if table.name.startswith('function-'):
+            continue
+        info = json.loads(table.read_text(encoding='utf-8'))
+        if info.get('xbeSha256') == digest:
+            return dict(name=info['region'], sha256=digest, table=table,
+                        seeds=table.with_name(f"function-seeds-{info['region']}.json"))
+    raise ValueError('Unsupported game: only the verified original-Xbox USA or European executable is accepted')
 
 def run(args, cwd, env):
     print('Running:', ' '.join(map(str, args)), flush=True)
     subprocess.run(list(map(str, args)), cwd=cwd, env=env, check=True)
 
-def generate(xbe, local, env):
+def generate(xbe, release, local, env):
     runtime = ROOT / 'xboxrecomp'
     private_street = local / 'source/street1'
     shutil.copytree(ROOT / 'street1', private_street, dirs_exist_ok=True)
+    seeds = ROOT / 'street1/function-seeds.json'
+    function_set = ROOT / 'street1/function-set.json'
+    if release['table']:
+        # Another release of the same build: move the USA addresses named by the
+        # native sources and routing tables before anything reads them.
+        changed = RELOCATE.relocate(private_street, release['table'])
+        print(f"Relocated {changed} USA addresses for the {release['name']} executable", flush=True)
+        seeds = release['seeds']
+        function_set = release['table'].with_name(f"function-set-{release['name']}.json")
     gen = private_street / 'project/src/recomp/gen'
-    gen.mkdir(parents=True, exist_ok=True)
+    shutil.rmtree(gen, ignore_errors=True)  # never mix translations of two executables
+    gen.mkdir(parents=True)
     disasm, identified, abi = (local / name for name in ('disasm', 'identified', 'abi'))
     for directory in (disasm, identified, abi):
         directory.mkdir(exist_ok=True)
-    run([sys.executable, '-m', 'tools.disasm', xbe, '--text-only', '--extra-sections',
+    # Header/section analysis of this XBE, kept with the private output (not beside the game files).
+    analysis = local / 'default_analysis.json'
+    run([sys.executable, '-m', 'tools.xbe_parser', xbe, '--quiet', '--json', analysis], runtime, env)
+    run([sys.executable, '-m', 'tools.disasm', xbe, '--analysis-json', analysis, '--text-only', '--extra-sections',
          'D3D,XGRPH,DSOUND,XPP,DOLBY', '--force', '--seed-functions',
-         ROOT / 'street1/function-seeds.json', '--output', disasm], runtime, env)
+         seeds, '--output', disasm], runtime, env)
+    run([sys.executable, private_street / 'apply-function-set.py', disasm / 'functions.json', function_set], ROOT, env)
     run([sys.executable, '-m', 'tools.func_id', xbe, '--functions', disasm / 'functions.json',
          '--strings', disasm / 'strings.json', '--xrefs', disasm / 'xrefs.json', '--output', identified], runtime, env)
     run([sys.executable, '-m', 'tools.abi_analysis', xbe, '--disasm-dir', disasm,
@@ -52,12 +83,12 @@ def generate(xbe, local, env):
         raise ValueError(f'Expected 6 interrupt acknowledgement sites, found {count}; refusing an unverified build')
     run([sys.executable, private_street / 'translate-ebp-boundaries.py', '--apply'], ROOT, env)
     run([sys.executable, private_street / 'hle/apply-hle-wrappers.py'], ROOT, env)
-    (local / 'generation-complete.json').write_text(json.dumps({'xbeSha256': SETUP.XBE_SHA256}) + '\n', encoding='utf-8')
+    (local / 'generation-complete.json').write_text(json.dumps({'xbeSha256': release['sha256'], 'release': release['name']}) + '\n', encoding='utf-8')
     return private_street / 'project'
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--game-files', type=Path, required=True, help='Extracted original-Xbox USA disc directory')
+    parser.add_argument('--game-files', type=Path, required=True, help='Extracted original-Xbox USA or European disc directory')
     parser.add_argument('--local-dir', type=Path, default=ROOT / '.local')
     parser.add_argument('--generate-only', action='store_true')
     parser.add_argument('--reuse-generated', action='store_true', help='Reuse this local directory after a completed generation')
@@ -66,14 +97,18 @@ def main():
     args = parser.parse_args()
     assets = args.game_files.resolve()
     xbe = assets / 'default.xbe'
-    if hashlib.sha256(xbe.read_bytes()).hexdigest() != SETUP.XBE_SHA256:
-        raise ValueError('Unsupported game: only the verified original-Xbox USA executable is accepted')
+    release = identify(xbe)
+    print(f"Executable: {release['name']} release ({release['sha256'][:16]}...)", flush=True)
     local = args.local_dir.resolve()
     local.mkdir(parents=True, exist_ok=True)
-    if args.reuse_generated and not (local / 'generation-complete.json').is_file():
-        raise ValueError('Generation has not finished in this directory; do not reuse incomplete output')
+    if args.reuse_generated:
+        marker = local / 'generation-complete.json'
+        if not marker.is_file():
+            raise ValueError('Generation has not finished in this directory; do not reuse incomplete output')
+        if json.loads(marker.read_text(encoding='utf-8')).get('xbeSha256') != release['sha256']:
+            raise ValueError('This directory was generated from a different executable; generate again or use another --local-dir')
     env = SETUP.developer_environment() if os.name == 'nt' and not args.generate_only else os.environ.copy()
-    project = local / 'source/street1/project' if args.reuse_generated else generate(xbe, local, env)
+    project = local / 'source/street1/project' if args.reuse_generated else generate(xbe, release, local, env)
     if not (project / 'src/recomp/gen/recomp_funcs.h').is_file():
         raise ValueError('Generated code missing: run without --reuse-generated first')
     if args.generate_only:
