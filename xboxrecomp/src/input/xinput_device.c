@@ -15,11 +15,11 @@
 #include <string.h>
 
 #if !defined(_WIN32)
-#ifndef VK_NUMPAD2
-#define VK_NUMPAD2 0x62
-#define VK_NUMPAD4 0x64
-#define VK_NUMPAD6 0x66
-#define VK_NUMPAD8 0x68
+#ifndef VK_TAB
+#define VK_TAB   0x09
+#endif
+#ifndef VK_OEM_1
+#define VK_OEM_1 0xBA
 #endif
 #endif
 
@@ -35,13 +35,16 @@
  * turns it on. It only ever answers for port 0, and is merged on top of a
  * pad connected there, so a real controller keeps working.
  *
- * The keys are the ones a Dreamcast or Saturn emulator would pick, which is
- * the closest thing to a convention here:
+ * The keys follow EA SPORTS FC 27's default "WASD" keyboard layout (basic
+ * actions only), on the buttons FIFA used on Xbox (A pass, B shoot, X lob,
+ * Y through ball, right trigger sprint):
  *
- *   arrows        d-pad             Enter      START
- *   Z X A S       A B X Y           Backspace  BACK
- *   Q E           white black       1 3        triggers
- *   numpad 8/2/4/6 left thumb       I/K/J/L    right thumb
+ *   W A S D       left thumb        arrows     d-pad (menus)
+ *   L             A (pass)          Enter      A + START
+ *   ; (Ç)         B (shoot)         Escape     START (pause)
+ *   K             X (lob / cross)   Backspace  B (back in menus)
+ *   O             Y (through ball)  Tab        BACK
+ *   P             right trigger (sprint)
  *
  * Keys come from the framebuffer window, which only receives them while it
  * has the focus, so typing in another window does not drive the game.
@@ -94,30 +97,22 @@ static void keyboard_state(XBOX_INPUT_STATE *pState)
     if (key_down(VK_LEFT))   b |= XBOX_GAMEPAD_DPAD_LEFT;
     if (key_down(VK_RIGHT))  b |= XBOX_GAMEPAD_DPAD_RIGHT;
     /* Esc pauses, as on PC; the options screen (F1) takes Esc for itself
-     * while it is open. */
+     * while it is open. Enter is also START so it passes PRESS START. */
     if (key_down(VK_RETURN) || key_down(VK_ESCAPE)) b |= XBOX_GAMEPAD_START;
-    if (key_down(VK_BACK))   b |= XBOX_GAMEPAD_BACK;
-    if (key_down(VK_SHIFT))  b |= XBOX_GAMEPAD_LEFT_THUMB;
-    if (key_down(VK_CONTROL))b |= XBOX_GAMEPAD_RIGHT_THUMB;
+    if (key_down(VK_TAB))    b |= XBOX_GAMEPAD_BACK;
     pState->Gamepad.wButtons = b;
 
     /* Analog on the console, so a key is 255 rather than a flag -- a title
-     * that reads these as a pressure never sees a press if they are 1. */
-    pState->Gamepad.bAnalogButtons[XBOX_BUTTON_A]        = key_down('Z') ? 255 : 0;
-    pState->Gamepad.bAnalogButtons[XBOX_BUTTON_B]        = key_down('X') ? 255 : 0;
-    pState->Gamepad.bAnalogButtons[XBOX_BUTTON_X]        = key_down('A') ? 255 : 0;
-    pState->Gamepad.bAnalogButtons[XBOX_BUTTON_Y]        = key_down('S') ? 255 : 0;
-    pState->Gamepad.bAnalogButtons[XBOX_BUTTON_WHITE]    = key_down('Q') ? 255 : 0;
-    pState->Gamepad.bAnalogButtons[XBOX_BUTTON_BLACK]    = key_down('E') ? 255 : 0;
-    pState->Gamepad.bAnalogButtons[XBOX_BUTTON_LTRIGGER] = key_down('1') ? 255 : 0;
-    pState->Gamepad.bAnalogButtons[XBOX_BUTTON_RTRIGGER] = key_down('3') ? 255 : 0;
+     * that reads these as a pressure never sees a press if they are 1.
+     * VK_OEM_1 is the key right of L (';' on US layouts, 'Ç' on ABNT2). */
+    pState->Gamepad.bAnalogButtons[XBOX_BUTTON_A] = (key_down('L') || key_down(VK_RETURN)) ? 255 : 0;
+    pState->Gamepad.bAnalogButtons[XBOX_BUTTON_B] = (key_down(VK_OEM_1) || key_down(VK_BACK)) ? 255 : 0;
+    pState->Gamepad.bAnalogButtons[XBOX_BUTTON_X] = key_down('K') ? 255 : 0;
+    pState->Gamepad.bAnalogButtons[XBOX_BUTTON_Y] = key_down('O') ? 255 : 0;
+    pState->Gamepad.bAnalogButtons[XBOX_BUTTON_RTRIGGER] = key_down('P') ? 255 : 0;
 
-    /* W/A/S/D would collide with the face buttons above, so the left thumb
-     * shares the arrow keys' row on the numeric pad instead. */
-    pState->Gamepad.sThumbLX = axis_from_keys(VK_NUMPAD4, VK_NUMPAD6);
-    pState->Gamepad.sThumbLY = axis_from_keys(VK_NUMPAD2, VK_NUMPAD8);
-    pState->Gamepad.sThumbRX = axis_from_keys('J', 'L');
-    pState->Gamepad.sThumbRY = axis_from_keys('K', 'I');
+    pState->Gamepad.sThumbLX = axis_from_keys('A', 'D');
+    pState->Gamepad.sThumbLY = axis_from_keys('S', 'W');
 
     /* The title's input layer looks for button edges, so the packet number
      * has to move whenever the state does or a press is never noticed. */

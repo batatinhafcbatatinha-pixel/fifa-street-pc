@@ -835,6 +835,43 @@ int hle_options_key(UINT msg, WPARAM vk, LPARAM lp)
     return 1;
 }
 
+/* The mouse works the menu: pointing selects a line, left click changes it
+ * forward (or runs it; on the "<" end, backward), right click backward, the
+ * wheel steps through the lines. Events ride the key queue as these codes. */
+enum { MK_MOVE = 0x10001, MK_LEFT, MK_RIGHT, MK_WHEEL_UP, MK_WHEEL_DOWN };
+static int s_pw, s_ph;                  /* the menu surface (defined with the drawing code) */
+static volatile LONG s_mouse_x = -1, s_mouse_y = -1;
+static RECT s_row[IT_COUNT], s_row_left[IT_COUNT], s_hint_a, s_hint_b;
+
+int hle_options_mouse(UINT msg, int x, int y, int wheel, int cw, int ch)
+{
+    WPARAM code;
+    LONG w;
+    if (!s_open)
+        return 0;
+    if (cw > 0 && ch > 0 && s_pw > 0 && s_ph > 0) {     /* client -> menu pixels */
+        x = (int)((long long)x * s_pw / cw);
+        y = (int)((long long)y * s_ph / ch);
+    }
+    InterlockedExchange(&s_mouse_x, x);
+    InterlockedExchange(&s_mouse_y, y);
+    switch (msg) {
+    case 0x0200: code = MK_MOVE; break;                       /* WM_MOUSEMOVE */
+    case 0x0201: code = MK_LEFT; break;                       /* WM_LBUTTONDOWN */
+    case 0x0204: code = MK_RIGHT; break;                      /* WM_RBUTTONDOWN */
+    case 0x020A: code = wheel > 0 ? MK_WHEEL_UP : MK_WHEEL_DOWN; break;   /* WM_MOUSEWHEEL */
+    default: return 1;
+    }
+    w = s_kq_w;
+    if (code == MK_MOVE && w != s_kq_r && s_kq[(w - 1) & 63] == MK_MOVE)
+        return 1;                                             /* coalesce moves */
+    if (w - s_kq_r < 64) {
+        s_kq[w & 63] = code;
+        InterlockedExchange(&s_kq_w, w + 1);
+    }
+    return 1;
+}
+
 int hle_options_hide_cursor(void)
 {
     return g_opt.display != 0 && !s_open;
@@ -977,8 +1014,60 @@ static void restart_game(void)
 #endif
 }
 
+static int row_at(int x, int y)
+{
+    POINT p;
+    int it;
+    p.x = x;
+    p.y = y;
+    for (it = 0; it < IT_COUNT; it++)
+        if (PtInRect(&s_row[it], p))
+            return it;
+    return -1;
+}
+
+static void menu_key(int vk);
+
+static void menu_mouse(int code)
+{
+    POINT p;
+    int row;
+    p.x = s_mouse_x;
+    p.y = s_mouse_y;
+    row = row_at(p.x, p.y);
+    switch (code) {
+    case MK_MOVE:
+        if (row >= 0 && row != s_sel) {
+            s_sel = row;
+            s_dirty = 1;
+        }
+        break;
+    case MK_LEFT: case MK_RIGHT:
+        if (PtInRect(&s_hint_b, p)) { menu_key(VK_ESCAPE); break; }
+        if (PtInRect(&s_hint_a, p)) { menu_key(VK_RETURN); break; }
+        if (row < 0) {
+            if (code == MK_RIGHT)
+                menu_key(VK_ESCAPE);                         /* right click outside: back */
+            break;
+        }
+        s_sel = row;
+        s_dirty = 1;
+        if (code == MK_RIGHT || PtInRect(&s_row_left[row], p))
+            menu_key(VK_LEFT);
+        else
+            menu_key(VK_RETURN);
+        break;
+    case MK_WHEEL_UP: menu_key(VK_UP); break;
+    case MK_WHEEL_DOWN: menu_key(VK_DOWN); break;
+    }
+}
+
 static void menu_key(int vk)
 {
+    if (vk >= MK_MOVE) {
+        menu_mouse(vk);
+        return;
+    }
     switch (vk) {
     case VK_UP:
         do s_sel = (s_sel + IT_COUNT - 1) % IT_COUNT; while (s_sel == IT_RESTART && !restart_pending());
@@ -1540,15 +1629,21 @@ static void render_menu(void)
         if (it == IT_RESTART && !restart_pending())
             continue;
         item_text(it, label, value, &greyed);
+        SetRect(&s_row[it], x0 - lh / 3, y, x1 + lh / 2, y + lh);
+        SetRectEmpty(&s_row_left[it]);
         if (sel)
             band(x0 - lh / 3, y + 1, x1, y + lh - 1, lh / 2, RGB(222, 214, 52));
         text(label, x0 + lh / 3, y, x0 + cw / 2, y + lh,
              sel ? RGB(15, 20, 30) : greyed ? RGB(115, 122, 135) : RGB(230, 233, 240), sel ? s_font_bold : s_font, DT_LEFT);
         if (value[0]) {
             wchar_t v[200];
+            SIZE vsz;
             swprintf(v, 200, sel && (it != IT_API || (hle_gpu_vulkan_available() && hle_gpu_d3d11_available())) ? L"◀  %ls%ls  ▶" : L"%ls%ls", value, item_restart(it) ? L" *" : L"");
             text(v, x0 + cw / 2, y, x1 - lh / 3, y + lh,
                  sel ? RGB(15, 20, 30) : greyed ? RGB(115, 122, 135) : RGB(190, 205, 230), sel ? s_font_bold : s_font, DT_RIGHT);
+            SelectObject(s_dc, sel ? s_font_bold : s_font);
+            GetTextExtentPoint32W(s_dc, v, (int)wcslen(v), &vsz);
+            SetRect(&s_row_left[it], x1 - lh / 3 - vsz.cx - lh / 2, y, x1 - lh / 3 - vsz.cx + lh, y + lh);
         }
         y += lh;
     }
@@ -1558,8 +1653,12 @@ static void render_menu(void)
     if (restart_pending())
         text(ui_text(L"* vale depois de reiniciar", L"* applies after restarting"), x0, h - lh * 3 + lh / 6, x1, h - lh * 2 + lh / 6, RGB(255, 190, 110), s_font_small, DT_RIGHT);
     bx = x0;
-    bx = button_hint(bx, h - lh * 2 + lh / 4, lh, L'A', RGB(40, 160, 60), ui_text(L"SELECIONAR (Enter)", L"SELECT (Enter)"));
+    SetRect(&s_hint_a, bx, h - lh * 2 + lh / 4, 0, h - lh + lh / 4);
+    bx = button_hint(bx, h - lh * 2 + lh / 4, lh, L'A', RGB(40, 160, 60), ui_text(L"SELECIONAR (Enter / clique)", L"SELECT (Enter / click)"));
+    s_hint_a.right = bx - lh;
+    SetRect(&s_hint_b, bx, h - lh * 2 + lh / 4, 0, h - lh + lh / 4);
     bx = button_hint(bx, h - lh * 2 + lh / 4, lh, L'B', RGB(200, 40, 40), ui_text(L"VOLTAR (Esc / F1)", L"BACK (Esc / F1)"));
+    s_hint_b.right = bx - lh;
     text(ui_text(L"◀ ▶  alterar      Alt+Enter  tela cheia", L"◀ ▶  change      Alt+Enter  fullscreen"), bx, h - lh * 2 + lh / 4, x1, h - lh + lh / 4,
          RGB(170, 180, 200), s_font_small, DT_LEFT);
     GdiFlush();

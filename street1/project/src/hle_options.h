@@ -30,6 +30,10 @@ extern HleOptions g_opt;
 void hle_options_init(void);
 /* Window thread, for every key message. Returns 1 when the menu took it. */
 int hle_options_key(UINT msg, WPARAM vk, LPARAM lp);
+/* Window thread, mouse messages (WM_MOUSEMOVE, WM_LBUTTONDOWN, WM_RBUTTONDOWN,
+ * WM_MOUSEWHEEL; x, y in client pixels of a cw x ch client area). Returns 1
+ * when the menu took it (it is open). */
+int hle_options_mouse(UINT msg, int x, int y, int wheel, int cw, int ch);
 /* Window thread, WM_SETCURSOR over the client area: 1 = hide the cursor. */
 int hle_options_hide_cursor(void);
 /* Game thread, after each Swap: opens the menu and holds the game there. */

@@ -4,6 +4,9 @@
 > This repository does **not** include the game, ROM/ISO/XBE, EA assets or a precompiled executable.
 > You need your own original-Xbox USA or European disc. See [the full notice](#notice) at the end.
 
+> [!TIP]
+> **New: play without a controller.** The keyboard now plays as an Xbox controller, with the basic actions of **EA SPORTS FC 27's default WASD layout**: WASD to move, **L** pass, **;** shoot, **K** lob, **O** through ball, **P** sprint, **Esc** pause. See [Keyboard controls](#keyboard-controls).
+
 An experimental original-Xbox FIFA Street port built through static recompilation, with native PC graphics and audio backends. **This public repository is a source and local-build kit, not a ready-to-play game download.** Game instructions are translated locally from your own verified USA or European disc. No game executable or generated game code is distributed here.
 
 ## Features
@@ -110,20 +113,29 @@ python3 tools/play.py --game-files game_files
 
 The DXVK prefix must contain `include/dxvk` and `lib/libdxvk_d3d11.so`, `lib/libdxvk_dxgi.so` (including their `.so.0` files). The vkd3d prefix must contain the headers and `lib/libvkd3d-shader.so.1`. Mac support is not provided.
 
+## Keyboard controls
+
+No controller needed: the keyboard plays as an Xbox controller, with the keys of the default **WASD** layout of EA SPORTS FC 27 ([EA's layout chart](https://help.ea.com/en/articles/ea-sports-fc/mouse-keyboard/)) on the buttons FIFA used on the original Xbox. Only the basic actions are mapped for now.
+
+| Key | In a match | In menus | Controller button |
+| --- | --- | --- | --- |
+| **W A S D** | Move the player | Navigate | Left stick |
+| **Arrows** | | Navigate | D-pad |
+| **L** | Pass | Confirm | A |
+| **;** (**Ç** on ABNT2 keyboards) | Shoot | Back | B |
+| **K** | Lob pass / cross | | X |
+| **O** | Through pass | | Y |
+| **P** | Sprint | | Right trigger |
+| **Enter** | | Confirm, passes *PRESS START* | A + Start |
+| **Esc** | Pause | | Start |
+| **Backspace** | | Back | B |
+| **Tab** | | | Back |
+
+The keyboard drives player 1 and is merged with a controller plugged in there, so both work at the same time. Tricks (right stick), the white/black buttons and the left trigger are not mapped on the keyboard yet. The launcher turns the keyboard on (`RECOMP_KEYBOARD=1`); set `RECOMP_KEYBOARD=0` to turn it off.
+
 ## Controls
 
 Xbox-style controllers use the standard game controls. **F1** or **Back + Start** opens PC settings. **Alt + Enter** switches fullscreen.
-
-| Keyboard | Action |
-| --- | --- |
-| Arrows | D-pad |
-| Numpad 8 / 4 / 2 / 6 | Left stick |
-| I / J / K / L | Right stick |
-| Z / X / A / S | A / B / X / Y |
-| Q / E | White / Black |
-| 1 / 3 | Left / Right trigger |
-| Enter or Esc | Start |
-| Backspace | Back |
 
 Settings are saved in `fifastreet.ini` beside the locally built executable. Options marked with `*` require a restart. Logs go under `.local/logs/`.
 

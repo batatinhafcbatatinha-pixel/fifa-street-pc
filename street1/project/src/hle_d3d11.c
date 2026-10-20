@@ -76,6 +76,19 @@ static LRESULT CALLBACK shadow_wndproc(HWND h, UINT m, WPARAM w, LPARAM l)
         if (m == WM_KEYDOWN || m == WM_KEYUP)
             return 0;
         break;
+    case WM_MOUSEMOVE: case WM_LBUTTONDOWN: case WM_RBUTTONDOWN: case WM_MOUSEWHEEL:
+        if (g_hle.primary) {
+            RECT cr;
+            POINT p;
+            p.x = (short)LOWORD(l);
+            p.y = (short)HIWORD(l);
+            if (m == WM_MOUSEWHEEL)               /* wheel positions are on the screen */
+                ScreenToClient(h, &p);
+            GetClientRect(h, &cr);
+            if (hle_options_mouse(m, p.x, p.y, m == WM_MOUSEWHEEL ? (short)HIWORD(w) : 0, cr.right, cr.bottom))
+                return 0;
+        }
+        break;
     case WM_KILLFOCUS:
         if (g_hle.primary)
             xbox_FramebufferKeyEvent(-1, 0);
@@ -221,6 +234,20 @@ static DWORD shadow_window_thread(LPVOID unused)
                 xbox_FramebufferKeyEvent(vk, down);
             break;
         }
+        case SDL_MOUSEMOTION: case SDL_MOUSEBUTTONDOWN: case SDL_MOUSEWHEEL:
+            if (g_hle.primary) {
+                int cw = 0, ch = 0, mx = 0, my = 0;
+                UINT msg = 0x0200u;
+                SDL_GetWindowSize(win, &cw, &ch);
+                SDL_GetMouseState(&mx, &my);
+                if (e.type == SDL_MOUSEBUTTONDOWN)
+                    msg = e.button.button == SDL_BUTTON_LEFT ? 0x0201u : e.button.button == SDL_BUTTON_RIGHT ? 0x0204u : 0u;
+                else if (e.type == SDL_MOUSEWHEEL)
+                    msg = 0x020Au;
+                if (msg)
+                    hle_options_mouse(msg, mx, my, e.type == SDL_MOUSEWHEEL ? e.wheel.y : 0, cw, ch);
+            }
+            break;
         case SDL_WINDOWEVENT:
             if (e.window.event == SDL_WINDOWEVENT_FOCUS_LOST && g_hle.primary)
                 xbox_FramebufferKeyEvent(-1, 0);
