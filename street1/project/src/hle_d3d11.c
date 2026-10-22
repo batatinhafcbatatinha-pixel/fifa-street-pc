@@ -899,7 +899,7 @@ static int ensure_swapchain(uint32_t w, uint32_t h)
  * they would while the Xbox waits for the flip. */
 int guest_cpu_suspend(void);
 void guest_cpu_resume(int token);
-static long long s_pace_wait, s_pace_freq = 1;
+static long long s_pace_wait, s_pace_wait_total, s_pace_freq = 1;
 
 void hle_native_pace(void)
 {
@@ -932,6 +932,7 @@ void hle_native_pace(void)
     }
     if (now.QuadPart < next) {
         s_pace_wait += next - now.QuadPart;
+        s_pace_wait_total += next - now.QuadPart;
         token = guest_cpu_suspend();
         long long left = next - now.QuadPart;
         /* Sleep until ~0.5 ms before the deadline, then spin. */
@@ -1042,6 +1043,7 @@ static void present_rt(HleSurface *rt)
     ID3D11Texture2D *bb = NULL;
     ID3D11RenderTargetView *rtv = NULL;
     UINT cw, ch;
+    hle_draw_state_invalidate();              /* present and the overlay bind their own state */
     hle_options_apply_display(rt->tw, rt->th);
     if (!window_client_size(&cw, &ch))
         return;                               /* minimised */
@@ -1113,6 +1115,104 @@ void hle_native_represent(void)
 
 void hle_stall_tick(void);
 
+/* RECOMP_HLE_PROFILE=1: every 600 swaps, what a frame cost on average and
+ * at worst -- the time between swaps, the draws (backend work for the
+ * game's draw calls), Present, the frame limiter's wait, shader/texture
+ * builds -- plus the CPU used by this (the game's render) thread and by the
+ * whole process, in % of one core. Disable the frame limiter and VSync
+ * when comparing throughput; capped runs measure the available headroom. */
+static uint64_t profile_cpu_ticks(int process)
+{
+#ifdef _WIN32
+    FILETIME a, b, k, u;
+    if (process) {
+        if (!GetProcessTimes(GetCurrentProcess(), &a, &b, &k, &u)) return 0;
+    } else {
+        if (!GetThreadTimes(GetCurrentThread(), &a, &b, &k, &u)) return 0;
+    }
+    return ((uint64_t)k.dwHighDateTime << 32 | k.dwLowDateTime) +
+           ((uint64_t)u.dwHighDateTime << 32 | u.dwLowDateTime);
+#else
+    struct timespec t;
+    if (clock_gettime(process ? CLOCK_PROCESS_CPUTIME_ID : CLOCK_THREAD_CPUTIME_ID, &t))
+        return 0;
+    return (uint64_t)t.tv_sec * 10000000u + (uint64_t)t.tv_nsec / 100u;
+#endif
+}
+
+static uint64_t profile_wall_ms(void)
+{
+    static LARGE_INTEGER freq;
+    LARGE_INTEGER c;
+    if (!freq.QuadPart) QueryPerformanceFrequency(&freq);
+    QueryPerformanceCounter(&c);
+    return (uint64_t)((double)c.QuadPart * 1000.0 / (double)freq.QuadPart);
+}
+
+static void profile_frame(double ms, double draw_ms, double present_ms, double build_ms)
+{
+    static int on = -1;
+    static unsigned n, slow;
+    static double sum_ms, sum_draw, sum_present, sum_build, sum_wait, max_ms, max_draw, worst[4];
+    static long long last_wait;
+    static uint64_t first_swap, draws0;
+    static uint64_t thread0, process0, wall0;
+    double wait_ms;
+    if (on < 0) {
+        const char *e = getenv("RECOMP_HLE_PROFILE");
+        on = e && *e && *e != '0';
+    }
+    if (!on || ms <= 0.0)
+        return;
+    wait_ms = (double)(s_pace_wait_total - last_wait) * 1000.0 / (double)s_pace_freq;
+    last_wait = s_pace_wait_total;
+    if (!n) {
+        uint64_t skipped, tris;
+        static int ab = -1;
+        extern int hle_ab_off;
+        if (ab < 0) {
+            const char *e = getenv("RECOMP_HLE_AB");
+            ab = e && *e && *e != '0';
+        }
+        if (ab)
+            hle_ab_off = !hle_ab_off;
+        first_swap = g_hle.swaps;
+        hle_draw_stats(&draws0, &skipped, &tris);
+        thread0 = profile_cpu_ticks(0);
+        process0 = profile_cpu_ticks(1);
+        wall0 = profile_wall_ms();
+        sum_ms = sum_draw = sum_present = sum_build = sum_wait = max_ms = max_draw = 0.0;
+        slow = 0;
+        n = 1;
+        return;                               /* the first interval starts here */
+    }
+    sum_ms += ms; sum_draw += draw_ms; sum_present += present_ms; sum_build += build_ms; sum_wait += wait_ms;
+    if (ms > 20.0) slow++;
+    if (draw_ms > max_draw) max_draw = draw_ms;
+    if (ms > max_ms) {
+        max_ms = ms;
+        worst[0] = draw_ms; worst[1] = present_ms; worst[2] = build_ms; worst[3] = wait_ms;
+    }
+    if (n++ == 600) {
+        uint64_t th, pr, wall = profile_wall_ms() - wall0;
+        uint64_t draws, skipped, tris;
+        double f = (double)(n - 1);
+        hle_draw_stats(&draws, &skipped, &tris);
+        th = profile_cpu_ticks(0);
+        pr = profile_cpu_ticks(1);
+        if (!wall) wall = 1;
+        extern int hle_ab_off;
+        fprintf(stderr, "[HLE-PROF]%s swaps %llu-%llu: frame %.2f ms (max %.1f, >20 ms %u), %.0f draws/frame, "
+                "draw %.3f ms (max %.2f), present %.3f, limiter wait %.2f, builds %.3f; "
+                "render thread %.0f%%, process %.0f%% of a core; worst frame: draw %.2f present %.2f builds %.2f wait %.2f\n",
+                hle_ab_off ? " [opt off]" : "", (unsigned long long)first_swap, (unsigned long long)g_hle.swaps, sum_ms / f, max_ms, slow,
+                (double)(draws - draws0) / f, sum_draw / f, max_draw, sum_present / f, sum_wait / f, sum_build / f,
+                (double)(th - thread0) / 100.0 / (double)wall, (double)(pr - process0) / 100.0 / (double)wall,
+                worst[0], worst[1], worst[2], worst[3]);
+        n = 0;
+    }
+}
+
 void hle_native_swap(uint32_t flags)
 {
     HleSurface *rt;
@@ -1163,6 +1263,7 @@ void hle_native_swap(uint32_t flags)
                     (unsigned long long)g_hle.swaps, ms, vs_n, vs_ms, tex_n, tex_ms);
             fprintf(stderr, "[HLE-SPIKE]   draws %.1f ms, present %.1f ms\n", draw_ms, present_ms);
         }
+            profile_frame(ms, draw_ms, present_ms, vs_ms + tex_ms);
         }
     }
     now = GetTickCount();

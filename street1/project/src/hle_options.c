@@ -328,6 +328,9 @@ void hle_options_init(void)
     e = getenv("RECOMP_HLE_VSYNC");                  /* test runs; not published */
     if (e && *e)
         g_opt.vsync = atoi(e) != 0;
+    e = getenv("RECOMP_HLE_MONITOR");                /* test runs: which monitor (0 = primary) */
+    if (e && *e)
+        g_opt.monitor = clampi(atoi(e), 0, 15);
     /* RECOMP_HLE_API (vulkan|d3d11) wins over the ini, like the others. */
     e = getenv("RECOMP_HLE_API");
     if (e && *e)

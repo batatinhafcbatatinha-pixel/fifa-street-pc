@@ -76,6 +76,7 @@ typedef struct HleTex {
     uint64_t shash, changed;      /* sampled hash; frame the contents last changed */
     uint32_t w, h;
     int linear;
+    uint32_t levels, dxgi;            /* of the native texture, for in-place updates */
     ID3D11Texture2D *tex;
     ID3D11ShaderResourceView *srv;
 } HleTex;
@@ -147,6 +148,40 @@ static struct {
     uint64_t draws, skipped, tris;
     unsigned warned[16];
 } d;
+
+/* What the draw path last bound on the context. Present, the options
+ * overlay and partial clears bind their own state and call
+ * hle_draw_state_invalidate(); nothing else changes these bindings
+ * (shader resources are not cached: binding a render target unbinds them).
+ * RECOMP_HLE_NO_STATE_CACHE=1 binds everything on every draw. */
+static struct {
+    int valid, off;
+    ID3D11BlendState *bs; float bf[4];
+    ID3D11DepthStencilState *ds; UINT sref;
+    ID3D11RasterizerState *rs;
+    ID3D11RenderTargetView *rtv; ID3D11DepthStencilView *dsv;
+    D3D11_VIEWPORT vp;
+    ID3D11Buffer *ib;
+    D3D11_PRIMITIVE_TOPOLOGY topo;
+    ID3D11VertexShader *vs;
+    ID3D11ShaderResourceView *vb_srv;
+    ID3D11PixelShader *ps;
+    ID3D11SamplerState *smp[4];
+    int gs_null;
+} s_bind;
+
+/* RECOMP_HLE_AB=1 (measurement): hle_d3d11.c's profiler turns the draw-path
+ * optimisations off for every other 600-frame window. */
+int hle_ab_off;
+
+void hle_draw_state_invalidate(void)
+{
+    s_bind.valid = 0;
+}
+
+/* Constant buffer contents last uploaded (a Map is skipped when equal).
+ * RECOMP_HLE_NO_CB_SKIP=1 uploads on every draw. */
+static int s_cb_skip = -1, s_cb_draw_valid, s_cb_ps_valid;
 
 static int warn(int which, unsigned limit)
 {
@@ -390,8 +425,90 @@ static double now_ms(void)
     return (double)c.QuadPart * 1000.0 / (double)f.QuadPart;
 }
 
+/* RECOMP_HLE_RTLOG=1 (diagnostics): at each swap, the render targets the
+ * frame drew into and the targets it sampled as textures, printed when that
+ * set is new -- which scenes render off screen (blur, glow, depth of field). */
+static int s_rtlog = -1;
+void hle_trace_arm_next(void);
+static struct { uint32_t rt, ps, vs; unsigned n; } s_rtf[8];
+static unsigned s_nrtf;
+static uint32_t s_rtread[8], s_rtread_ps[8], s_rtread_into[8], s_rtcur;
+static unsigned s_nrtread;
+
+static void rtlog_draw(uint32_t rt, uint32_t ps, uint32_t vs)
+{
+    unsigned i;
+    for (i = 0; i < s_nrtf; i++)
+        if (s_rtf[i].rt == rt && s_rtf[i].ps == ps) {
+            s_rtf[i].n++;
+            return;
+        }
+    if (s_nrtf < 8) {
+        s_rtf[s_nrtf].rt = rt; s_rtf[s_nrtf].ps = ps; s_rtf[s_nrtf].vs = vs; s_rtf[s_nrtf].n = 1;
+        s_nrtf++;
+    }
+}
+
+static void rtlog_read(uint32_t data)
+{
+    unsigned i;
+    if (s_rtlog <= 0)
+        return;
+    for (i = 0; i < s_nrtread; i++)
+        if (s_rtread[i] == data && s_rtread_ps[i] == d.ps && s_rtread_into[i] == s_rtcur)
+            return;
+    if (s_nrtread < 8) {
+        s_rtread_ps[s_nrtread] = d.ps;
+        s_rtread_into[s_nrtread] = s_rtcur;
+        s_rtread[s_nrtread++] = data;
+    }
+}
+
+static void rtlog_frame(void)
+{
+    static uint64_t seen[512];
+    static unsigned nseen;
+    uint64_t sig = 0xCBF29CE484222325ull;
+    unsigned i, k;
+    if (s_rtlog <= 0)
+        return;
+    if (s_nrtf > 1 || s_nrtread) {
+        uint32_t rts[8];
+        unsigned nrt = 0;
+        for (i = 0; i < s_nrtf; i++) {
+            for (k = 0; k < nrt && rts[k] != s_rtf[i].rt; k++)
+                ;
+            if (k == nrt) rts[nrt++] = s_rtf[i].rt;
+        }
+        for (i = 0; i < nrt; i++) sig = (sig ^ rts[i]) * 0x100000001B3ull;
+        for (i = 0; i < s_nrtread; i++) sig = (sig ^ s_rtread[i] ^ 0x5555u) * 0x100000001B3ull;
+        for (k = 0; k < nseen && seen[k] != sig; k++)
+            ;
+        if (k == nseen && nseen < 512) {
+            seen[nseen++] = sig;
+            fprintf(stderr, "[HLE-RT] swap %llu:", (unsigned long long)g_hle.swaps);
+            for (i = 0; i < s_nrtf; i++)
+                fprintf(stderr, " rt %08X ps %08X vs %08X x%u;", s_rtf[i].rt, s_rtf[i].ps, s_rtf[i].vs, s_rtf[i].n);
+            fprintf(stderr, " reads");
+            for (i = 0; i < s_nrtread; i++)
+                fprintf(stderr, " %08X(ps %08X -> rt %08X)", s_rtread[i], s_rtread_ps[i], s_rtread_into[i]);
+            fprintf(stderr, "\n");
+            {
+                extern volatile int hle_dump_request;
+                static int dumps;
+                if (dumps++ < 24)
+                    hle_dump_request = 1;     /* a picture of the next frame, when dumps are on */
+                if (s_nrtread && dumps < 4)
+                    hle_trace_arm_next();     /* RECOMP_HLE_TRACE=black: trace it too */
+            }
+        }
+    }
+    s_nrtf = s_nrtread = 0;
+}
+
 void hle_draw_frame_costs(double *vs_ms, unsigned *vs_n, double *tex_ms, unsigned *tex_n)
 {
+    rtlog_frame();
     *vs_ms = s_cost_vs_ms; *vs_n = s_cost_vs_n;
     *tex_ms = s_cost_tex_ms; *tex_n = s_cost_tex_n;
     s_cost_vs_ms = s_cost_tex_ms = 0.0;
@@ -676,42 +793,62 @@ static uint32_t yuv(int y, int u, int v)
          | (clamp8((298 * c - 100 * dd - 208 * e + 128) >> 8) << 8) | clamp8((298 * c + 516 * dd + 128) >> 8);
 }
 
-/* One level of an uncompressed texture, already in raster order, to BGRA8. */
+/* One level of an uncompressed texture, already in raster order, to BGRA8.
+ * The format is chosen once per level, not per texel (same arithmetic). */
+#define CONVERT_ROWS(expr) \
+    for (y = 0; y < h; y++) { \
+        const uint8_t *s = src + (size_t)y * pitch; \
+        uint32_t *o = dst + (size_t)y * w; \
+        for (x = 0; x < w; x++) { uint32_t v, l; (void)v; (void)l; o[x] = (expr); } \
+    }
+
+static uint32_t rd16(const uint8_t *s, uint32_t x) { return s[2 * x] | ((uint32_t)s[2 * x + 1] << 8); }
+static uint32_t rd32(const uint8_t *s, uint32_t x) { uint32_t v; memcpy(&v, s + 4 * x, 4); return v; }
+
 static void convert_level(uint32_t *dst, const uint8_t *src, uint32_t w, uint32_t h, uint32_t pitch,
                           int kind, const uint32_t *palette)
 {
     uint32_t x, y;
-    for (y = 0; y < h; y++) {
-        const uint8_t *s = src + (size_t)y * pitch;
-        uint32_t *o = dst + (size_t)y * w;
-        for (x = 0; x < w; x++) {
-            uint32_t v, l;
-            switch (kind) {
-            case K_ARGB8: memcpy(&o[x], s + 4 * x, 4); break;
-            case K_XRGB8: memcpy(&v, s + 4 * x, 4); o[x] = v | 0xFF000000u; break;
-            case K_565: v = s[2*x] | (s[2*x+1] << 8);
-                o[x] = 0xFF000000u | (e5(v >> 11) << 16) | (e6((v >> 5) & 63) << 8) | e5(v & 31); break;
-            case K_1555: v = s[2*x] | (s[2*x+1] << 8);
-                o[x] = ((v & 0x8000) ? 0xFF000000u : 0) | (e5((v >> 10) & 31) << 16) | (e5((v >> 5) & 31) << 8) | e5(v & 31); break;
-            case K_X555: v = s[2*x] | (s[2*x+1] << 8);
-                o[x] = 0xFF000000u | (e5((v >> 10) & 31) << 16) | (e5((v >> 5) & 31) << 8) | e5(v & 31); break;
-            case K_4444: v = s[2*x] | (s[2*x+1] << 8);
-                o[x] = (e4(v >> 12) << 24) | (e4((v >> 8) & 15) << 16) | (e4((v >> 4) & 15) << 8) | e4(v & 15); break;
-            case K_L8: l = s[x]; o[x] = 0xFF000000u | l * 0x010101u; break;
-            case K_AL8: l = s[x]; o[x] = l * 0x01010101u; break;
-            case K_A8: o[x] = ((uint32_t)s[x] << 24) | 0xFFFFFFu; break;
-            case K_A8L8: l = s[2*x]; o[x] = ((uint32_t)s[2*x+1] << 24) | l * 0x010101u; break;
-            case K_L16: l = s[2*x+1]; o[x] = 0xFF000000u | l * 0x010101u; break;
-            case K_P8: o[x] = palette ? palette[s[x]] : 0xFFFF00FFu; break;
-            case K_YUY2: { const uint8_t *p = s + 4 * (x >> 1);
-                o[x] = yuv(p[(x & 1) ? 2 : 0], p[1], p[3]); break; }
-            case K_UYVY: { const uint8_t *p = s + 4 * (x >> 1);
-                o[x] = yuv(p[(x & 1) ? 3 : 1], p[0], p[2]); break; }
-            default: o[x] = 0xFFFF00FFu; break;
+    switch (kind) {
+    case K_ARGB8:
+        for (y = 0; y < h; y++)
+            memcpy(dst + (size_t)y * w, src + (size_t)y * pitch, (size_t)w * 4);
+        break;
+    case K_XRGB8: CONVERT_ROWS(rd32(s, x) | 0xFF000000u) break;
+    case K_565: CONVERT_ROWS((v = rd16(s, x), 0xFF000000u | (e5(v >> 11) << 16) | (e6((v >> 5) & 63) << 8) | e5(v & 31))) break;
+    case K_1555: CONVERT_ROWS((v = rd16(s, x), ((v & 0x8000) ? 0xFF000000u : 0) | (e5((v >> 10) & 31) << 16) | (e5((v >> 5) & 31) << 8) | e5(v & 31))) break;
+    case K_X555: CONVERT_ROWS((v = rd16(s, x), 0xFF000000u | (e5((v >> 10) & 31) << 16) | (e5((v >> 5) & 31) << 8) | e5(v & 31))) break;
+    case K_4444: CONVERT_ROWS((v = rd16(s, x), (e4(v >> 12) << 24) | (e4((v >> 8) & 15) << 16) | (e4((v >> 4) & 15) << 8) | e4(v & 15))) break;
+    case K_L8: CONVERT_ROWS(0xFF000000u | s[x] * 0x010101u) break;
+    case K_AL8: CONVERT_ROWS(s[x] * 0x01010101u) break;
+    case K_A8: CONVERT_ROWS(((uint32_t)s[x] << 24) | 0xFFFFFFu) break;
+    case K_A8L8: CONVERT_ROWS(((uint32_t)s[2 * x + 1] << 24) | s[2 * x] * 0x010101u) break;
+    case K_L16: CONVERT_ROWS(0xFF000000u | s[2 * x + 1] * 0x010101u) break;
+    case K_P8: CONVERT_ROWS(palette ? palette[s[x]] : 0xFFFF00FFu) break;
+    case K_YUY2: case K_UYVY: {
+        /* Video frames: the chroma terms of yuv() once per pixel pair. */
+        int yo = kind == K_YUY2 ? 0 : 1, uo = kind == K_YUY2 ? 1 : 0;
+        for (y = 0; y < h; y++) {
+            const uint8_t *s = src + (size_t)y * pitch;
+            uint32_t *o = dst + (size_t)y * w;
+            for (x = 0; x < w; x += 2) {
+                const uint8_t *p = s + 2 * x;
+                int dd = p[uo] - 128, e = p[uo + 2] - 128;
+                int rv = 409 * e + 128, gv = -100 * dd - 208 * e + 128, bv = 516 * dd + 128;
+                int c0 = 298 * (p[yo] - 16);
+                o[x] = 0xFF000000u | (clamp8((c0 + rv) >> 8) << 16) | (clamp8((c0 + gv) >> 8) << 8) | clamp8((c0 + bv) >> 8);
+                if (x + 1 < w) {
+                    int c1 = 298 * (p[yo + 2] - 16);
+                    o[x + 1] = 0xFF000000u | (clamp8((c1 + rv) >> 8) << 16) | (clamp8((c1 + gv) >> 8) << 8) | clamp8((c1 + bv) >> 8);
+                }
             }
         }
+        break;
+    }
+    default: CONVERT_ROWS(0xFFFF00FFu) break;
     }
 }
+#undef CONVERT_ROWS
 
 static void tex_release(HleTex *t)
 {
@@ -806,9 +943,34 @@ static int tex_build(HleTex *t, uint32_t obj, uint32_t pal)
         sd[lv].SysMemSlicePitch = 0;
     }
     td.MipLevels = levels;
-    hr = ID3D11Device_CreateTexture2D(g_hle.dev, &td, sd, &t->tex);
-    if (SUCCEEDED(hr))
-        hr = ID3D11Device_CreateShaderResourceView(g_hle.dev, (ID3D11Resource *)t->tex, NULL, &t->srv);
+    /* Contents changed, same shape (video frames, HUD digits): new texels
+     * into the same texture instead of a new texture and view per change.
+     * RECOMP_HLE_NO_TEX_REUSE=1 always recreates. */
+    {
+        static int reuse = -1;
+        if (reuse < 0) {
+            const char *e = getenv("RECOMP_HLE_NO_TEX_REUSE");
+            reuse = !(e && *e && *e != '0');
+        }
+        if (t->tex && (!reuse || hle_ab_off || t->w != w || t->h != h || t->levels != levels || t->dxgi != (uint32_t)td.Format)) {
+            ID3D11Texture2D *old_tex = t->tex;
+            ID3D11ShaderResourceView *old_srv = t->srv;
+            t->tex = NULL;
+            t->srv = NULL;
+            if (old_srv) ID3D11ShaderResourceView_Release(old_srv);
+            ID3D11Texture2D_Release(old_tex);
+        }
+    }
+    if (t->tex && t->srv) {
+        for (lv = 0; lv < levels; lv++)
+            ID3D11DeviceContext_UpdateSubresource(g_hle.ctx, (ID3D11Resource *)t->tex, lv, NULL,
+                                                  sd[lv].pSysMem, sd[lv].SysMemPitch, 0);
+        hr = S_OK;
+    } else {
+        hr = ID3D11Device_CreateTexture2D(g_hle.dev, &td, sd, &t->tex);
+        if (SUCCEEDED(hr))
+            hr = ID3D11Device_CreateShaderResourceView(g_hle.dev, (ID3D11Resource *)t->tex, NULL, &t->srv);
+    }
     for (lv = 0; lv < 16; lv++)
         free(buf[lv]);
     free(tmp);
@@ -821,6 +983,8 @@ static int tex_build(HleTex *t, uint32_t obj, uint32_t pal)
     t->w = w;
     t->h = h;
     t->linear = linear;
+    t->levels = levels;
+    t->dxgi = (uint32_t)td.Format;
     return 1;
 }
 
@@ -872,8 +1036,10 @@ static ID3D11ShaderResourceView *tex_get(uint32_t obj, uint32_t pal, float scale
     if (hle_trace_on())
         fprintf(stderr, "[HLE-T]   tex obj %08X data %08X fmt %08X size %08X%s\n",
                 obj, data, fmt, size, rt ? " (native render target)" : "");
-    if (rt)
+    if (rt) {
+        rtlog_read(data);
         return rt;
+    }
     for (i = 0; i < 16; i++) {
         HleTex *c = &d.texc[(key + i) & (TEX_SLOTS - 1)];
         if (c->tex && c->data == data && c->format == fmt && c->size == size && c->pal == pal) {
@@ -931,9 +1097,7 @@ static ID3D11ShaderResourceView *tex_get(uint32_t obj, uint32_t pal, float scale
     if (!t) {
         t = victim;
         tex_release(t);
-    } else {
-        tex_release(t);
-    }
+    }                                     /* else tex_build updates it in place */
     t->data = data;
     t->format = fmt;
     t->size = size;
@@ -1070,7 +1234,11 @@ static void apply_output_state(int has_depth, uint32_t geometry_flags)
         bf[0] = ((bc >> 16) & 255) / 255.0f; bf[1] = ((bc >> 8) & 255) / 255.0f;
         bf[2] = (bc & 255) / 255.0f; bf[3] = (bc >> 24) / 255.0f;
     }
-    ID3D11DeviceContext_OMSetBlendState(g_hle.ctx, bs, bf, 0xFFFFFFFFu);
+    if (!s_bind.valid || s_bind.bs != bs || memcmp(s_bind.bf, bf, sizeof bf)) {
+        ID3D11DeviceContext_OMSetBlendState(g_hle.ctx, bs, bf, 0xFFFFFFFFu);
+        s_bind.bs = bs;
+        memcpy(s_bind.bf, bf, sizeof bf);
+    }
 
     {
         int zen = has_depth && RS(RS_ZENABLE) != 0, sen = has_depth && RS(RS_STENCILENABLE) != 0;
@@ -1096,7 +1264,11 @@ static void apply_output_state(int has_depth, uint32_t geometry_flags)
             if (SUCCEEDED(ID3D11Device_CreateDepthStencilState(g_hle.dev, &z, &ds)))
                 state_insert(d.depth, key, ds);
         }
-        ID3D11DeviceContext_OMSetDepthStencilState(g_hle.ctx, ds, NV(0x368) & 0xFF);
+        if (!s_bind.valid || s_bind.ds != ds || s_bind.sref != (NV(0x368) & 0xFF)) {
+            ID3D11DeviceContext_OMSetDepthStencilState(g_hle.ctx, ds, NV(0x368) & 0xFF);
+            s_bind.ds = ds;
+            s_bind.sref = NV(0x368) & 0xFF;
+        }
     }
 
     {
@@ -1112,7 +1284,10 @@ static void apply_output_state(int has_depth, uint32_t geometry_flags)
             if (SUCCEEDED(ID3D11Device_CreateRasterizerState(g_hle.dev, &r, &rs)))
                 state_insert(d.raster, key, rs);
         }
-        ID3D11DeviceContext_RSSetState(g_hle.ctx, rs);
+        if (!s_bind.valid || s_bind.rs != rs) {
+            ID3D11DeviceContext_RSSetState(g_hle.ctx, rs);
+            s_bind.rs = rs;
+        }
     }
 }
 
@@ -1379,7 +1554,10 @@ static void setup_pixels(PsCB *p)
     }
     memcpy(&p->fogparm[0], (const void *)XBOX_PTR(G_RENDER_STATE + 4u * 94), 12);
     ID3D11DeviceContext_PSSetShaderResources(g_hle.ctx, 0, 4, srv);
-    ID3D11DeviceContext_PSSetSamplers(g_hle.ctx, 0, 4, smp);
+    if (!s_bind.valid || memcmp(s_bind.smp, smp, sizeof smp)) {
+        ID3D11DeviceContext_PSSetSamplers(g_hle.ctx, 0, 4, smp);
+        memcpy(s_bind.smp, smp, sizeof smp);
+    }
 }
 
 /* -------------------------------------------------------------- uploads */
@@ -1543,6 +1721,15 @@ static void draw(uint32_t prim, const uint32_t *verts, uint32_t n, const CustomS
     }
     if (ds && (!ds->dsv || ds->w != rt->w || ds->h != rt->h))
         ds = NULL;
+    if (s_rtlog) {
+        if (s_rtlog < 0) {
+            const char *e = getenv("RECOMP_HLE_RTLOG");
+            s_rtlog = e && *e && *e != '0';
+        }
+        if (s_rtlog > 0)
+            rtlog_draw(rt->data, d.ps, vs_obj);
+        s_rtcur = rt->data;
+    }
 
     for (i = 0; i < n; i++) {
         if (verts[i] < vmin) vmin = verts[i];
@@ -1642,9 +1829,24 @@ static void draw(uint32_t prim, const uint32_t *verts, uint32_t n, const CustomS
         ID3D11DeviceContext_UpdateSubresource(g_hle.ctx, (ID3D11Resource *)d.cb_vsc, 0, NULL, d.vsc, 0, 0);
         d.vsc_dirty = 0;
     }
-    if (SUCCEEDED(ID3D11DeviceContext_Map(g_hle.ctx, (ID3D11Resource *)d.cb_draw, 0, D3D11_MAP_WRITE_DISCARD, 0, &m))) {
-        memcpy(m.pData, &cb, sizeof cb);
-        ID3D11DeviceContext_Unmap(g_hle.ctx, (ID3D11Resource *)d.cb_draw, 0);
+    if (s_cb_skip < 0) {
+        const char *e = getenv("RECOMP_HLE_NO_CB_SKIP");
+        s_cb_skip = !(e && *e && *e != '0');
+        e = getenv("RECOMP_HLE_NO_STATE_CACHE");
+        s_bind.off = e && *e && *e != '0';
+    }
+    if (s_bind.off || hle_ab_off)
+        s_bind.valid = 0;
+    {
+        static DrawCB last;
+        if (!s_cb_skip || hle_ab_off || !s_cb_draw_valid || memcmp(&last, &cb, sizeof cb)) {
+            if (SUCCEEDED(ID3D11DeviceContext_Map(g_hle.ctx, (ID3D11Resource *)d.cb_draw, 0, D3D11_MAP_WRITE_DISCARD, 0, &m))) {
+                memcpy(m.pData, &cb, sizeof cb);
+                ID3D11DeviceContext_Unmap(g_hle.ctx, (ID3D11Resource *)d.cb_draw, 0);
+                memcpy(&last, &cb, sizeof cb);
+                s_cb_draw_valid = 1;
+            }
+        }
     }
     setup_pixels(&pcb);
     {
@@ -1675,39 +1877,81 @@ static void draw(uint32_t prim, const uint32_t *verts, uint32_t n, const CustomS
                             d.tex[i], MEM32(d.tex[i] + 4), MEM32(d.tex[i] + 12), MEM32(d.tex[i] + 16), d.pal[i]);
         }
     }
-    if (SUCCEEDED(ID3D11DeviceContext_Map(g_hle.ctx, (ID3D11Resource *)d.cb_ps, 0, D3D11_MAP_WRITE_DISCARD, 0, &m))) {
-        memcpy(m.pData, &pcb, sizeof pcb);
-        ID3D11DeviceContext_Unmap(g_hle.ctx, (ID3D11Resource *)d.cb_ps, 0);
+    {
+        static PsCB last;
+        if (!s_cb_skip || hle_ab_off || !s_cb_ps_valid || memcmp(&last, &pcb, sizeof pcb)) {
+            if (SUCCEEDED(ID3D11DeviceContext_Map(g_hle.ctx, (ID3D11Resource *)d.cb_ps, 0, D3D11_MAP_WRITE_DISCARD, 0, &m))) {
+                memcpy(m.pData, &pcb, sizeof pcb);
+                ID3D11DeviceContext_Unmap(g_hle.ctx, (ID3D11Resource *)d.cb_ps, 0);
+                memcpy(&last, &pcb, sizeof pcb);
+                s_cb_ps_valid = 1;
+            }
+        }
     }
     extern uint32_t hle_geometry_flags(uint32_t primitive, D3D11_PRIMITIVE_TOPOLOGY topology);
     extern int hle_geometry_bind(uint32_t primitive, D3D11_PRIMITIVE_TOPOLOGY topology, const D3D11_VIEWPORT *vp);
     uint32_t geometry = hle_geometry_flags(prim, topo);
     if (geometry && hle_geometry_bind(prim, topo, &vp) <= 0) {
         ID3D11DeviceContext_GSSetShader(g_hle.ctx, NULL, NULL, 0);
+        s_bind.gs_null = 1;
         geometry = 0;
-    } else if (!geometry)
+    } else if (geometry) {
+        s_bind.gs_null = 0;
+    } else if (!s_bind.valid || !s_bind.gs_null) {
         ID3D11DeviceContext_GSSetShader(g_hle.ctx, NULL, NULL, 0);
+        s_bind.gs_null = 1;
+    }
     apply_output_state(ds != NULL, geometry);
 
-    ID3D11DeviceContext_OMSetRenderTargets(g_hle.ctx, 1, &rt->rtv, ds ? ds->dsv : NULL);
-    ID3D11DeviceContext_RSSetViewports(g_hle.ctx, 1, &vp);
-    ID3D11DeviceContext_IASetInputLayout(g_hle.ctx, NULL);
-    ID3D11DeviceContext_IASetIndexBuffer(g_hle.ctx, d.ib, DXGI_FORMAT_R32_UINT, 0);
-    ID3D11DeviceContext_IASetPrimitiveTopology(g_hle.ctx, topo);
-    ID3D11DeviceContext_VSSetShader(g_hle.ctx, vsh, NULL, 0);
     {
-        ID3D11Buffer *vcb[2] = { d.cb_vsc, d.cb_draw };
-        ID3D11DeviceContext_VSSetConstantBuffers(g_hle.ctx, 0, 2, vcb);
-    }
-    ID3D11DeviceContext_VSSetShaderResources(g_hle.ctx, 0, 1, &d.vb_srv);
-    {
+        ID3D11DepthStencilView *dsv = ds ? ds->dsv : NULL;
         ID3D11PixelShader *psv = ps_variant(&pcb);
-        ID3D11DeviceContext_PSSetShader(g_hle.ctx, psv ? psv : d.ps_main, NULL, 0);
+        if (!psv)
+            psv = d.ps_main;
+        if (!s_bind.valid) {
+            /* Never change between draws: the input layout, the constant
+             * buffers (their contents are updated in place). */
+            ID3D11Buffer *vcb[2] = { d.cb_vsc, d.cb_draw };
+            ID3D11DeviceContext_IASetInputLayout(g_hle.ctx, NULL);
+            ID3D11DeviceContext_VSSetConstantBuffers(g_hle.ctx, 0, 2, vcb);
+            ID3D11DeviceContext_PSSetConstantBuffers(g_hle.ctx, 0, 1, &d.cb_ps);
+        }
+        if (!s_bind.valid || s_bind.rtv != rt->rtv || s_bind.dsv != dsv) {
+            ID3D11DeviceContext_OMSetRenderTargets(g_hle.ctx, 1, &rt->rtv, dsv);
+            s_bind.rtv = rt->rtv;
+            s_bind.dsv = dsv;
+        }
+        if (!s_bind.valid || memcmp(&s_bind.vp, &vp, sizeof vp)) {
+            ID3D11DeviceContext_RSSetViewports(g_hle.ctx, 1, &vp);
+            s_bind.vp = vp;
+        }
+        if (!s_bind.valid || s_bind.ib != d.ib) {
+            ID3D11DeviceContext_IASetIndexBuffer(g_hle.ctx, d.ib, DXGI_FORMAT_R32_UINT, 0);
+            s_bind.ib = d.ib;
+        }
+        if (!s_bind.valid || s_bind.topo != topo) {
+            ID3D11DeviceContext_IASetPrimitiveTopology(g_hle.ctx, topo);
+            s_bind.topo = topo;
+        }
+        if (!s_bind.valid || s_bind.vs != vsh) {
+            ID3D11DeviceContext_VSSetShader(g_hle.ctx, vsh, NULL, 0);
+            s_bind.vs = vsh;
+        }
+        if (!s_bind.valid || s_bind.vb_srv != d.vb_srv) {
+            ID3D11DeviceContext_VSSetShaderResources(g_hle.ctx, 0, 1, &d.vb_srv);
+            s_bind.vb_srv = d.vb_srv;
+        }
+        if (!s_bind.valid || s_bind.ps != psv) {
+            ID3D11DeviceContext_PSSetShader(g_hle.ctx, psv, NULL, 0);
+            s_bind.ps = psv;
+        }
+        s_bind.valid = !s_bind.off && !hle_ab_off;
     }
-    ID3D11DeviceContext_PSSetConstantBuffers(g_hle.ctx, 0, 1, &d.cb_ps);
     ID3D11DeviceContext_DrawIndexed(g_hle.ctx, nidx, first, 0);
-    if (geometry)
+    if (geometry) {
         ID3D11DeviceContext_GSSetShader(g_hle.ctx, NULL, NULL, 0);
+        s_bind.gs_null = 1;
+    }
     /* RECOMP_HLE_SEAMPROBE (traced frames, widened targets): mean brightness
      * just inside and just outside the right 4:3 edge, lower half, after
      * each draw -- which draw makes the two sides differ. */
@@ -1744,6 +1988,7 @@ static void draw(uint32_t prim, const uint32_t *verts, uint32_t n, const CustomS
 }
 
 static double s_draw_ms;
+static int s_measure_draws;
 
 double hle_draw_frame_draw_ms(void)
 {
@@ -1771,11 +2016,12 @@ static void draw_api(uint32_t prim, uint32_t count, uint32_t indices, uint32_t s
         for (i = 0; i < count; i++)
             verts[i] = start + i;
     }
-    {
+    if (s_measure_draws) {
         double t0 = now_ms();
         draw(prim, verts, count, NULL);
         s_draw_ms += now_ms() - t0;
-    }
+    } else
+        draw(prim, verts, count, NULL);
 }
 
 /* Inline vertices (immediate mode, BeginPush INLINE_ARRAY) through the same
@@ -1793,7 +2039,12 @@ static void draw_custom(uint32_t prim, CustomStream *cs)
     }
     for (i = 0; i < n; i++)
         verts[i] = i;
-    draw(prim, verts, n, cs);
+    if (s_measure_draws) {
+        double t0 = now_ms();
+        draw(prim, verts, n, cs);
+        s_draw_ms += now_ms() - t0;
+    } else
+        draw(prim, verts, n, cs);
 }
 
 static void flush_immediate(void)
@@ -1942,10 +2193,12 @@ void hle_native_observe(int id, int depth, int phase, const uint32_t a[6],
                 uint32_t k;
                 for (k = 0; k < 4; k++) {
                     uint32_t w = MEM32(edx + 16 * i + 4 * k);
-                    memcpy(&d.vsc[ecx + i][k], &w, 4);
+                    if (!s_cb_skip || hle_ab_off || memcmp(&d.vsc[ecx + i][k], &w, 4)) {
+                        memcpy(&d.vsc[ecx + i][k], &w, 4);
+                        d.vsc_dirty = 1;        /* re-uploaded only when a value changed */
+                    }
                 }
             }
-            d.vsc_dirty = 1;
         }
         break;
     case HLE_D3DDevice_CreateVertexShader:
@@ -2086,6 +2339,7 @@ void hle_draw_clear_rect(HleSurface *rt, HleSurface *ds, const D3D11_RECT *r, ui
 
     if (failed || !size_of)
         return;
+    hle_draw_state_invalidate();
     if (!vs) {
         ID3DBlob *v = compile(k_clear_vs, sizeof k_clear_vs - 1, "vs_5_0", "hle_clear_vs");
         ID3DBlob *p = compile(k_clear_ps, sizeof k_clear_ps - 1, "ps_5_0", "hle_clear_ps");
@@ -2174,6 +2428,9 @@ int hle_draw_init(void)
     D3D11_FEATURE_DATA_D3D11_OPTIONS opt;
     ID3DBlob *ps;
 
+    /* Profiling must not add two clock queries to every production draw. */
+    const char *measure = getenv("RECOMP_HLE_PROFILE");
+    s_measure_draws = measure && *measure && *measure != '0';
     disk_load();
     d.vb_size = 32u << 20;
     memset(&bd, 0, sizeof bd);

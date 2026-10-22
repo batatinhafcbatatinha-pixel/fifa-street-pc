@@ -94,6 +94,8 @@ HRESULT hle_d3d_compile(LPCVOID src, SIZE_T len, LPCSTR name, const D3D_SHADER_M
 /* hle_draw.c */
 int  hle_draw_init(void);
 void hle_draw_flush(void);
+/* The draw path's cached context bindings are stale (another binder ran). */
+void hle_draw_state_invalidate(void);
 void hle_draw_clear_rect(HleSurface *rt, HleSurface *ds, const D3D11_RECT *r, uint32_t flags,
                          const float c[4], float z, uint32_t stencil);
 void hle_draw_stats(uint64_t *draws, uint64_t *skipped, uint64_t *tris);
