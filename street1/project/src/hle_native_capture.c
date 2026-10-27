@@ -101,14 +101,15 @@ uint32_t hle_native_surface_readback(uint32_t source, uint32_t out, uint32_t wid
     HleSurface *s = hle_surface_for(descriptor);
     HRESULT hr = E_FAIL;
     ID3D11Texture2D *staging = NULL;
-    if (s && s->tex) {
+    ID3D11Texture2D *tex = hle_surface_resolved(s);
+    if (tex) {
         D3D11_TEXTURE2D_DESC td;
-        ID3D11Texture2D_GetDesc(s->tex, &td);
+        ID3D11Texture2D_GetDesc(tex, &td);
         td.Usage = D3D11_USAGE_STAGING; td.BindFlags = 0; td.CPUAccessFlags = D3D11_CPU_ACCESS_READ; td.MiscFlags = 0;
         hr = ID3D11Device_CreateTexture2D(g_hle.dev, &td, NULL, &staging);
         if (SUCCEEDED(hr)) {
             D3D11_MAPPED_SUBRESOURCE map;
-            ID3D11DeviceContext_CopyResource(g_hle.ctx, (ID3D11Resource *)staging, (ID3D11Resource *)s->tex);
+            ID3D11DeviceContext_CopyResource(g_hle.ctx, (ID3D11Resource *)staging, (ID3D11Resource *)tex);
             hr = ID3D11DeviceContext_Map(g_hle.ctx, (ID3D11Resource *)staging, 0, D3D11_MAP_READ, 0, &map);
             if (SUCCEEDED(hr)) {
                 for (uint32_t y = 0; y < height; y++) {

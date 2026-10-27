@@ -20,7 +20,7 @@ An experimental original-Xbox FIFA Street port built through static recompilatio
 - Windows x64 and Linux x64 build paths.
 - Resolution presets from 720p to 8K, or your monitor's resolution. Performance depends on hardware, scene and build; 4K/60 is not a universal guarantee.
 - The game's own 16:9 widescreen mode; other display shapes use letterboxing. Additional aspect settings remain experimental.
-- In-game settings with **F1**: display mode, monitor, refresh rate, VSync, frame limit, resolution, aspect ratio, graphics API, GPU, game language (English / Spanish on the USA disc; English / French / German on the European disc), FXAA, anisotropic filtering and volume.
+- In-game settings with **F1**: display mode, monitor, refresh rate, VSync, frame limit, resolution, aspect ratio, graphics API, GPU, game language (English / Spanish on the USA disc; English / French / German on the European disc), FXAA, MSAA (off, 2x/4x/8x or the 2x the Xbox game asks for), anisotropic filtering and volume.
 - Settings default to **English**, with Portuguese available through **Menu language**. The settings language is separate from game language.
 - Shader caching, specialized pixel shaders and native audio/frame-pacing improvements. Visual, audio, gameplay and save regressions may remain.
 
