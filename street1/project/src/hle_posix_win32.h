@@ -135,5 +135,8 @@ DWORD GetPrivateProfileStringW(const wchar_t *section, const wchar_t *key, const
 BOOL WritePrivateProfileStringW(const wchar_t *section, const wchar_t *key, const wchar_t *value,
                                 const wchar_t *file);
 
+/* Rectangle helpers the options menu's mouse code uses. */
+static inline BOOL PtInRect(const RECT *r, POINT p) { return p.x >= r->left && p.x < r->right && p.y >= r->top && p.y < r->bottom; }
+static inline BOOL SetRectEmpty(RECT *r) { r->left = r->top = r->right = r->bottom = 0; return TRUE; }
 #endif /* !_WIN32 */
 #endif
