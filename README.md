@@ -137,6 +137,8 @@ The keyboard drives player 1 and is merged with a controller plugged in there, s
 
 Xbox-style controllers use the standard game controls. **F1** or **Back + Start** opens PC settings. **Alt + Enter** switches fullscreen.
 
+The PC settings screen is drawn in the game's own style (orange title, white brush frame, yellow selection band) with the game's fonts, FreeStyle European and Euromode. They are read from your disc (`data/aptanims/aptfntz.big`) when the game starts and are not part of this repository. On the main menu and the Options screens a **BACK · PC SETTINGS** hint shows that the controller's Back button opens it there. The menu is in English by default; *Menu language* switches it to Portuguese.
+
 Settings are saved in `fifastreet.ini` beside the locally built executable. Options marked with `*` require a restart. Logs go under `.local/logs/`.
 
 ## Credits and licenses

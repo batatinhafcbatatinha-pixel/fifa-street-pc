@@ -73,6 +73,8 @@ BOOL Polygon(HDC dc, const POINT *p, int n);
 BOOL Ellipse(HDC dc, int l, int t, int r, int b);
 BOOL RoundRect(HDC dc, int l, int t, int r, int b, int w, int h);
 static inline BOOL GdiFlush(void) { return TRUE; }
+/* A TrueType face in memory, used by CreateFontW for that family name. */
+int hle_gdi_register_face(const wchar_t *family, const void *data, size_t len);
 
 #endif /* !_WIN32 */
 #endif

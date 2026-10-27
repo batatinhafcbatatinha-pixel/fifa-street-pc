@@ -172,17 +172,47 @@ static TTF_Font *open_face(int px_size, int bold, int italic)
     return f;
 }
 
+/* Faces handed over in memory (the game's own fonts), by family name. The
+ * data stays owned by the caller for the life of the process. */
+static struct { wchar_t name[64]; const void *data; size_t len; } s_faces[8];
+
+int hle_gdi_register_face(const wchar_t *family, const void *data, size_t len)
+{
+    size_t i;
+    for (i = 0; i < sizeof s_faces / sizeof s_faces[0]; i++)
+        if (!s_faces[i].data) {
+            wcsncpy(s_faces[i].name, family, 63);
+            s_faces[i].data = data;
+            s_faces[i].len = len;
+            return 1;
+        }
+    return 0;
+}
+
+static TTF_Font *open_registered(const wchar_t *face, int px_size)
+{
+    size_t i;
+    if (!face || (!TTF_WasInit() && TTF_Init() != 0))
+        return NULL;
+    for (i = 0; i < sizeof s_faces / sizeof s_faces[0]; i++)
+        if (s_faces[i].data && !wcscmp(s_faces[i].name, face))
+            return TTF_OpenFontRW(SDL_RWFromConstMem(s_faces[i].data, (int)s_faces[i].len), 1, px_size);
+    return NULL;
+}
+
 HFONT CreateFontW(int height, int width, int esc, int orient, int weight, DWORD italic, DWORD underline,
                   DWORD strike, DWORD charset, DWORD out_precision, DWORD clip_precision, DWORD quality,
                   DWORD pitch, const wchar_t *face)
 {
     GdiObj *o = (GdiObj *)calloc(1, sizeof *o);
     (void)width; (void)esc; (void)orient; (void)underline; (void)strike; (void)charset;
-    (void)out_precision; (void)clip_precision; (void)quality; (void)pitch; (void)face;
+    (void)out_precision; (void)clip_precision; (void)quality; (void)pitch;
     if (!o)
         return NULL;
     o->kind = O_FONT;
-    o->font = open_face(height < 0 ? -height : height, weight >= FW_BOLD, italic != 0);
+    o->font = open_registered(face, height < 0 ? -height : height);
+    if (!o->font)
+        o->font = open_face(height < 0 ? -height : height, weight >= FW_BOLD, italic != 0);
     return (HFONT)o;
 }
 

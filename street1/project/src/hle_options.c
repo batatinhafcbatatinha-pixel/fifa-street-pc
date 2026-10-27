@@ -808,7 +808,7 @@ static char s_screen[48];
 
 static int screen_has_button(void)
 {
-    return !strcmp(s_screen, "f_MAIN_i_0100") || !strcmp(s_screen, "f_OPTIONS_i_0100") ||
+    return !strcmp(s_screen, "f_MAIN_i_0100") || !strcmp(s_screen, "f_MAIN_i_0300") || !strcmp(s_screen, "f_OPTIONS_i_0100") ||
            !strcmp(s_screen, "f_INGAME_i_0200");
 }
 
@@ -1374,10 +1374,182 @@ static int overlay_resources(void)
 
 static HFONT s_font_title;
 
+/* The game's own faces, read from the disc at run time (never shipped):
+ * aptanims/aptfntz.big holds the front end's font archive aptfnts.big
+ * (RefPack), with _title.ttf (FreeStyle European Bold, the orange screen
+ * titles) and _body.ttf (Euromode Bold, the menu lines). Segoe UI when the
+ * files are missing. */
+#define FACE_TITLE L"FreeStyle_European_Bold"
+#define FACE_BODY  L"Euromode"
+static int s_game_fonts = -1;
+
+static uint32_t be32(const uint8_t *p)
+{
+    return (uint32_t)p[0] << 24 | (uint32_t)p[1] << 16 | (uint32_t)p[2] << 8 | p[3];
+}
+
+static uint8_t *refpack_decode(const uint8_t *s, size_t n, size_t *out_len)
+{
+    size_t p = 2, o = 0, len, lit, cnt, dist;
+    int large, stop = 0;
+    uint8_t *d;
+    if (n < 6 || (s[0] & 0x0E) || s[1] != 0xFB)
+        return NULL;
+    large = (s[0] & 0x80) != 0;
+    if (s[0] & 0x01)
+        p += large ? 4 : 3;
+    if (p + 4 > n)
+        return NULL;
+    len = large ? be32(s + p) : ((size_t)s[p] << 16 | (size_t)s[p + 1] << 8 | s[p + 2]);
+    p += large ? 4 : 3;
+    if (!len || !(d = (uint8_t *)malloc(len)))
+        return NULL;
+    while (!stop && p < n) {
+        uint8_t b0 = s[p++];
+        if (!(b0 & 0x80)) {                                  /* 0DDRRRPP DDDDDDDD */
+            if (p + 1 > n) break;
+            lit = b0 & 3; dist = ((size_t)(b0 & 0x60) << 3) + s[p] + 1; cnt = ((b0 >> 2) & 7) + 3; p += 1;
+        } else if (!(b0 & 0x40)) {                           /* 10RRRRRR PPDDDDDD DDDDDDDD */
+            if (p + 2 > n) break;
+            lit = s[p] >> 6; dist = ((size_t)(s[p] & 0x3F) << 8) + s[p + 1] + 1; cnt = (b0 & 0x3F) + 4; p += 2;
+        } else if (!(b0 & 0x20)) {                           /* 110DRRPP DDDDDDDD DDDDDDDD RRRRRRRR */
+            if (p + 3 > n) break;
+            lit = b0 & 3; dist = ((size_t)(b0 & 0x10) << 12) + ((size_t)s[p] << 8) + s[p + 1] + 1;
+            cnt = ((size_t)(b0 & 0x0C) << 6) + s[p + 2] + 5; p += 3;
+        } else {                                             /* 111RRRRR literals, or the end */
+            lit = (size_t)(b0 & 0x1F) * 4 + 4; cnt = 0; dist = 0;
+            if (lit > 0x70) { lit = b0 & 3; stop = 1; }
+        }
+        if (p + lit > n || o + lit + cnt > len || dist > o + lit)
+            break;
+        memcpy(d + o, s + p, lit);
+        p += lit;
+        o += lit;
+        for (; cnt; cnt--, o++)
+            d[o] = d[o - dist];
+    }
+    if (o != len) {
+        free(d);
+        return NULL;
+    }
+    *out_len = len;
+    return d;
+}
+
+/* An entry of an EA BIG archive (BIGF: entry count big-endian at 8, then
+ * offset, size and NUL-terminated name), unpacked when it is RefPack. */
+static uint8_t *big_entry(const uint8_t *b, size_t n, const char *name, size_t *len)
+{
+    uint32_t count, i;
+    size_t p = 16;
+    if (n < 16 || memcmp(b, "BIGF", 4))
+        return NULL;
+    count = be32(b + 8);
+    for (i = 0; i < count && p + 9 <= n; i++) {
+        uint32_t off = be32(b + p), sz = be32(b + p + 4);
+        const char *nm = (const char *)b + p + 8;
+        size_t nl = 0;
+        uint8_t *out;
+        while (p + 8 + nl < n && nm[nl])
+            nl++;
+        p += 8 + nl + 1;
+        if (p > n || strcmp(nm, name) || off > n || sz > n - off)
+            continue;
+        if (sz > 2 && b[off + 1] == 0xFB)
+            return refpack_decode(b + off, sz, len);
+        if ((out = (uint8_t *)malloc(sz)) != NULL) {
+            memcpy(out, b + off, sz);
+            *len = sz;
+        }
+        return out;
+    }
+    return NULL;
+}
+
+/* Some of the game's fonts keep their Windows character map as an old byte
+ * table (cmap format 0), which GDI reads in the Mac character set ("ç"
+ * comes out as "Á"). Point that record at the font's Unicode (0,3)
+ * format 4 map, which has the same glyphs. */
+static void cmap_fix(uint8_t *ttf, size_t len)
+{
+    uint32_t ntab, i, cmap = 0, cnt, uni = 0;
+    if (len < 12)
+        return;
+    ntab = (uint32_t)ttf[4] << 8 | ttf[5];
+    for (i = 0; i < ntab && 12 + 16 * (size_t)i + 16 <= len; i++)
+        if (!memcmp(ttf + 12 + 16 * i, "cmap", 4))
+            cmap = be32(ttf + 12 + 16 * i + 8);
+    if (!cmap || (size_t)cmap + 4 > len)
+        return;
+    cnt = (uint32_t)ttf[cmap + 2] << 8 | ttf[cmap + 3];
+    for (i = 0; i < cnt && (size_t)cmap + 12 + 8 * (size_t)i <= len; i++) {
+        const uint8_t *r = ttf + cmap + 4 + 8 * i;
+        uint32_t so = be32(r + 4);
+        if (r[1] == 0 && r[3] == 3 && (size_t)cmap + so + 2 <= len && ttf[cmap + so] == 0 && ttf[cmap + so + 1] == 4)
+            uni = so;                                        /* platform 0, encoding 3 */
+    }
+    for (i = 0; uni && i < cnt && (size_t)cmap + 12 + 8 * (size_t)i <= len; i++) {
+        uint8_t *r = ttf + cmap + 4 + 8 * i;
+        uint32_t so = be32(r + 4);
+        if (r[1] == 3 && r[3] == 1 && (size_t)cmap + so + 2 <= len && !(ttf[cmap + so] == 0 && ttf[cmap + so + 1] == 4)) {
+            r[4] = (uint8_t)(uni >> 24); r[5] = (uint8_t)(uni >> 16); r[6] = (uint8_t)(uni >> 8); r[7] = (uint8_t)uni;
+        }
+    }
+}
+
+static int register_face(const wchar_t *family, const uint8_t *archive, size_t n, const char *entry)
+{
+    size_t len = 0;
+    uint8_t *ttf = big_entry(archive, n, entry, &len);       /* kept for the process's life */
+    if (ttf)
+        cmap_fix(ttf, len);
+#ifdef _WIN32
+    DWORD count = 0;
+    (void)family;
+    return ttf && AddFontMemResourceEx(ttf, (DWORD)len, NULL, &count) && count;
+#else
+    return ttf && hle_gdi_register_face(family, ttf, len);
+#endif
+}
+
+static int game_fonts(void)
+{
+    FILE *f;
+    uint8_t *outer = NULL, *inner = NULL;
+    size_t n = 0, inner_len = 0;
+    if (s_game_fonts >= 0)
+        return s_game_fonts;
+    s_game_fonts = 0;
+    if ((f = fopen("game_files/data/aptanims/aptfntz.big", "rb")) != NULL) {
+        fseek(f, 0, SEEK_END);
+        n = (size_t)ftell(f);
+        fseek(f, 0, SEEK_SET);
+        if (n && (outer = (uint8_t *)malloc(n)) != NULL && fread(outer, 1, n, f) != n)
+            n = 0;
+        fclose(f);
+    }
+    if (outer && n)
+        inner = big_entry(outer, n, "aptfnts.big", &inner_len);
+    if (inner)
+        s_game_fonts = register_face(FACE_TITLE, inner, inner_len, "_title.ttf") &&
+                       register_face(FACE_BODY, inner, inner_len, "_body.ttf");
+    free(inner);
+    free(outer);
+    fprintf(stderr, "[OPTIONS] game fonts %s\n", s_game_fonts ? "loaded (FreeStyle European, Euromode)" : "not found: Segoe UI");
+    return s_game_fonts;
+}
+
+static HFONT make_face(const wchar_t *face, int px, int weight, int italic)
+{
+    if (!game_fonts())
+        face = L"Segoe UI";
+    return CreateFontW(-px, 0, 0, 0, weight, (DWORD)italic, 0, 0, DEFAULT_CHARSET, OUT_TT_PRECIS,
+                       CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH, face);
+}
+
 static HFONT make_font(int px, int weight, int italic)
 {
-    return CreateFontW(-px, 0, 0, 0, weight, (DWORD)italic, 0, 0, DEFAULT_CHARSET, OUT_TT_PRECIS,
-                       CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH, L"Segoe UI");
+    return make_face(FACE_BODY, px, weight, italic);
 }
 
 /* The screen covers the whole window: a DIB of the window's size. */
@@ -1405,10 +1577,10 @@ static void surface_resize(int pw, int ph, int lh)
     if (!s_bmp)
         return;
     SelectObject(s_dc, s_bmp);
-    s_font = make_font(lh * 60 / 100, FW_NORMAL, 0);
-    s_font_bold = make_font(lh * 62 / 100, FW_BOLD, 0);
-    s_font_small = make_font(lh * 48 / 100, FW_NORMAL, 0);
-    s_font_title = make_font(lh * 175 / 100, FW_HEAVY, 1);
+    s_font = make_font(lh * 74 / 100, FW_BOLD, 0);
+    s_font_bold = make_font(lh * 74 / 100, FW_BOLD, 0);
+    s_font_small = make_font(lh * 54 / 100, FW_BOLD, 0);
+    s_font_title = make_face(FACE_TITLE, lh * 250 / 100, FW_NORMAL, 0);
     memset(&td, 0, sizeof td);
     td.Width = (UINT)pw;
     td.Height = (UINT)ph;
@@ -1444,43 +1616,112 @@ static void fill(int x0, int y0, int x1, int y1, COLORREF c)
     DeleteObject(b);
 }
 
-/* A slanted band, the shape the game's own menus use for headers. */
-static void band(int x0, int y0, int x1, int y1, int slant, COLORREF c)
+/* The game's menu text: light lines carry a dark drop shadow. */
+static void text_sh(const wchar_t *s, int x0, int y0, int x1, int y1, COLORREF c, HFONT f, UINT align)
 {
-    POINT p[4];
+    int o = s_lh / 14 + 1;
+    text(s, x0 + o, y0 + o, x1 + o, y1 + o, RGB(6, 10, 18), f, align);
+    text(s, x0, y0, x1, y1, c, f, align);
+}
+
+static int text_width(const wchar_t *s, HFONT f)
+{
+    SIZE sz;
+    SelectObject(s_dc, f);
+    GetTextExtentPoint32W(s_dc, s, (int)wcslen(s), &sz);
+    return sz.cx;
+}
+
+/* Menu lines are capitals, as on the game's screens; "1366x768" keeps its x. */
+static void upper(wchar_t *s)
+{
+    int i;
+    for (i = 0; s[i]; i++)
+        if ((s[i] >= L'a' && s[i] <= L'z' && !(s[i] == L'x' && i && s[i - 1] >= L'0' && s[i - 1] <= L'9')) ||
+            (s[i] >= 0xE0 && s[i] <= 0xFE && s[i] != 0xF7))
+            s[i] = (wchar_t)(s[i] - 0x20);
+}
+
+static void poly(const POINT *p, int n, COLORREF c)
+{
     HBRUSH b = CreateSolidBrush(c);
     HPEN pen = CreatePen(PS_SOLID, 1, c);
-    p[0].x = x0; p[0].y = y0;
-    p[1].x = x1 + slant; p[1].y = y0;
-    p[2].x = x1; p[2].y = y1;
-    p[3].x = x0; p[3].y = y1;
     SelectObject(s_dc, b);
     SelectObject(s_dc, pen);
-    Polygon(s_dc, p, 4);
+    Polygon(s_dc, p, n);
     DeleteObject(b);
     DeleteObject(pen);
 }
 
-/* A controller button glyph and its caption, e.g. (A) SELECIONAR. Returns
- * the x after it. */
+/* A triangle pointing left (dir < 0) or right, tip at (x, y). */
+static void arrow(int x, int y, int size, int dir, COLORREF c)
+{
+    POINT p[3];
+    p[0].x = x; p[0].y = y;
+    p[1].x = x - dir * size * 9 / 10; p[1].y = y - size;
+    p[2].x = x - dir * size * 9 / 10; p[2].y = y + size;
+    poly(p, 3, c);
+}
+
+/* Left-to-right colour ramp. */
+static void hramp(int x0, int x1, int y0, int y1, COLORREF a, COLORREF b)
+{
+    int x, n = x1 - x0;
+    for (x = x0; x < x1; x += 2) {
+        int t = n > 0 ? (x - x0) * 256 / n : 256;
+        fill(x, y0, x + 2, y1, RGB((GetRValue(a) * (256 - t) + GetRValue(b) * t) >> 8,
+                                   (GetGValue(a) * (256 - t) + GetGValue(b) * t) >> 8,
+                                   (GetBValue(a) * (256 - t) + GetBValue(b) * t) >> 8));
+    }
+}
+
+/* A rough paint stroke, like the white brush lines framing the game's
+ * screens: short quads of uneven width with a few gaps. */
+static void brush(int ax, int ay, int bx, int by, int th, COLORREF c, unsigned seed)
+{
+    double dx = bx - ax, dy = by - ay, len = sqrt(dx * dx + dy * dy), nx, ny;
+    int i, steps;
+    if (len < 1.0)
+        return;
+    nx = -dy / len;
+    ny = dx / len;
+    steps = (int)(len / (th * 0.7)) + 1;
+    for (i = 0; i < steps; i++) {
+        double t0 = (double)i / steps, t1 = (double)(i + 1) / steps, h0, h1;
+        POINT p[4];
+        seed = seed * 1103515245u + 12345u;
+        if (((seed >> 16) & 63) == 0 && i && i + 1 < steps)
+            continue;                                        /* a dry gap */
+        h0 = th * (0.36 + ((seed >> 8) & 63) / 384.0);
+        seed = seed * 1103515245u + 12345u;
+        h1 = th * (0.36 + ((seed >> 8) & 63) / 384.0);
+        p[0].x = (LONG)(ax + dx * t0 + nx * h0); p[0].y = (LONG)(ay + dy * t0 + ny * h0);
+        p[1].x = (LONG)(ax + dx * t1 + nx * h1 + dx / len); p[1].y = (LONG)(ay + dy * t1 + ny * h1 + dy / len);
+        p[2].x = (LONG)(ax + dx * t1 - nx * h1 + dx / len); p[2].y = (LONG)(ay + dy * t1 - ny * h1 + dy / len);
+        p[3].x = (LONG)(ax + dx * t0 - nx * h0); p[3].y = (LONG)(ay + dy * t0 - ny * h0);
+        poly(p, 4, c);
+    }
+}
+
+/* A controller button as the game draws it: a coloured disc with a white
+ * letter, then the caption in capitals. Returns the x after it. */
 static int button_hint(int x, int y, int lh, wchar_t letter, COLORREF c, const wchar_t *caption)
 {
-    wchar_t l[2] = { letter, 0 };
-    int d = lh * 7 / 10, w;
+    wchar_t l[2] = { letter, 0 }, cap[64];
+    int d = lh * 72 / 100, w;
     HBRUSH b = CreateSolidBrush(c);
     HPEN pen = CreatePen(PS_SOLID, 1, RGB(235, 235, 235));
-    SIZE sz;
     SelectObject(s_dc, b);
     SelectObject(s_dc, pen);
     Ellipse(s_dc, x, y + (lh - d) / 2, x + d, y + (lh - d) / 2 + d);
     DeleteObject(b);
     DeleteObject(pen);
     text(l, x, y, x + d, y + lh, RGB(255, 255, 255), s_font_small, DT_CENTER);
-    SelectObject(s_dc, s_font_small);
-    GetTextExtentPoint32W(s_dc, caption, (int)wcslen(caption), &sz);
-    w = sz.cx;
-    text(caption, x + d + lh / 5, y, x + d + lh / 5 + w + 4, y + lh, RGB(225, 228, 235), s_font_small, DT_LEFT);
-    return x + d + lh / 5 + w + lh;
+    swprintf(cap, 64, L"%ls", caption);
+    upper(cap);
+    w = text_width(cap, s_font_small);
+    text_sh(cap, x + d + lh / 4, y, x + d + lh / 4 + w + 4, y + lh, RGB(240, 240, 240), s_font_small, DT_LEFT);
+    return x + d + lh / 4 + w + lh;
 }
 
 static void item_text(int it, wchar_t *label, wchar_t *value, int *greyed)
@@ -1601,72 +1842,142 @@ static const wchar_t *item_help(int it)
     return L"";
 }
 
-#define BG_ALPHA 0xE0000000u
+/* The game's Options look: an orange FreeStyle title on a white brush
+ * frame, a dark see-through panel, white Euromode capitals; the chosen line
+ * on a yellow paint band with "::", its value in a dark box between orange
+ * arrows (as in Options > Gameplay); (A)/(B) hints under a white line. */
+#define BG_ALPHA    0xC8000000u
+#define PANEL_RGB   RGB(18, 30, 52)
+#define PANEL_PIXEL 0x121E34u
+#define PANEL_ALPHA 0xEC000000u
+#define S1_ORANGE   RGB(243, 146, 30)
+#define S1_YELLOW   RGB(226, 232, 48)
+#define S1_WHITE    RGB(238, 238, 232)
 
 static void render_menu(void)
 {
     const int lh = s_lh, w = s_pw, h = s_ph;
-    const int cw = w * 7 / 10 < lh * 34 ? w * 7 / 10 : lh * 34;
+    const int cw = w * 78 / 100 < lh * 40 ? w * 78 / 100 : lh * 40;
     const int x0 = (w - cw) / 2, x1 = x0 + cw;
-    int y, it, i, n = s_pw * s_ph, bx;
+    const int xm = x0 + cw * 44 / 100;                       /* labels end here */
+    const int va0 = xm + lh * 3 / 2, va1 = x1 - lh * 2;      /* the value box */
+    const int top = lh * 4, foot = h - lh * 2;
+    int y, it, i, n = s_pw * s_ph, bx, pb;
     wchar_t sub[160];
+    POINT p[4];
     SelectObject(s_dc, s_bmp);
     SetBkMode(s_dc, TRANSPARENT);
     fill(0, 0, w, h, BG_RGB);
-    /* Header: the game's slanted band and orange italic title. */
-    band(0, lh * 7 / 10, x0 + lh * 12, lh * 3, lh, RGB(30, 44, 70));
-    text(ui_text(L"configurações", L"settings"), x0, lh / 2, x1, lh * 3, RGB(250, 160, 30), s_font_title, DT_LEFT);
-    swprintf(sub, 160, ui_text(L"PC  •  vídeo, tela e sistema%ls", L"PC  •  video, display and system%ls"), ui_text(L"  •  jogo pausado", L"  •  game paused"));
-    text(sub, x0, lh * 3, x1, lh * 4, RGB(170, 185, 210), s_font_small, DT_LEFT);
-    fill(x0, lh * 4, x1, lh * 4 + 2, RGB(250, 160, 30));
-    y = lh * 4 + lh / 2;
+    /* The rows first (to know where the panel ends), drawn over it after. */
+    y = top + lh / 3;
     for (it = 0; it < IT_COUNT; it++) {
-        wchar_t label[128], value[160];
-        int greyed, sel = it == s_sel;
+        if (it == IT_DISPLAY || it == IT_UI_LANG)
+            y += lh * 3 / 4;
+        if (it == IT_RESUME)
+            y += lh / 3;
+        if (it == IT_RESTART && !restart_pending())
+            continue;
+        y += lh;
+    }
+    pb = y + lh / 3;
+    p[0].x = x0 - lh * 2; p[0].y = top;
+    p[1].x = x1 + lh; p[1].y = top;
+    p[2].x = x1 + lh; p[2].y = pb;
+    p[3].x = x0 - lh; p[3].y = pb;
+    poly(p, 4, PANEL_RGB);
+    /* The white brush frame: down from the top left, under the title, then
+     * along the panel's right side. */
+    brush(x0 - lh * 5, -lh, x0 - lh * 3 / 2, top - lh / 2, lh / 2, S1_WHITE, 7u);
+    brush(x0 - lh * 3 / 2, top - lh / 2, x1 + lh * 3 / 2, top - lh / 2, lh / 2, S1_WHITE, 11u);
+    brush(x1 + lh * 3 / 2, top - lh / 2, x1 + lh * 2, top + lh / 2, lh / 2, S1_WHITE, 13u);
+    brush(x1 + lh * 2, top + lh / 2, x1 + lh * 2, pb - lh, lh / 2, S1_WHITE, 17u);
+    brush(x1 + lh * 2, pb - lh, x1 + lh * 3, pb + lh, lh / 2, S1_WHITE, 19u);
+    /* Title, lower case as in the game ("options", "gameplay"). */
+    text_sh(ui_text(L"configurações", L"settings"), x0, 0, x1, top - lh * 3 / 4, S1_ORANGE, s_font_title, DT_LEFT);
+    swprintf(sub, 160, ui_text(L"PC  •  jogo pausado", L"PC  •  game paused"));
+    upper(sub);
+    text_sh(sub, x0, top - lh * 2, x1, top - lh, RGB(175, 192, 215), s_font_small, DT_RIGHT);
+    y = top + lh / 3;
+    for (it = 0; it < IT_COUNT; it++) {
+        wchar_t label[128], value[160], v[200];
+        int greyed, sel = it == s_sel, ym, a = lh / 2;
+        COLORREF lc;
         if (it == IT_DISPLAY || it == IT_UI_LANG) {
-            text(it == IT_DISPLAY ? ui_text(L"VÍDEO", L"VIDEO") : ui_text(L"SISTEMA", L"SYSTEM"), x0, y, x1, y + lh * 8 / 10, RGB(250, 160, 30), s_font_small, DT_LEFT);
-            y += lh * 8 / 10;
+            text_sh(it == IT_DISPLAY ? ui_text(L"VÍDEO", L"VIDEO") : ui_text(L"SISTEMA", L"SYSTEM"), x0 - lh, y, xm, y + lh * 3 / 4, S1_ORANGE, s_font_small, DT_LEFT);
+            y += lh * 3 / 4;
         }
         if (it == IT_RESUME)
             y += lh / 3;
         if (it == IT_RESTART && !restart_pending())
             continue;
         item_text(it, label, value, &greyed);
-        SetRect(&s_row[it], x0 - lh / 3, y, x1 + lh / 2, y + lh);
+        upper(label);
+        upper(value);
+        ym = y + lh / 2;
+        SetRect(&s_row[it], x0 - lh, y, x1 + lh, y + lh);
         SetRectEmpty(&s_row_left[it]);
+        if (sel) {
+            /* The yellow paint band, ragged at its left end, then "::". */
+            int bl = xm - text_width(label, s_font_bold) - lh * 2;
+            if (bl > x0 - lh) bl = x0 - lh;
+            hramp(bl, bl + lh * 3, y + lh / 8, y + lh - lh / 8, PANEL_RGB, S1_YELLOW);
+            fill(bl + lh * 3, y + lh / 8, xm + lh, y + lh - lh / 8, S1_YELLOW);
+            for (i = 0; i < 4; i++)
+                fill(xm + lh / 3 + (i & 1) * (lh / 6), ym - lh / 8 + (i >> 1) * (lh / 6), xm + lh / 3 + (i & 1) * (lh / 6) + lh / 10 + 1,
+                     ym - lh / 8 + (i >> 1) * (lh / 6) + lh / 10 + 1, RGB(30, 30, 30));
+            if (!value[0])                                   /* a line that acts: the (A) disc */
+                button_hint(xm - text_width(label, s_font_bold) - lh * 6 / 5, y, lh, L'A', RGB(60, 170, 60), L"");
+        }
+        lc = sel ? RGB(20, 20, 20) : greyed ? RGB(120, 130, 145) : RGB(240, 240, 240);
         if (sel)
-            band(x0 - lh / 3, y + 1, x1, y + lh - 1, lh / 2, RGB(222, 214, 52));
-        text(label, x0 + lh / 3, y, x0 + cw / 2, y + lh,
-             sel ? RGB(15, 20, 30) : greyed ? RGB(115, 122, 135) : RGB(230, 233, 240), sel ? s_font_bold : s_font, DT_LEFT);
+            text(label, x0 - lh, y, xm, y + lh, lc, s_font_bold, DT_RIGHT);
+        else
+            text_sh(label, x0 - lh, y, xm, y + lh, lc, s_font, DT_RIGHT);
         if (value[0]) {
-            wchar_t v[200];
-            SIZE vsz;
-            swprintf(v, 200, sel && (it != IT_API || (hle_gpu_vulkan_available() && hle_gpu_d3d11_available())) ? L"◀  %ls%ls  ▶" : L"%ls%ls", value, item_restart(it) ? L" *" : L"");
-            text(v, x0 + cw / 2, y, x1 - lh / 3, y + lh,
-                 sel ? RGB(15, 20, 30) : greyed ? RGB(115, 122, 135) : RGB(190, 205, 230), sel ? s_font_bold : s_font, DT_RIGHT);
-            SelectObject(s_dc, sel ? s_font_bold : s_font);
-            GetTextExtentPoint32W(s_dc, v, (int)wcslen(v), &vsz);
-            SetRect(&s_row_left[it], x1 - lh / 3 - vsz.cx - lh / 2, y, x1 - lh / 3 - vsz.cx + lh, y + lh);
+            int arrows = sel && (it != IT_API || (hle_gpu_vulkan_available() && hle_gpu_d3d11_available()));
+            swprintf(v, 200, L"%ls%ls", value, item_restart(it) ? L" *" : L"");
+            if (sel) {
+                fill(va0, y + lh / 8, va1, y + lh - lh / 8, RGB(40, 40, 42));
+                if (arrows) {
+                    arrow(va0 - a, ym, a, -1, S1_ORANGE);
+                    arrow(va1 + a, ym, a, 1, S1_ORANGE);
+                }
+                text(v, va0 + lh / 2, y, va1 - lh / 2, y + lh, greyed ? RGB(150, 120, 90) : S1_ORANGE, s_font_bold, DT_CENTER);
+            } else {
+                text_sh(v, va0 + lh / 2, y, va1 - lh / 2, y + lh, greyed ? RGB(120, 130, 145) : RGB(240, 240, 240), s_font, DT_CENTER);
+            }
+            SetRect(&s_row_left[it], va0 - lh * 3 / 2, y, va0 + lh, y + lh);
         }
         y += lh;
     }
-    /* Help for the selected line, then the button hints. */
-    fill(x0, h - lh * 3, x1, h - lh * 3 + 1, RGB(60, 75, 100));
-    text(item_help(s_sel), x0, h - lh * 3 + lh / 6, x1, h - lh * 2 + lh / 6, RGB(200, 210, 225), s_font_small, DT_LEFT);
+    /* Help for the selected line, then the white base line and the hints. */
+    text_sh(item_help(s_sel), x0 - lh, pb + lh / 6, x1 + lh, pb + lh + lh / 6, RGB(205, 215, 230), s_font_small, DT_LEFT);
     if (restart_pending())
-        text(ui_text(L"* vale depois de reiniciar", L"* applies after restarting"), x0, h - lh * 3 + lh / 6, x1, h - lh * 2 + lh / 6, RGB(255, 190, 110), s_font_small, DT_RIGHT);
+        text_sh(ui_text(L"* vale depois de reiniciar", L"* applies after restarting"), x0 - lh, foot - lh, x1 + lh, foot, RGB(255, 190, 110), s_font_small, DT_RIGHT);
+    fill(0, foot - 1, x0 + cw / 2, foot + 1, S1_WHITE);
+    p[0].x = x0 + cw / 2; p[0].y = foot - 1;
+    p[1].x = x0 + cw / 2 + 2; p[1].y = foot - 1;
+    p[2].x = x0 + cw / 2 + lh * 2 + 2; p[2].y = h;
+    p[3].x = x0 + cw / 2 + lh * 2; p[3].y = h;
+    poly(p, 4, S1_WHITE);
     bx = x0;
-    SetRect(&s_hint_a, bx, h - lh * 2 + lh / 4, 0, h - lh + lh / 4);
-    bx = button_hint(bx, h - lh * 2 + lh / 4, lh, L'A', RGB(40, 160, 60), ui_text(L"SELECIONAR (Enter / clique)", L"SELECT (Enter / click)"));
+    SetRect(&s_hint_a, bx, foot + lh / 4, 0, h - lh / 4);
+    bx = button_hint(bx, foot + lh / 4, lh, L'A', RGB(60, 170, 60), ui_text(L"Selecionar", L"Select"));
     s_hint_a.right = bx - lh;
-    SetRect(&s_hint_b, bx, h - lh * 2 + lh / 4, 0, h - lh + lh / 4);
-    bx = button_hint(bx, h - lh * 2 + lh / 4, lh, L'B', RGB(200, 40, 40), ui_text(L"VOLTAR (Esc / F1)", L"BACK (Esc / F1)"));
+    SetRect(&s_hint_b, bx, foot + lh / 4, 0, h - lh / 4);
+    bx = button_hint(bx, foot + lh / 4, lh, L'B', RGB(200, 40, 40), ui_text(L"Voltar", L"Back"));
     s_hint_b.right = bx - lh;
-    text(ui_text(L"◀ ▶  alterar      Alt+Enter  tela cheia", L"◀ ▶  change      Alt+Enter  fullscreen"), bx, h - lh * 2 + lh / 4, x1, h - lh + lh / 4,
-         RGB(170, 180, 200), s_font_small, DT_LEFT);
+    bx = x0 + cw / 2 + lh * 3;
+    arrow(bx, foot + lh * 3 / 4, lh / 4, -1, S1_ORANGE);
+    arrow(bx + lh * 3 / 4, foot + lh * 3 / 4, lh / 4, 1, S1_ORANGE);
+    swprintf(sub, 160, ui_text(L"alterar      Alt+Enter  tela cheia      F1  fechar", L"change      Alt+Enter  fullscreen      F1  close"));
+    upper(sub);
+    text_sh(sub, bx + lh, foot + lh / 4, w, h - lh / 4, RGB(200, 208, 220), s_font_small, DT_LEFT);
     GdiFlush();
-    for (i = 0; i < n; i++)
-        s_bits[i] = (s_bits[i] & 0xFFFFFFu) | ((s_bits[i] & 0xFFFFFFu) == BG_PIXEL ? BG_ALPHA : 0xFF000000u);
+    for (i = 0; i < n; i++) {
+        uint32_t c = s_bits[i] & 0xFFFFFFu;
+        s_bits[i] = c | (c == BG_PIXEL ? BG_ALPHA : c == PANEL_PIXEL ? PANEL_ALPHA : 0xFF000000u);
+    }
     ID3D11DeviceContext_UpdateSubresource(g_hle.ctx, (ID3D11Resource *)s_tex, 0, NULL, s_bits, (UINT)s_pw * 4u, 0);
 }
 
@@ -1745,14 +2056,16 @@ static ID3D11BlendState *s_blend_pre;
 static int s_btn_w, s_btn_h, s_btn_language = -1;
 
 /* The capsule and caption, drawn twice: white-on-black for coverage, then
- * in colour on black, which is the colour premultiplied by that coverage. */
+ * in colour on black, which is the colour premultiplied by that coverage.
+ * The caption is the game's Euromode capitals with their drop shadow, like
+ * its own "(B) BACK" hint. */
 static void button_paint(int w, int h, int mask)
 {
-    HFONT big = make_font(h * 62 / 100, FW_BOLD, 1), fsmall = make_font(h * 40 / 100, FW_BOLD, 0);
+    HFONT big = make_font(h * 56 / 100, FW_BOLD, 0), fsmall = make_font(h * 36 / 100, FW_BOLD, 0);
     HBRUSH white = CreateSolidBrush(RGB(255, 255, 255));
     HPEN pen = CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
     RECT r;
-    int cap = h * 17 / 10;
+    int cap = h * 17 / 10, o = h / 16 + 1;
     SetRect(&r, 0, 0, w, h);
     FillRect(s_dc, &r, (HBRUSH)GetStockObject(BLACK_BRUSH));
     SelectObject(s_dc, white);
@@ -1760,7 +2073,8 @@ static void button_paint(int w, int h, int mask)
     RoundRect(s_dc, 1, h / 5, cap, h - h / 5, h / 2, h / 2);
     SetBkMode(s_dc, TRANSPARENT);
     text(L"BACK", 1, h / 5, cap, h - h / 5, mask ? RGB(255, 255, 255) : RGB(20, 20, 20), fsmall, DT_CENTER);
-    text(ui_text(L"CONFIGURAÇÕES DO PC", L"PC SETTINGS"), cap + h / 3, 0, w, h, RGB(255, 255, 255), big, DT_LEFT);
+    text(ui_text(L"CONFIGURAÇÕES DO PC", L"PC SETTINGS"), cap + h / 3 + o, o, w, h + o, mask ? RGB(255, 255, 255) : RGB(6, 10, 18), big, DT_LEFT);
+    text(ui_text(L"CONFIGURAÇÕES DO PC", L"PC SETTINGS"), cap + h / 3, 0, w, h, RGB(240, 240, 240), big, DT_LEFT);
     DeleteObject(white);
     DeleteObject(pen);
     DeleteObject(big);
