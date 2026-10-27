@@ -4,7 +4,7 @@ This is a source and tooling distribution. No original game assets, executable, 
 
 The independently written native integration and build tooling are offered under the root MIT license. Existing attribution and upstream licenses take precedence for imported files. This license grants no rights to Electronic Arts game content.
 
-`xboxrecomp/` is a modified source snapshot of sp00nznet/xboxrecomp revision `193e2995ffaec871bb3be43a43bd66aa5fccfeb1`. Original copyright headers, LICENSE, NOTICE, CONTRIBUTORS and component license texts are retained. Local modifications include platform/runtime repairs used by this port. Optional NV2A replay/test sources and their build entries, and font-atlas placeholders, are excluded from this publication snapshot.
+`xboxrecomp/` is a submodule: the fork batatinhafcbatatinha-pixel/xboxrecomp, branch `ports`, a modified version of sp00nznet/xboxrecomp revision `193e2995ffaec871bb3be43a43bd66aa5fccfeb1`. Original copyright headers, LICENSE, NOTICE, CONTRIBUTORS and component license texts are retained. Its modifications are the platform/runtime work used by these ports; they are not part of the upstream project.
 
 The runtime contains LGPL components derived from xemu and GPL-2.0-or-later DSP interpreter/debug sources derived through xemu from Hatari/ARAnyM. These files keep those licenses even when the native profile does not execute them. See `xboxrecomp/src/apu/dsp/UPSTREAM.md`, `COPYING.GPL-2.0`, `COPYING.LGPL-2.1`, and individual headers. A future binary distribution must independently satisfy all applicable licensing obligations; this source release does not authorize distribution of proprietary game translations.
 

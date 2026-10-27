@@ -41,11 +41,13 @@ The source tree still contains the older Xbox hardware models (NV2A, APU/DSP, OH
 ## Download or clone
 
 ```sh
-git clone https://github.com/batatinhafcbatatinha-pixel/fifa-street-pc.git
+git clone --recursive https://github.com/batatinhafcbatatinha-pixel/fifa-street-pc.git
 cd fifa-street-pc
 ```
 
-Alternatively, download the **source-kit ZIP** from [Releases](https://github.com/batatinhafcbatatinha-pixel/fifa-street-pc/releases), or choose **Code → Download ZIP**. Extract the entire archive. These downloads contain source and tools only; they do not contain a precompiled game.
+The xboxrecomp toolkit is the `xboxrecomp/` submodule ([batatinhafcbatatinha-pixel/xboxrecomp](https://github.com/batatinhafcbatatinha-pixel/xboxrecomp), branch `ports`). If you cloned without `--recursive`, run `git submodule update --init`.
+
+Alternatively, download the **source-kit ZIP** from [Releases](https://github.com/batatinhafcbatatinha-pixel/fifa-street-pc/releases), which includes the toolkit. Extract the entire archive. GitHub's **Code → Download ZIP** does not include the submodule. These downloads contain source and tools only; they do not contain a precompiled game.
 
 The GitHub Actions workflow audits the publication allowlist, tests ISO extraction, and creates a source-kit ZIP on release tags. It never receives a ROM or builds translated game code. Standard hosted runners are [free for public repositories](https://docs.github.com/en/billing/concepts/product-billing/github-actions); the workflow uses a standard Ubuntu runner and publishes the ZIP as a release asset.
 
@@ -144,7 +146,7 @@ Settings are saved in `fifastreet.ini` beside the locally built executable. Opti
 ## Credits and licenses
 
 - Port integration and native backend work: [batatinhafcbatatinha-pixel](https://github.com/batatinhafcbatatinha-pixel).
-- [xboxrecomp](https://github.com/sp00nznet/xboxrecomp): **Ned Heller / sp00nz**, and the contributors listed in the preserved [CONTRIBUTORS.md](xboxrecomp/CONTRIBUTORS.md). This repository vendors a modified snapshot based on revision `193e2995ffaec871bb3be43a43bd66aa5fccfeb1`, with its original MIT license and notices.
+- [xboxrecomp](https://github.com/sp00nznet/xboxrecomp): **Ned Heller / sp00nz**, and the contributors listed in the preserved [CONTRIBUTORS.md](xboxrecomp/CONTRIBUTORS.md). The modified copy used here is the fork [batatinhafcbatatinha-pixel/xboxrecomp](https://github.com/batatinhafcbatatinha-pixel/xboxrecomp) (branch `ports`, based on revision `193e2995ffaec871bb3be43a43bd66aa5fccfeb1`), with its original MIT license and notices.
 - [xemu](https://github.com/xemu-project/xemu): **espes, Jannik Vogel, Matt Borgerson** and contributors for the runtime components identified in [xboxrecomp/NOTICE](xboxrecomp/NOTICE). LGPL and GPL sources retain their original notices and license texts. DSP interpreter lineage also credits the **ARAnyM team** and **Thomas Huth / Hatari**; see [DSP provenance](xboxrecomp/src/apu/dsp/UPSTREAM.md).
 - [DXVK / DXVK native](https://github.com/doitsujin/dxvk): Philip Rebohle and contributors, zlib license. Optional external dependency; license reproduced in `licenses/`.
 - [vkd3d-shader](https://gitlab.winehq.org/wine/vkd3d): the Wine project and contributors, LGPL; optional Linux dependency.
