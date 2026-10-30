@@ -33,3 +33,8 @@ street1/hle/out[0-9]*.json
 game_files/
 .game-install.lock
 game-install-report.json
+
+# Local game data and installer outputs
+game_files/
+.game-install.lock
+game-install-report.json
