@@ -28,3 +28,8 @@ street1/hle/d3d_decomp/
 street1/hle/caller_decomp/
 street1/hle/calls[0-9]*.json
 street1/hle/out[0-9]*.json
+
+# Local game data and installer outputs
+game_files/
+.game-install.lock
+game-install-report.json
