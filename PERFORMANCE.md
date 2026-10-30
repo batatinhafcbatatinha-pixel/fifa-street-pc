@@ -1,3 +1,24 @@
+# Native animation math — 2026-10-30
+
+Three of the game's own functions now run as native C: the skinning palette
+blend (0x1A03B0), the skeleton's bone matrices from scale, quaternion and
+translation (0x1A4EE0), and the matrix multiply used all over the game
+(0x161386). They were the hottest game code in a match: the translated code
+keeps every temporary in guest memory. Each is a port of the translated code
+operation by operation (same single-precision operations in the same order,
+the same truncating conversions and bit tests), so results are bit-identical.
+
+Switches: `RECOMP_GAME_NATIVE_SKIN=0` runs the translated functions;
+`RECOMP_GAME_NATIVE_CHECK=1` runs both and compares every result (`MISMATCH`
+in the log); `RECOMP_HLE_AB=2` alternates them every 600 frames;
+`RECOMP_HLE_PROFILE=1` prints the skinning blend's time per call.
+
+Check mode over a 150-second attract match: 6.5 million matrix multiplies,
+28 thousand skeletons and 606 thousand skinning blends, 0 mismatches.
+Interleaved A/B (300 s, same machine and settings as below, texture watch off
+to isolate this change): 143.7 → 157.6 fps, skinning blend 3.44 → 1.21 µs per
+call. The Europe region table covers the new addresses.
+
 # Texture change detection — 2026-10-30
 
 Textures in the contiguous window are now watched instead of re-hashed: after a

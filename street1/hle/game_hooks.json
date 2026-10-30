@@ -8,5 +8,20 @@
   "lib": "game",
   "name": "fe_load_screen_big",
   "note": "cdecl (const char *screen): builds '<screen>.big' and loads that front-end screen"
+ },
+ "001A03B0": {
+  "lib": "game",
+  "name": "skin_palette_blend",
+  "note": "cdecl (weights, count, dest1, bytes1, dest2, bytes2, palette): blends bone matrices into 0x2F3D90, hands them to 0x1A0700; native in game_hooks.c"
+ },
+ "00161386": {
+  "lib": "game",
+  "name": "matrix_multiply",
+  "note": "stdcall (out, a, b): out = a * b (D3DX-style SSE); native in game_hooks.c"
+ },
+ "001A4EE0": {
+  "lib": "game",
+  "name": "skeleton_bone_matrices",
+  "note": "thiscall skeleton, stdcall (bones, matrices, mask): bone matrices from scale/quaternion/translation times parent; native in game_hooks.c"
  }
 }
