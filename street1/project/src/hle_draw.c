@@ -74,6 +74,11 @@ typedef struct HleTex {
     uint32_t data, format, size, pal;
     uint64_t hash, checked;
     uint64_t shash, changed;      /* sampled hash; frame the contents last changed */
+    int64_t tw_stamp;                 /* write-watch stamp the hash is valid from (0 = none) */
+    int64_t tw_seen;                  /* page opens counted when last found clean (0 = check pages) */
+    uint32_t pal_data;                /* palette bytes the hash covered */
+    uint32_t tw_churn;                /* armed, written, yet unchanged: in a row */
+    uint64_t tw_rest;                 /* not armed again before this frame */
     uint32_t w, h;
     int linear;
     uint32_t levels, dxgi;            /* of the native texture, for in-place updates */
@@ -173,6 +178,8 @@ static struct {
 /* RECOMP_HLE_AB=1 (measurement): hle_d3d11.c's profiler turns the draw-path
  * optimisations off for every other 600-frame window. */
 int hle_ab_off;
+/* RECOMP_HLE_AB=2: only the 2026-10-30 additions alternate (same windows). */
+int hle_ab_new_off;
 
 void hle_draw_state_invalidate(void)
 {
@@ -736,6 +743,219 @@ static uint64_t sample_hash(const uint8_t *p, size_t n)
     return h;
 }
 
+/* Exact change detection for textures in the contiguous window (Windows).
+ *
+ * Instead of re-hashing static textures, their pages are write-protected
+ * after a full hash, in both views of that storage (0x80000000 and the tiled
+ * alias at 0xF0000000). The first write through either view faults; the
+ * handler opens the page again and stamps it with a sequence number. A
+ * texture is unchanged while every page it (and its palette) covers is still
+ * armed and was not written after the texture's own stamp -- no bytes are
+ * read, and no write can be missed, unlike the sampled probe it replaces.
+ * Kernel-mode writes (ReadFile into a guest buffer) do not fault, so the
+ * runtime calls tw_kernel_write around them. Textures that just changed are
+ * not armed (they are hashed in full on every use, as before), so a rewritten
+ * HUD texture costs a hash, not a fault per page per frame.
+ *
+ * RECOMP_HLE_NO_TEXWATCH=1 restores the hashing scheme; RECOMP_HLE_TEXWATCH_CHECK=1
+ * also hashes every texture the watch calls unchanged and logs any difference
+ * as a MISS. RECOMP_HLE_AB alternates it with the other optimisations. */
+#define TW_PAGES (0x04000000u >> 12)          /* XBOX_CONTIG_SIZE / 4096 */
+static int s_tw = -1, s_tw_check, s_tw_log;
+static uint64_t s_tw_skips, s_tw_hashes, s_tw_hash_bytes, s_tw_arms, s_tw_misses, s_tw_faults;
+static uint64_t s_tw_h_new, s_tw_h_dyn, s_tw_h_rest, s_tw_h_written;
+
+#ifdef _WIN32
+typedef void (*tw_hook_fn)(void *host, size_t bytes, int done);
+extern tw_hook_fn volatile g_xbox_guest_write_hook;
+static uint8_t s_tw_armed[TW_PAGES];
+static volatile LONG64 s_tw_wrote[TW_PAGES];  /* sequence of the last write seen */
+static volatile LONG64 s_tw_seq = 1;
+static volatile LONG s_tw_kernel;             /* kernel writes in flight: do not arm */
+static SRWLOCK s_tw_lock = SRWLOCK_INIT;
+static volatile LONG64 s_tw_opens = 1;        /* pages opened (written or unarmed) so far */
+
+static uintptr_t tw_host(uint32_t base, uint32_t page)
+{
+    return (uintptr_t)XBOX_PTR(base + (page << 12));
+}
+
+/* Caller holds s_tw_lock. */
+static void tw_open(uint32_t page)
+{
+    DWORD old;
+    if (s_tw_armed[page]) {
+        VirtualProtect((void *)tw_host(0x80000000u, page), 4096, PAGE_READWRITE, &old);
+        VirtualProtect((void *)tw_host(0xF0000000u, page), 4096, PAGE_READWRITE, &old);
+        s_tw_armed[page] = 0;
+    }
+    s_tw_wrote[page] = InterlockedIncrement64(&s_tw_seq);
+    InterlockedIncrement64(&s_tw_opens);
+}
+
+static int tw_page_of(uintptr_t a, uint32_t *page)
+{
+    uintptr_t c = tw_host(0x80000000u, 0), t = tw_host(0xF0000000u, 0);
+    if (a >= c && a < c + 0x04000000u) { *page = (uint32_t)((a - c) >> 12); return 1; }
+    if (a >= t && a < t + 0x04000000u) { *page = (uint32_t)((a - t) >> 12); return 1; }
+    return 0;
+}
+
+static LONG CALLBACK tw_veh(EXCEPTION_POINTERS *e)
+{
+    EXCEPTION_RECORD *r = e->ExceptionRecord;
+    uint32_t page;
+    int ours;
+    if (r->ExceptionCode != EXCEPTION_ACCESS_VIOLATION || r->NumberParameters < 2 || r->ExceptionInformation[0] != 1 ||
+        !tw_page_of((uintptr_t)r->ExceptionInformation[1], &page))
+        return EXCEPTION_CONTINUE_SEARCH;
+    AcquireSRWLockExclusive(&s_tw_lock);
+    ours = s_tw_armed[page];
+    if (ours) {
+        tw_open(page);
+        s_tw_faults++;
+        if (s_tw_log > 0 && g_hle.swaps > 3000) {
+            /* RECOMP_HLE_TEXWATCH_LOG=<n>: who writes watched pages during play (diagnostic). */
+            s_tw_log--;
+            fprintf(stderr, "[HLE-TEXWATCH] write pa %08X by exe+%llX\n",
+                    (page << 12) | ((uint32_t)r->ExceptionInformation[1] & 4095u),
+                    (unsigned long long)((uintptr_t)r->ExceptionAddress - (uintptr_t)GetModuleHandleA(NULL)));
+        }
+    }
+    ReleaseSRWLockExclusive(&s_tw_lock);
+    if (!ours) {
+        /* Another thread opened it between the fault and the lock: retry. */
+        MEMORY_BASIC_INFORMATION mi;
+        if (!VirtualQuery((void *)(uintptr_t)r->ExceptionInformation[1], &mi, sizeof mi) ||
+            mi.Protect != PAGE_READWRITE)
+            return EXCEPTION_CONTINUE_SEARCH;
+    }
+    return EXCEPTION_CONTINUE_EXECUTION;
+}
+
+static int tw_range(uintptr_t host, size_t bytes, uint32_t *p0, uint32_t *p1)
+{
+    uint32_t a, b;
+    if (!bytes || !tw_page_of(host, &a) || !tw_page_of(host + bytes - 1, &b) || b < a)
+        return 0;
+    *p0 = a;
+    *p1 = b;
+    return 1;
+}
+
+static void tw_kernel_write(void *host, size_t bytes, int done)
+{
+    uint32_t p0, p1, p;
+    if (!tw_range((uintptr_t)host, bytes, &p0, &p1))
+        return;
+    AcquireSRWLockExclusive(&s_tw_lock);
+    if (!done)
+        InterlockedIncrement(&s_tw_kernel);
+    for (p = p0; p <= p1; p++)
+        tw_open(p);
+    if (done)
+        InterlockedDecrement(&s_tw_kernel);
+    ReleaseSRWLockExclusive(&s_tw_lock);
+}
+#endif
+
+static int tw_enabled(void)
+{
+    if (s_tw < 0) {
+        const char *e = getenv("RECOMP_HLE_NO_TEXWATCH");
+        s_tw = 0;
+#ifdef _WIN32
+        if (!(e && *e && *e != '0') && AddVectoredExceptionHandler(1, tw_veh)) {
+            g_xbox_guest_write_hook = tw_kernel_write;
+            s_tw = 1;
+        }
+        e = getenv("RECOMP_HLE_TEXWATCH_CHECK");
+        s_tw_check = e && *e && *e != '0';
+        e = getenv("RECOMP_HLE_TEXWATCH_LOG");
+        s_tw_log = e ? atoi(e) : 0;
+#endif
+        fprintf(stderr, "[HLE-TEXWATCH] %s%s\n", s_tw ? "on" : "off", s_tw_check ? " (check mode)" : "");
+    }
+    return s_tw && !hle_ab_off && !hle_ab_new_off;
+}
+
+/* While no page anywhere has been opened since a texture was last found clean, it still is: the
+ * check for the many uses of a texture within a frame. */
+static int64_t tw_opens(void)
+{
+#ifdef _WIN32
+    return s_tw_opens;
+#else
+    return 0;
+#endif
+}
+
+/* Unchanged since `stamp` (all pages armed, none written after it)? */
+static int tw_clean(const uint8_t *host, size_t bytes, int64_t stamp)
+{
+#ifdef _WIN32
+    uint32_t p0, p1, p;
+    if (!stamp || !tw_range((uintptr_t)host, bytes, &p0, &p1))
+        return 0;
+    for (p = p0; p <= p1; p++)
+        if (!s_tw_armed[p] || s_tw_wrote[p] >= stamp)
+            return 0;
+    return 1;
+#else
+    (void)host; (void)bytes; (void)stamp;
+    return 0;
+#endif
+}
+
+/* Protect the pages of a range that was just found unchanged; returns the
+ * stamp to compare later writes against (0 = could not arm). Must run before
+ * the bytes are read for the hash that the stamp vouches for. */
+static int64_t tw_arm(const uint8_t *host, size_t bytes)
+{
+#ifdef _WIN32
+    uint32_t p0, p1, p;
+    LONG64 stamp = 0;
+    DWORD old;
+    if (!tw_range((uintptr_t)host, bytes, &p0, &p1))
+        return 0;
+    AcquireSRWLockExclusive(&s_tw_lock);
+    if (!s_tw_kernel) {
+        for (p = p0; p <= p1; p++)
+            if (!s_tw_armed[p]) {
+                if (!VirtualProtect((void *)tw_host(0x80000000u, p), 4096, PAGE_READONLY, &old) ||
+                    !VirtualProtect((void *)tw_host(0xF0000000u, p), 4096, PAGE_READONLY, &old)) {
+                    VirtualProtect((void *)tw_host(0x80000000u, p), 4096, PAGE_READWRITE, &old);
+                    break;
+                }
+                s_tw_armed[p] = 1;
+                s_tw_arms++;
+            }
+        if (p > p1)
+            stamp = InterlockedIncrement64(&s_tw_seq);
+    }
+    ReleaseSRWLockExclusive(&s_tw_lock);
+    return stamp;
+#else
+    (void)host; (void)bytes;
+    return 0;
+#endif
+}
+
+static void tw_report(void)
+{
+    static uint64_t last;
+    if (s_tw > 0 && g_hle.swaps / 600 != last / 600) {
+        fprintf(stderr, "[HLE-TEXWATCH] swaps %llu: unchanged %llu, hashed %llu (%.1f MB), armed pages %llu, faults %llu, misses %llu (watched hashes: new %llu, written %llu; previous scheme: dynamic %llu, resting %llu uses)\n",
+                (unsigned long long)g_hle.swaps, (unsigned long long)s_tw_skips, (unsigned long long)s_tw_hashes,
+                s_tw_hash_bytes / 1048576.0, (unsigned long long)s_tw_arms, (unsigned long long)s_tw_faults,
+                (unsigned long long)s_tw_misses, (unsigned long long)s_tw_h_new, (unsigned long long)s_tw_h_written,
+                (unsigned long long)s_tw_h_dyn, (unsigned long long)s_tw_h_rest);
+        s_tw_skips = s_tw_hashes = s_tw_hash_bytes = s_tw_arms = 0;
+        s_tw_h_new = s_tw_h_dyn = s_tw_h_rest = s_tw_h_written = 0;
+    }
+    last = g_hle.swaps;
+}
+
 typedef struct { int bpp; int kind; } XFmt;
 enum { K_NONE, K_ARGB8, K_XRGB8, K_565, K_1555, K_X555, K_4444, K_L8, K_AL8, K_A8, K_A8L8,
        K_P8, K_DXT1, K_DXT3, K_DXT5, K_YUY2, K_UYVY, K_L16 };
@@ -1021,6 +1241,7 @@ static ID3D11ShaderResourceView *tex_get(uint32_t obj, uint32_t pal, float scale
     uint64_t h, sample = 0;
     unsigned i;
     int changed_now = 0;
+    int64_t stamp = 0;
 
     scale[0] = scale[1] = 1.0f;
     scale[2] = scale[3] = 0.0f;
@@ -1061,8 +1282,68 @@ static ID3D11ShaderResourceView *tex_get(uint32_t obj, uint32_t pal, float scale
         size_t nb = tex_bytes(fmt, size);
         uint64_t sh = 0;
         int have_sh = 0;
-        if (t) {
+        /* Textures that changed lately, or whose pages the game keeps writing around unchanged
+         * contents (they share them with live data, so they would fault every frame), stay on
+         * the hashing scheme below; the rest are watched. */
+        int watched = tw_enabled() && !(t && (t->changed + 30 > frame || t->tw_rest > frame));
+        if (tw_enabled())
+            tw_report();
+        if (watched) {
+            const uint8_t *pb = pal ? (const uint8_t *)XBOX_PTR(contig(MEM32(pal + 4))) : NULL;
+            uint32_t pal_data = pal ? MEM32(pal + 4) : 0;
+            int64_t opens = tw_opens();
+            int clean = t && t->tw_stamp && t->pal_data == pal_data &&
+                        ((t->tw_seen && t->tw_seen == opens) ||
+                         (tw_clean(bytes, nb, t->tw_stamp) && (!pb || tw_clean(pb, 1024, t->tw_stamp))));
+            if (clean) {
+                t->tw_seen = opens;
+                s_tw_skips++;
+                t->checked = frame;
+                t->tw_churn = 0;
+                if (!s_tw_check)
+                    return t->srv;
+                h = hash_bytes(bytes, nb, 0xCBF29CE484222325ull);
+                if (pb)
+                    h = hash_bytes(pb, 1024, h);
+                if (h == t->hash)
+                    return t->srv;
+                if (++s_tw_misses <= 32)
+                    fprintf(stderr, "[HLE-TEXWATCH] MISS swap %llu data %08X fmt %08X size %08X pal %08X (%zu bytes)\n",
+                            (unsigned long long)g_hle.swaps, data, fmt, size, pal, nb);
+                changed_now = 1;
+            } else {
+                stamp = tw_arm(bytes, nb);
+                if (stamp && pb && !tw_arm(pb, 1024))
+                    stamp = 0;
+                h = hash_bytes(bytes, nb, 0xCBF29CE484222325ull);
+                if (pb)
+                    h = hash_bytes(pb, 1024, h);
+                s_tw_hashes++;
+                s_tw_hash_bytes += nb;
+                if (!t) s_tw_h_new++;
+                else s_tw_h_written++;
+                if (t && t->hash == h) {
+                    if (t->tw_stamp && ++t->tw_churn >= 1) {
+                        t->tw_rest = frame + 3600;
+                        t->tw_churn = 0;
+                    }
+                    t->checked = frame;
+                    t->tw_stamp = stamp;
+                    t->tw_seen = 0;
+                    t->pal_data = pal_data;
+                    return t->srv;
+                }
+                if (t)
+                    changed_now = 1;
+            }
+            if (changed_now)
+                stamp = 0;                    /* just changed: hash it in full while it keeps changing */
+        } else if (t) {
             int dynamic = t->changed + 30 > frame;
+            if (tw_enabled()) {
+                if (dynamic) s_tw_h_dyn++;
+                else s_tw_h_rest++;
+            }
             if (t->checked == frame && !(dynamic && nb <= 65536))
                 return t->srv;
             if (!dynamic && t->checked != frame &&
@@ -1077,6 +1358,7 @@ static ID3D11ShaderResourceView *tex_get(uint32_t obj, uint32_t pal, float scale
                 }
             }
         }
+        if (!watched) {
         h = hash_bytes(bytes, nb, 0xCBF29CE484222325ull);
         if (pal)
             h = hash_bytes((const uint8_t *)XBOX_PTR(contig(MEM32(pal + 4))), 1024, h);
@@ -1093,6 +1375,7 @@ static ID3D11ShaderResourceView *tex_get(uint32_t obj, uint32_t pal, float scale
         if (t && t->hash != h)
             changed_now = 1;
         sample = sh;
+        }
     }
     if (!t) {
         t = victim;
@@ -1114,6 +1397,9 @@ static ID3D11ShaderResourceView *tex_get(uint32_t obj, uint32_t pal, float scale
     }
     t->hash = h;
     t->shash = sample;
+    t->tw_stamp = stamp;
+    t->tw_seen = 0;
+    t->pal_data = pal ? MEM32(pal + 4) : 0;
     t->checked = g_hle.swaps + 1;
     t->changed = changed_now ? g_hle.swaps + 1 : 0;
     return t->srv;

@@ -1,3 +1,34 @@
+# Texture change detection — 2026-10-30
+
+Textures in the contiguous window are now watched instead of re-hashed: after a
+full hash their pages are write-protected in both views of that memory
+(0x80000000 and the tiled alias at 0xF0000000). The first write faults, the
+handler reopens the page and stamps it, and a texture is reused only while
+none of its pages (or its palette's) were written after its own stamp. No
+write can be missed, unlike the sampled probe that checked static textures
+before. Kernel-mode writes (ReadFile into guest memory) do not fault, so the
+xboxrecomp runtime calls a hook around them (fork commit aa0fa6d). Textures
+that changed lately, or whose pages the game rewrites every frame with the same
+bytes, stay on the previous hashing scheme.
+
+Switches: `RECOMP_HLE_NO_TEXWATCH=1` restores the previous scheme;
+`RECOMP_HLE_TEXWATCH_CHECK=1` also hashes every texture the watch calls
+unchanged and logs any difference as `MISS`; `RECOMP_HLE_AB=2` alternates only
+this change every 600 frames; `RECOMP_HLE_TEXWATCH_LOG=<n>` logs who writes
+watched pages. Linux builds keep the hashing scheme.
+
+Same machine and settings as below (RTX 3050 Laptop, 1080p, VSync and limit
+off, monitor 1), interleaved 600-frame windows in one session, gameplay windows
+only (≥250 draws/frame for Street 1, ≥200 for Street 2):
+
+| Run | Windows off / on | Draw time per frame | Throughput |
+|---|---:|---:|---:|
+| Street 1 (attract-mode match) | 6 / 9 | 1.006 → 0.848 ms (−16%) | 153.9 → 155.8 fps |
+
+Check-mode runs in a match: 0 misses for both games (Street 1 ~110k frames,
+Street 2 ~19k frames). Screens captured with and without the watch show the
+same rendering (menus, matches, HUD, replay).
+
 # Renderer update — 2026-10-22
 
 The native renderer now avoids rebinding unchanged D3D11 state and uploading
