@@ -94,6 +94,7 @@ def main():
     parser.add_argument('--reuse-generated', action='store_true', help='Reuse this local directory after a completed generation')
     parser.add_argument('--dxvk-native-dir', type=Path)
     parser.add_argument('--vkd3d-dir', type=Path)
+    parser.add_argument('--dxmt-dir', type=Path, help='macOS: DXMT prefix from tools/macos/build-deps.sh')
     args = parser.parse_args()
     assets = args.game_files.resolve()
     xbe = assets / 'default.xbe'
@@ -125,6 +126,10 @@ def main():
         configure.append('-DDXVK_NATIVE_DIR=' + str(args.dxvk_native_dir.resolve()))
     if args.vkd3d_dir:
         configure.append('-DVKD3D_DIR=' + str(args.vkd3d_dir.resolve()))
+    if sys.platform == 'darwin':
+        if not (args.dxmt_dir and args.vkd3d_dir):
+            raise ValueError('macOS: pass --dxmt-dir and --vkd3d-dir (see MACOS.md)')
+        configure += ['-DDXMT_DIR=' + str(args.dxmt_dir.resolve()), '-DCMAKE_OSX_ARCHITECTURES=x86_64']
     run(configure, ROOT, env)
     run([cmake, '--build', local / 'build', '--parallel', '4', '--target', 'fifastreet_recomp'], ROOT, env)
     print('Built privately in', local / 'build')

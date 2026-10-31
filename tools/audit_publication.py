@@ -7,7 +7,7 @@ import subprocess
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-ALLOWED = {'.c', '.h', '.inc', '.hlsl', '.cmake', '.txt', '.md', '.py', '.json', '.cmd', '.sh', '.yml', '.yaml'}
+ALLOWED = {'.c', '.h', '.m', '.inc', '.hlsl', '.cmake', '.txt', '.md', '.py', '.json', '.cmd', '.sh', '.yml', '.yaml'}
 ROOT_FILES = {'.gitignore', '.gitmodules', 'LICENSE', 'NOTICE', 'requirements.txt'}
 FORBIDDEN_PARTS = {'.local', 'game_files', 'gen', 'output', 'fixtures', '__pycache__', 'build', 'dist'}
 MAGIC = (b'MZ', b'XBEH', b'\x7fELF', b'PK\x03\x04', b'\x89PNG\r\n\x1a\n', b'RIFF', b'DDS ')

@@ -17,7 +17,7 @@ An experimental original-Xbox FIFA Street port built through static recompilatio
 - Native audio: DirectSound reimplemented in C with its own mixer, output through XAudio2 (Windows) or SDL2 (Linux).
 - Native controllers: the XInput API reimplemented in C on host pads (XInput/SDL) and the keyboard; no USB stack.
 - Game threads run in parallel on the host CPU, with heap and stream code serialized (`RECOMP_GUEST_SMP=1`).
-- Windows x64 and Linux x64 build paths.
+- Windows x64 and Linux x64 build paths. Experimental [macOS](MACOS.md) build files are included; they have not been compiled or run yet.
 - Resolution presets from 720p to 8K, or your monitor's resolution. Performance depends on hardware, scene and build; 4K/60 is not a universal guarantee.
 - The game's own 16:9 widescreen mode; other display shapes use letterboxing. Additional aspect settings remain experimental.
 - In-game settings with **F1**: display mode, monitor, refresh rate, VSync, frame limit, resolution, aspect ratio, graphics API, GPU, game language (English / Spanish on the USA disc; English / French / German on the European disc), FXAA, MSAA (off, 2x/4x/8x or the 2x the Xbox game asks for), anisotropic filtering and volume.
@@ -114,6 +114,10 @@ python3 tools/play.py --game-files game_files
 ```
 
 The DXVK prefix must contain `include/dxvk` and `lib/libdxvk_d3d11.so`, `lib/libdxvk_dxgi.so` (including their `.so.0` files). The vkd3d prefix must contain the headers and `lib/libvkd3d-shader.so.1`. Mac support is not provided.
+
+## Build on macOS
+
+Experimental and not compiled or run yet: see [MACOS.md](MACOS.md).
 
 ## Keyboard controls
 
