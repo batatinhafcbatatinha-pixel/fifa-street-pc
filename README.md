@@ -83,6 +83,10 @@ python street1/project/tools/fifa_setup.py install --iso "/path/to/your-disc.iso
 
 Use `.local/disc/game_files` instead of `game_files` in the build and launch commands below. Do not upload the ISO, extracted files, local analysis output, generated C, caches or compiled game executable to GitHub.
 
+## Controllers
+
+Xbox pads use XInput. On Windows, `SDL3.dll` next to the executable adds every other pad SDL knows: DualShock 3/4, DualSense, Switch pads, USB adapters for PS2 and original Xbox pads. `tools/build_local.py` downloads it with `gamecontrollerdb.txt` (both zlib license); `tools/fetch_pad_support.py` does the same for a manual build. Without those files the port behaves as before. No PlayStation pad or adapter has been tried on real hardware yet.
+
 ## Build on Windows
 
 Install Python 3.10+ (with Tkinter), Visual Studio 2022 Build Tools with the C++ workload and Windows SDK, LLVM/Clang, CMake and Ninja. The scripts discover installed tools; they do not install system dependencies.

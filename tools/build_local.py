@@ -132,6 +132,9 @@ def main():
         configure += ['-DDXMT_DIR=' + str(args.dxmt_dir.resolve()), '-DCMAKE_OSX_ARCHITECTURES=x86_64']
     run(configure, ROOT, env)
     run([cmake, '--build', local / 'build', '--parallel', '4', '--target', 'fifastreet_recomp'], ROOT, env)
+    if os.name == 'nt':
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        __import__('fetch_pad_support').install(local / 'build', sdl3=True)
     print('Built privately in', local / 'build')
     print('Run from the folder containing game_files, following README.md. Do not upload the generated code or executable.')
 

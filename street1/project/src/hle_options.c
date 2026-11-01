@@ -29,6 +29,8 @@
 #include <math.h>
 #ifdef _WIN32
 #include <xinput.h>
+DWORD xbox_InputGetRaw(DWORD port, XINPUT_STATE *out);   /* xinput_device.c: XInput or SDL pads */
+#define pad_get_state xbox_InputGetRaw
 
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "gdi32.lib")
@@ -63,6 +65,7 @@
 typedef struct { WORD wButtons; BYTE bLeftTrigger, bRightTrigger; SHORT sThumbLX, sThumbLY, sThumbRX, sThumbRY; } XINPUT_GAMEPAD;
 typedef struct { DWORD dwPacketNumber; XINPUT_GAMEPAD Gamepad; } XINPUT_STATE;
 
+#define pad_get_state XInputGetState
 /* The menu's view of controller i, as XInput would give it. */
 static DWORD XInputGetState(DWORD i, XINPUT_STATE *st)
 {
@@ -1126,7 +1129,7 @@ static WORD pads_read(int probe_all)
         XINPUT_STATE st;
         if (!s_pad_seen[i] && !probe_all && (s_pad_probe % 240u) != (unsigned)i * 60u)
             continue;
-        if (XInputGetState((DWORD)i, &st) != ERROR_SUCCESS) {
+        if (pad_get_state((DWORD)i, &st) != ERROR_SUCCESS) {
             s_pad_seen[i] = 0;
             continue;
         }
