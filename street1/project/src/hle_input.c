@@ -286,8 +286,43 @@ static void input_00270234(void)
 
 /* XINPUT_STATE: dwPacketNumber, then XINPUT_GAMEPAD = report bytes 2..19.
  * The packet number moves only when the state does, as on the console. */
+/* The F1 menu lives in another module and publishes its vibration option as a process variable. The game may
+ * not call again while a motor runs, so a change also stops or restarts the motors. */
+static int s_vibration_off;
+
+static void vibration_refresh(void)
+{
+    static unsigned polls;
+    int off, port;
+    if (polls++ & 31)
+        return;
+#ifdef _WIN32
+    {
+        char v[8] = "";
+        GetEnvironmentVariableA("XBOX_VIBRATION_OFF", v, sizeof v);
+        off = v[0] == '1';
+    }
+#else
+    {
+        const char *e = getenv("XBOX_VIBRATION_OFF");
+        off = e && e[0] == '1';
+    }
+#endif
+    if (off == s_vibration_off)
+        return;
+    s_vibration_off = off;
+    for (port = 0; port < NPORTS; port++)
+        if (s_port[port].open && (s_port[port].rumble_l || s_port[port].rumble_r)) {
+            HostVibration v;
+            v.left = off ? 0 : s_port[port].rumble_l;
+            v.right = off ? 0 : s_port[port].rumble_r;
+            xbox_InputSetState((DWORD)port, &v);
+        }
+}
+
 static void input_0027040C(void)
 {
+    vibration_refresh();
     uint8_t rep[20];
     uint32_t st, i;
     int port;
@@ -360,7 +395,8 @@ static void input_0027047F(void)
         if (v.left != p->rumble_l || v.right != p->rumble_r) {
             p->rumble_l = v.left;
             p->rumble_r = v.right;
-            xbox_InputSetState((DWORD)port, &v);
+            if (!s_vibration_off)
+                xbox_InputSetState((DWORD)port, &v);
         }
     }
     ev = MEM32(fb + 4);

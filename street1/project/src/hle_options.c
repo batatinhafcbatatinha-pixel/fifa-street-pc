@@ -143,6 +143,15 @@ static const int k_msaa[] = { 0, -1, 2, 4, 8 };
 
 /* ------------------------------------------------------------- ini file */
 
+static void vibration_publish(void)
+{
+#ifdef _WIN32
+    SetEnvironmentVariableA("XBOX_VIBRATION_OFF", g_opt.vibration ? "0" : "1");
+#else
+    setenv("XBOX_VIBRATION_OFF", g_opt.vibration ? "0" : "1", 1);
+#endif
+}
+
 static int ini_get(const wchar_t *key, int def)
 {
     wchar_t b[32];
@@ -184,6 +193,7 @@ static void save_ini(void)
     ini_put(L"gpu", g_opt.adapter);
     ini_put(L"idioma", g_opt.language);
     ini_put(L"volume", g_opt.volume);
+    ini_put(L"vibracao", g_opt.vibration);
     ini_put(L"idioma_menu", g_opt.ui_language);
 }
 
@@ -320,6 +330,8 @@ void hle_options_init(void)
                 g_opt.language = want;
     }
     g_opt.volume = clampi(ini_get(L"volume", 100), 0, 100);
+    g_opt.vibration = clampi(ini_get(L"vibracao", 1), 0, 1);
+    vibration_publish();
     g_opt.ui_language = clampi(ini_get(L"idioma_menu", 1), 0, 1);
 
     /* RECOMP_HLE_RES: the preset a restart from the menu asked for. A bare
@@ -784,7 +796,7 @@ void hle_options_apply_display(uint32_t pw, uint32_t ph)
 
 enum {
     IT_DISPLAY, IT_MONITOR, IT_REFRESH, IT_VSYNC, IT_FPS, IT_SCALE, IT_ASPECT, IT_AA, IT_MSAA, IT_ANISO,
-    IT_API, IT_GPU, IT_UI_LANG, IT_LANG, IT_VOLUME, IT_RESUME, IT_RESTART, IT_QUIT, IT_COUNT
+    IT_API, IT_GPU, IT_UI_LANG, IT_LANG, IT_VOLUME, IT_VIBRATION, IT_RESUME, IT_RESTART, IT_QUIT, IT_COUNT
 };
 
 static volatile LONG s_request;             /* asked to open (window thread or pad) */
@@ -964,6 +976,7 @@ static void change(int it, int d)
         g_opt.language = cycle(list, n, g_opt.language, d);
         break;
     case IT_VOLUME: g_opt.volume = clampi(g_opt.volume + 10 * d, 0, 100); break;
+    case IT_VIBRATION: g_opt.vibration = !g_opt.vibration; vibration_publish(); break;
     }
     s_dirty = 1;
 }
@@ -1829,6 +1842,10 @@ static void item_text(int it, wchar_t *label, wchar_t *value, int *greyed)
         wcscpy(label, ui_text(L"Idioma do jogo", L"Game language"));
         wcscpy(value, language_name(g_opt.language));
         break;
+    case IT_VIBRATION:
+        wcscpy(label, ui_text(L"Vibração do controle", L"Controller vibration"));
+        wcscpy(value, g_opt.vibration ? ui_text(L"Ligada", L"On") : ui_text(L"Desligada", L"Off"));
+        break;
     case IT_VOLUME:
         wcscpy(label, L"Volume");
         swprintf(value, 128, L"%d%%", g_opt.volume);
@@ -1860,6 +1877,7 @@ static const wchar_t *item_help(int it)
     case IT_UI_LANG: return ui_text(L"Idioma deste menu de configurações. A mudança é imediata.", L"Language of this settings menu. Changes apply immediately.");
     case IT_LANG: return ui_text(L"Idioma dos textos e narração do jogo.", L"Game language supported by the installed game resources.");
     case IT_VOLUME: return ui_text(L"Volume geral do jogo.", L"Overall game volume.");
+    case IT_VIBRATION: return ui_text(L"Liga ou desliga a vibração do controle.", L"Turns the controller's vibration on or off.");
     case IT_RESUME: return ui_text(L"Salva e volta para onde você estava.", L"Saves settings and returns to the game.");
     case IT_RESTART: return ui_text(L"Fecha e abre o jogo de novo com as opções marcadas com *.", L"Restarts the game to apply settings marked with *.");
     case IT_QUIT: return ui_text(L"Salva as configurações e fecha o jogo.", L"Saves settings and quits the game.");
