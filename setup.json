@@ -1,0 +1,38 @@
+{
+  "game": "FIFA Street",
+  "disc": "original Xbox, USA or Europe",
+  "play": "Play-FIFA-Street.cmd",
+  "disk_gb": 8,
+  "download_gb": 1,
+  "minutes": "20-60",
+  "tools": [
+    "llvm",
+    "cmake",
+    "ninja"
+  ],
+  "gb_per_job": 2,
+  "requirements": "requirements.txt",
+  "steps": [
+    {
+      "name": "Translate the game code and compile",
+      "run": [
+        "{python}",
+        "tools/build_local.py",
+        "--game-files",
+        "{game_files}"
+      ],
+      "reuse_if": ".local/generation-complete.json",
+      "reuse_arg": "--reuse-generated"
+    }
+  ],
+  "submodules": {
+    "tools/port-installer": {
+      "url": "https://github.com/batatinhafcbatatinha-pixel/port-installer.git",
+      "commit": "225df3dc28e697a19d5edb3ac58e0d532496619b"
+    },
+    "xboxrecomp": {
+      "url": "https://github.com/batatinhafcbatatinha-pixel/xboxrecomp.git",
+      "commit": "b27d2e85935b9aed4bf6870099657e1aac0a4d62"
+    }
+  }
+}
